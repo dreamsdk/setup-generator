@@ -18,9 +18,9 @@
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 #define SourceDirectory "C:\dcsdk\"
 
-#include "utils.iss"
-#include "helpers.iss"
-#include "environ.iss"
+#include "inc/utils.iss"
+#include "inc/helpers.iss"
+#include "inc/environ.iss"
 
 [Setup]
 AppId={{DF847892-5D85-4FFA-8603-E71750D81602}
