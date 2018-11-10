@@ -41,6 +41,7 @@ DisableWelcomePage=False
 UninstallDisplayIcon={app}\dreamsdk.exe
 UninstallFilesDir={app}\uninst
 ChangesEnvironment=True
+WizardSmallImageFile=E:\projects\dreamsdk\setup\rsrc\dreamsdk-48.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -62,7 +63,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{#AppMainExeName}"; WorkingDir:
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
 
 [Run]
-Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"
+Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
 AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable (recommended)
