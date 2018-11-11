@@ -45,7 +45,7 @@ UninstallDisplayIcon={uninstallexe}
 UninstallFilesDir={app}\uninst
 ChangesEnvironment=True
 WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
-WizardImageFile=..\rsrc\banner.bmp
+WizardImageFile=..\rsrc\banner\banner.bmp
 SetupIconFile=..\rsrc\package\setup.ico
 AppCopyright={#MyAppCopyright}
 UninstallDisplayName={#MyAppName}
@@ -54,9 +54,10 @@ VersionInfoCompany={#MyAppPublisher}
 VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductTextVersion={#MyAppVersion}
+VersionInfoDescription={#MyAppName} Setup
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"
+Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
 
 [Tasks]
 Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}" 
@@ -72,7 +73,7 @@ Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; Working
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; Comment: "{cm:UninstallPackage}"
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
+Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
 
 [Run]
 Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
@@ -122,7 +123,7 @@ begin
   end;
 
   // Patch fstab and setup KallistiOS.
-  if (CurPageID = wpFinished) then
+  if (CurPageID = wpInfoAfter) then
     FinalizeSetup;
 end;
 

@@ -104,8 +104,7 @@ end;
 
 procedure PatchMountPoint;
 var
-  Temp, InstallPath, fstabFileName: String;
-  Buffer: TStringList;
+  InstallPath, fstabFileName: String;
 
 begin
   InstallPath := ExpandConstant('{app}');
