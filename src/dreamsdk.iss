@@ -80,6 +80,7 @@ Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainNam
 
 [Run]
 Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
+Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
 
 [CustomMessages]
 AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
@@ -104,7 +105,7 @@ LogAddPathVariableSuccess=The [%s] added to PATH: [%s]
 LogAddPathVariableFailed=Error while adding the [%s] to PATH: [%s]
 LogRemovePathVariableSuccess=The [%s] removed from PATH: [%s]
 LogRemovePathVariableFailed=Error while removing the [%s] from PATH: [%s]
-LicenseInformation=License Information
+LicenseInformation={#MyAppName} Licenses Information
 
 [Code]
 function InitializeSetup: Boolean;

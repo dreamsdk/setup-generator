@@ -120,7 +120,7 @@ var
 
 begin
   ManagerFileName := ExpandConstant('{#AppManagerExeName}');
-  if not Exec(ManagerFileName, '--post-install', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
+  if not ExecAsOriginalUser(ManagerFileName, '--post-install', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
     MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
 end;
 
