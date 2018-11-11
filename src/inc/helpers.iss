@@ -125,11 +125,6 @@ begin
     MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
 end;
 
-function GeneratePackageDateTimeStamp: String;
-begin
-  Result := GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
-end;
-
 procedure SetPackageVersion;
 var
   VersionFileName: String;
@@ -137,7 +132,7 @@ var
 begin
   VersionFileName := ExpandConstant('{#AppMainDirectory}\' + 'VERSION');
   PatchFile(VersionFileName, '(RELEASE)', '{#MyAppVersion}');  
-  PatchFile(VersionFileName, '(DATE)', GeneratePackageDateTimeStamp);
+  PatchFile(VersionFileName, '(DATE)', '{#BuildDateTime}');
 end;
 
 procedure FinalizeSetup;
@@ -145,4 +140,41 @@ begin
   SetPackageVersion;
   PatchMountPoint;
   SetupDreamSDK;
+end;
+// https://stackoverflow.com/a/39291592/3726096
+function CheckInternetConnection: Boolean;
+var
+  WinHttpReq: Variant;
+  Connected: Boolean;
+
+begin
+  Connected := False;
+  repeat
+    Log(CustomMessage('LogCheckingConnection'));
+    try
+      WinHttpReq := CreateOleObject('WinHttp.WinHttpRequest.5.1');
+      WinHttpReq.Open('GET', '{#MyAppURL}', False);
+      WinHttpReq.Send('');
+      Log(Format(CustomMessage('LogInternetConnectionAvailable'), [WinHttpReq.Status, WinHttpReq.StatusText]));
+      Connected := True;
+    except
+      Log(Format(CustomMessage('LogInternetConnectionNotAvailable'), [GetExceptionMessage]));
+      if WizardSilent then
+      begin
+        Log(CustomMessage('LogInternetConnectionNotAvailableAbortSilent'));
+        Result := False;
+        Exit;
+      end
+      else 
+        if MsgBox(CustomMessage('InactiveInternetConnection'), mbError, MB_RETRYCANCEL) = IDRETRY then
+          Log(CustomMessage('LogInternetConnectionRetry'))
+        else
+        begin
+          Log(CustomMessage('LogInternetConnectionAbort'));
+          Result := False;
+          Exit;
+        end;
+    end;
+  until Connected;
+  Result := True;
 end;

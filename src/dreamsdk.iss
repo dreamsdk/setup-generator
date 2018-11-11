@@ -18,6 +18,8 @@
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 #define SourceDirectory "C:\dcsdk\"
 
+#define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
+
 #include "inc/utils.iss"
 #include "inc/helpers.iss"
 #include "inc/environ.iss"
@@ -41,7 +43,7 @@ DisableWelcomePage=False
 UninstallDisplayIcon={app}\dreamsdk.exe
 UninstallFilesDir={app}\uninst
 ChangesEnvironment=True
-WizardSmallImageFile=E:\projects\dreamsdk\setup\rsrc\dreamsdk-48.bmp
+WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -55,18 +57,18 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Source: "{#SourceDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
-Name: "{group}\{#AppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
+Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
+Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; Comment: "{cm:UninstallPackage}"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
+Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
 
 [Run]
 Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
-AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable (recommended)
+AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
 ExecuteMainApplication=Start a new {#FullAppMainName} session.
 ExecuteManagerApplication=Configure and manage your {#MyAppName} installation.
 DocumentationGroupDirectory=Documentation
@@ -77,6 +79,17 @@ PrerequisiteMissingGit=Git
 PrerequisiteMissingSubversion=Subversion (SVN)
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 UninstallPackage=Remove {#MyAppName} from your computer.
+InactiveInternetConnection=The {#MyAppName} setup process need to be connected to Internet, as some critical components are downloaded at the installation's end. Please check your Internet connection and click the Retry button or click the Cancel button to exit the installer.
+LogCheckingConnection=Checking connection to the server
+LogInternetConnectionAvailable=Connected to the server; status: %s %s
+LogInternetConnectionNotAvailable=Error connecting to the server: %s
+LogInternetConnectionNotAvailableAbortSilent=Connection to the server is not available, aborting silent installation
+LogInternetConnectionRetry=Retrying
+LogInternetConnectionAbort=Aborting
+LogAddPathVariableSuccess=The [%s] added to PATH: [%s]
+LogAddPathVariableFailed=Error while adding the [%s] to PATH: [%s]
+LogRemovePathVariableSuccess=The [%s] removed from PATH: [%s]
+LogRemovePathVariableFailed=Error while removing the [%s] from PATH: [%s]
 
 [Code]
 function InitializeSetup: Boolean;
@@ -84,6 +97,7 @@ begin
   Result := CheckPrerequisites;
   if not Result then        
     MsgBox(GeneratePrerequisiteMessage, mbError, MB_OK);
+  Result := Result and CheckInternetConnection;      
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
