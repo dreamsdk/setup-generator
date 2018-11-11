@@ -44,6 +44,8 @@ UninstallDisplayIcon={app}\dreamsdk.exe
 UninstallFilesDir={app}\uninst
 ChangesEnvironment=True
 WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
+WizardImageFile=..\rsrc\banner.bmp
+SetupIconFile=..\rsrc\package\setup.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
