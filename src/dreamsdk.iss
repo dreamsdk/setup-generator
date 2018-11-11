@@ -4,6 +4,7 @@
 #define MyAppVersion "R1"
 #define MyAppPublisher "The DreamSDK Team"
 #define MyAppURL "http://dreamsdk.sizious.com/"
+#define MyAppCopyright "© Copyleft 2018"
 
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
@@ -40,15 +41,22 @@ OutputBaseFilename={#OutputBaseFileName}
 Compression=none
 SolidCompression=True
 DisableWelcomePage=False
-UninstallDisplayIcon={app}\dreamsdk.exe
+UninstallDisplayIcon={uninstallexe}
 UninstallFilesDir={app}\uninst
 ChangesEnvironment=True
 WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
 WizardImageFile=..\rsrc\banner.bmp
 SetupIconFile=..\rsrc\package\setup.ico
+AppCopyright={#MyAppCopyright}
+UninstallDisplayName={#MyAppName}
+VersionInfoVersion=1.0.0.0
+VersionInfoCompany={#MyAppPublisher}
+VersionInfoCopyright={#MyAppCopyright}
+VersionInfoProductName={#MyAppName}
+VersionInfoProductTextVersion={#MyAppVersion}
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"
 
 [Tasks]
 Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}" 
