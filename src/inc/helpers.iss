@@ -110,7 +110,8 @@ begin
   InstallPath := ExpandConstant('{app}');
   StringChangeEx(InstallPath, '\', '/', True);
   fstabFileName := ExpandConstant('{app}\msys\1.0\etc\fstab');
-  PatchFile(fstabFileName, '{app}', InstallPath); 
+  PatchFile(fstabFileName, '{app}', InstallPath);
+  PatchFile(fstabFileName + '.sample', '{app}', InstallPath); 
 end;
 
 procedure SetupDreamSDK;
