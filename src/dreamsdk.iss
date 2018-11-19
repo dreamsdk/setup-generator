@@ -18,7 +18,7 @@
 #define AppSupportDirectory "{app}\support\"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
-#define SourceDirectory "C:\dcsdk\"
+#define SourceDirectory "C:\dcsdk"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
