@@ -6,6 +6,8 @@
 #define MyAppURL "http://dreamsdk.sizious.com/"
 #define MyAppCopyright "© Copyleft 2018"
 
+#define PackageVersion "1.0.0.20181123"
+
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
 
@@ -50,7 +52,7 @@ WizardImageFile=..\rsrc\banner\banner.bmp
 SetupIconFile=..\rsrc\package\setup.ico
 AppCopyright={#MyAppCopyright}
 UninstallDisplayName={#MyAppName}
-VersionInfoVersion=1.0.0.0
+VersionInfoVersion={#PackageVersion}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
