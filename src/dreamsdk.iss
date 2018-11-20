@@ -7,6 +7,7 @@
 #define MyAppCopyright "© Copyleft 2018"
 
 #define PackageVersion "1.0.0.20181123"
+#define ProductVersion "1.0.0.0"
 
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
@@ -58,6 +59,7 @@ VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductTextVersion={#MyAppVersion}
 VersionInfoDescription={#MyAppName} Setup
+VersionInfoProductVersion={#ProductVersion}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
