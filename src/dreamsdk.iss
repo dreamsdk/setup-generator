@@ -6,7 +6,7 @@
 #define MyAppURL "http://dreamsdk.sizious.com/"
 #define MyAppCopyright "© Copyleft 2018"
 
-#define PackageVersion "1.0.0.20181123"
+#define PackageVersion "1.0.0.0"
 #define ProductVersion "1.0.0.0"
 
 #define AppMainName "Shell"
