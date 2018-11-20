@@ -111,7 +111,7 @@ LicenseInformation={#MyAppName} Licenses Information
 ProgramHelp={#MyAppName} Help
 
 [Registry]
-Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype
+Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
 [Code]
 function InitializeSetup: Boolean;
