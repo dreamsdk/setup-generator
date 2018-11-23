@@ -117,6 +117,9 @@ ProgramHelp={#MyAppName} Help
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
+
 [Code]
 function InitializeSetup: Boolean;
 begin
