@@ -120,6 +120,9 @@ Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environm
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
 
+[InstallDelete]
+Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
+
 [Code]
 function InitializeSetup: Boolean;
 begin
