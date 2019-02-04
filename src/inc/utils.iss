@@ -1,7 +1,11 @@
 [Code]
 const
   sLineBreak = #13#10;
-  
+  MAX_RAND_SEED = $FFFFFFFF;  
+
+var
+  BrowseForFolderExFakePage: TInputDirWizardPage;
+    
 // Thanks Michel (Phidels.com)
 function Left(SubStr, S: String): String;
 begin
@@ -29,11 +33,12 @@ end;
 function AdjustLineBreaks(const S: String): String;
 begin
   Result := S;
-  StringChangeEx(Result, #10, sLineBreak, True);
+  if (Pos(sLineBreak, Result) = 0) and (Pos(#10, Result) > 0) then
+    StringChangeEx(Result, #10, sLineBreak, True);
 end;
 
 // https://stackoverflow.com/a/1282143/3726096
-function StartsWith( const AMatchStr, ATestStr : string ) : Boolean;
+function StartsWith(const AMatchStr, ATestStr : String) : Boolean;
 begin
   Result := AMatchStr = Copy( ATestStr, 1, Length( AMatchStr ));
 end;
@@ -60,4 +65,48 @@ begin
       Buffer.Free;
     end;
   end;
+end;
+
+function CreateBrowseForFolderExFakePage: Integer;
+begin
+  // Create BrowseForFolderExFakePage
+  BrowseForFolderExFakePage := CreateInputDirPage(wpWelcome, '', '', '', False, SetupMessage(msgButtonNewFolder));
+  BrowseForFolderExFakePage.Add('');
+  Result := BrowseForFolderExFakePage.ID;
+end;
+
+procedure BrowseForFolderEx(var Directory: String);
+begin
+  BrowseForFolderExFakePage.Values[0] := Directory;
+  BrowseForFolderExFakePage.Buttons[0].OnClick(BrowseForFolderExFakePage.Buttons[0]);
+  Directory := BrowseForFolderExFakePage.Values[0];
+end;
+
+function RunCommand(const CommandLine: String): String;
+var
+  TmpFileName, Executable, RealCommandLine: String;
+  ExecBuffer: AnsiString;
+  ResultCode: Integer; 
+
+begin
+  Executable := ExpandConstant('{cmd}');
+  TmpFileName := Format('%s\%.8x.tmp', [ExpandConstant('{tmp}'), Random(MAX_RAND_SEED)]);  
+  RealCommandLine := Format('/C "%s > %s 2>&1"', [CommandLine, TmpFileName]);
+  
+  Log(Executable + ' ' + RealCommandLine);
+
+  if not Exec(Executable, RealCommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    Log(CustomMessage('LogRunCommandError'));
+  
+  if LoadStringFromFile(TmpFileName, ExecBuffer) then
+  begin
+    ExecBuffer := AdjustLineBreaks(ExecBuffer);
+    Result := ExecBuffer;
+    Log(Result);
+  end
+  else
+    Log(CustomMessage('LogRunCommandNoOutputError'));
+  
+  if FileExists(TmpFileName) then
+    DeleteFile(TmpFileName);
 end;

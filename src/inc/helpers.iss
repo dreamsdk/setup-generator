@@ -55,6 +55,7 @@ begin
   begin
     ExecBuffer := AdjustLineBreaks(ExecBuffer);
     Result := Trim(ExtractStr(ExtractionTag, sLineBreak, ExecBuffer));
+    Log(Format(CustomMessage('LogPrerequisiteVersion'), [PrerequisiteName, Result]));
   end;
   
   if FileExists(TmpFileName) then
