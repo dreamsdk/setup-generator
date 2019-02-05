@@ -1,13 +1,15 @@
 ; DreamSDK Inno Setup Script
 #define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
 #define MyAppName "DreamSDK"
-#define MyAppVersion "R2-dev"
+#define MyAppVersion "R2"
 #define MyAppPublisher "The DreamSDK Team"
 #define MyAppURL "http://dreamsdk.sizious.com/"
 #define MyAppCopyright "© Copyleft 2019"
 
-#define PackageVersion "1.1.0.0"
-#define ProductVersion "1.1.0.0"
+#define MyAppNameHelp MyAppName + " Help"
+
+#define PackageVersion "2.0.0.0"
+#define ProductVersion "2.0.0.0"
 
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
@@ -15,14 +17,15 @@
 #define FullAppMainName MyAppName + " " + AppMainName
 #define FullAppManagerName MyAppName + " " + AppManagerName
 
-#define AppMainDirectory "{app}\msys\1.0\opt\dreamsdk\"
+#define AppMainDirectory "{app}\msys\1.0\opt\dreamsdk"
 #define AppMainExeName AppMainDirectory + "\dreamsdk.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
-#define AppSupportDirectory "{app}\support\"
-#define AppSupportIntegrationDirectory AppSupportDirectory + "ide\"
+#define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
+#define AppSupportDirectory "{app}\support"
+#define AppSupportIntegrationDirectory AppSupportDirectory + "\ide"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
-#define SourceDirectory "C:\dcsdk"
+#define SourceDirectory "C:\dcsdk(FAKE)"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
@@ -31,7 +34,7 @@
 #define IdeCodeBlocksVerName IdeCodeBlocksName + " " + IdeCodeBlocksVersion
 
 #define PSVinceLibraryFileName "psvince.dll"
-#define PSVinceLibrary AppSupportDirectory + PSVinceLibraryFileName
+#define PSVinceLibrary AppSupportDirectory + "\" + PSVinceLibraryFileName
 
 #include "inc/utils.iss"
 #include "inc/helpers.iss"
@@ -52,9 +55,9 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-;Compression=lzma2/ultra64
-Compression=none
-SolidCompression=True
+Compression=lzma2/ultra64
+;Compression=none
+SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}uninst.ico
 UninstallFilesDir={#AppSupportDirectory}
@@ -81,25 +84,26 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "{#SourceDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
+Source: "..\rsrc\ide\codeblocks.bmp"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
-Source: "..\rsrc\ide\codeblocks.bmp"; Flags: dontcopy noencryption
-Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
+Source: "{#SourceDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppMainDirectory}\dreamsdk.chm"
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
 Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
 
 [Run]
 Filename: "{#AppManagerExeName}"; Parameters: "--first-run --directory ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
-Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
+Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(MyAppNameHelp, '&', '&&')}}"
+;Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
 AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
@@ -114,22 +118,8 @@ PrerequisiteMissingSubversion=Subversion Client (SVN)
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 UninstallPackage=Remove {#MyAppName} from your computer
 InactiveInternetConnection=The {#MyAppName} Setup need to be connected to Internet, as some critical components are downloaded at the installation's end. Please check your Internet connection and click the Retry button or click the Cancel button to exit the installer.
-LogCheckingConnection=Checking connection to the server
-LogInternetConnectionAvailable=Connected to the server; status: %s %s
-LogInternetConnectionNotAvailable=Error connecting to the server: %s
-LogInternetConnectionNotAvailableAbortSilent=Connection to the server is not available, aborting silent installation
-LogInternetConnectionRetry=Retrying
-LogInternetConnectionAbort=Aborting
-LogAddPathVariableSuccess=The [%s] added to PATH: [%s]
-LogAddPathVariableFailed=Error while adding the [%s] to PATH: [%s]
-LogRemovePathVariableSuccess=The [%s] removed from PATH: [%s]
-LogRemovePathVariableFailed=Error while removing the [%s] from PATH: [%s]
-LogShouldSkipPageIDE=Should Skip Page IDE: %d
-LogRunCommandError=Run Command Error!
-LogRunCommandNoOutputError=Run Command No Output Error!
-LogPrerequisiteVersion=Prerequisite %s version: %s.
-LicenseInformation={#MyAppName} Licenses Information
-ProgramHelp={#MyAppName} Help
+LicenseInformation={#MyAppName} License Information
+ProgramHelp={#MyAppNameHelp}
 ComponentMainFiles=Program files (Required)
 ComponentAdditionalTools=Additional tools
 ComponentIDE={#IdeCodeBlocksVerName} integrationCodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
@@ -146,7 +136,7 @@ CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
 PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
 PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x). You should restart your computer and run Setup again. Continue anyway?
-VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, please uninstall it manually first.
+VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, it need to be uninstalled first. Continue anyway?
 NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newer that the version provided in this package (%s). Setup will exit now.
 PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
 
@@ -161,7 +151,7 @@ Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
 
 [Components]
 Name: "main"; Description: "{cm:ComponentMainFiles}"; Types: full compact custom; Flags: fixed
-Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
+Name: "ide"; Description: "{cm:ComponentIDE}"; ExtraDiskSpaceRequired: 52428800; Types: full
 ;Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
 
 [Code]
@@ -300,7 +290,7 @@ begin
   if (PageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
   begin
     Result := not IsCodeBlocksIntegrationEnabled;
-    Log(Format(CustomMessage('LogShouldSkipPageIDE'), [Result]));
+    Log(Format('Should Skip Page IDE: %d', [Result]));
   end;
 end;
 

@@ -131,15 +131,31 @@ begin
     UninstallParameters := Trim(UninstallParameters); 
   end;
 end;
+
+function UninstallPreviousVersion(RootKey: Integer; RegistryKey, OldVersion: String): Boolean;
+var
+  UninstallExecutable, 
+  UninstallParameters: String;
+  ErrorCode: Integer;
+
+begin
+  Result := True;
+  if GetUninstallCommand(RootKey, RegistryKey, UninstallExecutable, UninstallParameters) then
+  begin
+    Log(Format('UninstallExecutable: "%s", UninstallParameters: "%s"', [UninstallExecutable, UninstallParameters]));    
+    if not Exec(UninstallExecutable, UninstallParameters, '', SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
+      Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallFailed'), [OldVersion, ErrorCode]), mbError, MB_YESNO) = IDYES);
+  end
+  else
+    Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallUnableToGetCommand'), [OldVersion]), mbCriticalError, MB_YESNO) = IDYES);
+end;
              
 function HandlePreviousVersion(AppID, AppVersion: string): Boolean;
 var
   RootKey: Integer;
   RegistryKey,
-  OldVersion,
-  UninstallExecutable, 
-  UninstallParameters: String;
-  VersionCompareResult, ErrorCode: Integer;
+  OldVersion: String;
+  VersionCompareResult: Integer;
 
 begin
   Result := True;
@@ -161,23 +177,17 @@ begin
 
       VERSION_IDENTICAL: 
         begin
-          MsgBox(Format(CustomMessage('VersionAlreadyInstalled'), [OldVersion]), mbInformation, MB_OK);
-          Result := False;
+          Result := (MsgBox(Format(CustomMessage('VersionAlreadyInstalled'), [OldVersion]), mbConfirmation, MB_YESNO) = IDYES);
+          if Result then               
+            Result := UninstallPreviousVersion(RootKey, RegistryKey, OldVersion);
         end;
 
       VERSION_NEWER:
         begin
           Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstall'), [OldVersion]), mbConfirmation, MB_YESNO) = IDYES);
           if Result then               
-            if GetUninstallCommand(RootKey, RegistryKey, UninstallExecutable, UninstallParameters) then
-            begin
-              Log(Format('UninstallExecutable: "%s", UninstallParameters: "%s"', [UninstallExecutable, UninstallParameters]));    
-              if not Exec(UninstallExecutable, UninstallParameters, '', SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
-                Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallFailed'), [OldVersion, ErrorCode]), mbError, MB_YESNO) = IDYES);
-            end
-            else
-              Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallUnableToGetCommand'), [OldVersion]), mbCriticalError, MB_YESNO) = IDYES);            
-        end; // VERSION_NEWER
+            Result := UninstallPreviousVersion(RootKey, RegistryKey, OldVersion);           
+        end;
 
      end; // case
   end; // RegKeyExists

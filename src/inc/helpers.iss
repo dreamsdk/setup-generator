@@ -55,7 +55,7 @@ begin
   begin
     ExecBuffer := AdjustLineBreaks(ExecBuffer);
     Result := Trim(ExtractStr(ExtractionTag, sLineBreak, ExecBuffer));
-    Log(Format(CustomMessage('LogPrerequisiteVersion'), [PrerequisiteName, Result]));
+    Log(Format('Prerequisite %s version: %s.', [PrerequisiteName, Result]));
   end;
   
   if FileExists(TmpFileName) then
@@ -151,27 +151,27 @@ var
 begin
   Connected := False;
   repeat
-    Log(CustomMessage('LogCheckingConnection'));
+    Log('Checking connection to the server');
     try
       WinHttpReq := CreateOleObject('WinHttp.WinHttpRequest.5.1');
       WinHttpReq.Open('GET', '{#MyAppURL}', False);
       WinHttpReq.Send('');
-      Log(Format(CustomMessage('LogInternetConnectionAvailable'), [WinHttpReq.Status, WinHttpReq.StatusText]));
+      Log(Format('Connected to the server; status: %s %s', [WinHttpReq.Status, WinHttpReq.StatusText]));
       Connected := True;
     except
-      Log(Format(CustomMessage('LogInternetConnectionNotAvailable'), [GetExceptionMessage]));
+      Log(Format('Error connecting to the server: %s', [GetExceptionMessage]));
       if WizardSilent then
       begin
-        Log(CustomMessage('LogInternetConnectionNotAvailableAbortSilent'));
+        Log('Connection to the server is not available, aborting silent installation');
         Result := False;
         Exit;
       end
       else 
         if MsgBox(CustomMessage('InactiveInternetConnection'), mbError, MB_RETRYCANCEL) = IDRETRY then
-          Log(CustomMessage('LogInternetConnectionRetry'))
+          Log('Retrying')
         else
         begin
-          Log(CustomMessage('LogInternetConnectionAbort'));
+          Log('Aborting');
           Result := False;
           Exit;
         end;

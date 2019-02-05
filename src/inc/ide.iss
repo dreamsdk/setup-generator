@@ -4,13 +4,19 @@ type
 
 const
   CODEBLOCKS_SDK_DLL_SHA1 = 'bea660dd5dbfca817e6d06a0be04b2e7de5da34f';
-  CODEBLOCKS_SDK_DLL_NAME = 'codeblocks.dll';    
-  DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks\';
+  CODEBLOCKS_SDK_DLL_FILE = '\codeblocks.dll';    
+
+  DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
   DEFAULT_CB_CONFIG_FILE = '{userappdata}\CodeBlocks\default.conf';
-  CB_PATCH_DIR = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\';
-  CB_BACKUP_RESTORE_FILE = 'codeblocks-backup-restore.cmd';
-  CB_PATCHER_FILE = 'codeblocks-patcher.exe';
-  CB_INSTALL_DIR_STORE_FILE = 'cb.dat';
+  
+  CB_PATCH_DIR = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks';
+  
+  CB_BACKUP_RESTORE_FILE = '\codeblocks-backup-restore.cmd';
+  CB_PATCHER_FILE = '\codeblocks-patcher.exe';
+  
+  CB_INSTALL_DIR_STORE_FILE = '\..\ide.dat';
+  
+  CB_LIBINFO_DIR = '\share\CodeBlocks\templates\wizard\dc\libinfo';
 
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
@@ -44,6 +50,8 @@ begin
     LoadStringFromFile(CodeBlocksInstallationDirectoryStoreFile, Buffer);
     Result := Buffer;
   end;
+  
+  Result := RemoveBackslash(Result);
 end;
 
 function GetCodeBlocksConfigurationFile: String;
@@ -55,7 +63,7 @@ end;
 
 procedure SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory: String);
 begin
-  CodeBlocksBackupDirectory := ACodeBlocksBackupDirectory;
+  CodeBlocksBackupDirectory := RemoveBackslash(ACodeBlocksBackupDirectory);
   CodeBlocksInstallationDirectoryStoreFile := CodeBlocksBackupDirectory 
     + CB_INSTALL_DIR_STORE_FILE;
 end;
@@ -99,10 +107,12 @@ var
 begin
   SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);
   ForceDirectories(CodeBlocksBackupDirectory);
-  RunCodeBlocksBackupRestore(cbBackup);
+  RunCodeBlocksBackupRestore(cbBackup);  
   if not RunCodeBlocksPatcher(Buffer) then
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), 
-      mbCriticalError, MB_OK);
+      mbCriticalError, MB_OK)
+  else
+    SetDirectoryRights(GetCodeBlocksInstallationDirectory + CB_LIBINFO_DIR, 'S-1-1-0', 'F');
 end;
 
 procedure UninstallCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
@@ -146,7 +156,7 @@ begin
 
   // codeblocks.dll will be used to check if we are on 17.12 stock release
   CodeBlocksBinaryFileName := GetCodeBlocksInstallationDirectory + 
-    CODEBLOCKS_SDK_DLL_NAME;
+    CODEBLOCKS_SDK_DLL_FILE;
 
   // Check existence of the installation folder
   if not DirExists(GetCodeBlocksInstallationDirectory) then
@@ -277,4 +287,3 @@ begin
 
   Result := IntegratedDevelopmentEnvironmentPage.ID;
 end;
-

@@ -68,12 +68,12 @@ begin
   end;
   
   // Generate Log messages
-  LogSuccess := CustomMessage('LogAddPathVariableSuccess');
-  LogFailed := CustomMessage('LogAddPathVariableFailed');
+  LogSuccess := 'The [%s] added to PATH: [%s]';
+  LogFailed := 'Error while adding the [%s] to PATH: [%s]'
   if Operation = evoRemove then
   begin
-    LogSuccess := CustomMessage('LogRemovePathVariableSuccess');
-    LogFailed := CustomMessage('LogRemovePathVariableFailed');   
+    LogSuccess := 'The [%s] removed from PATH: [%s]';
+    LogFailed := 'Error while removing the [%s] from PATH: [%s]';
   end;
 
   // Overwrite (or create if missing) path environment variable

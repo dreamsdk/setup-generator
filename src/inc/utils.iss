@@ -96,7 +96,7 @@ begin
   Log(Executable + ' ' + RealCommandLine);
 
   if not Exec(Executable, RealCommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
-    Log(CustomMessage('LogRunCommandError'));
+    Log('Run Command Error!');
   
   if LoadStringFromFile(TmpFileName, ExecBuffer) then
   begin
@@ -105,8 +105,33 @@ begin
     Log(Result);
   end
   else
-    Log(CustomMessage('LogRunCommandNoOutputError'));
+    Log('Run Command Error: No output catch!');
   
   if FileExists(TmpFileName) then
     DeleteFile(TmpFileName);
+end;
+
+function SetDirectoryRights(DirectoryName, SID, Rights: String): Boolean;
+var
+  Executable,
+  CommandLine: String;
+  ResultCode: Integer;
+
+begin
+  Result := False;
+  Log('SetDirectoryRights');
+  if DirExists(DirectoryName) then
+  begin
+    Executable := ExpandConstant('{sys}\icacls.exe');
+    if FileExists(Executable) then
+    begin
+      CommandLine := Format('"%s" /t /grant *%s:(OI)(CI)%s', [DirectoryName, SID, Rights]);
+      Log(Format('  Executable: "%s", CommandLine: "%s"', [Executable, CommandLine]));
+      
+      Result := Exec(Executable, CommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      Log(Format('  Result: %d', [Result]));
+    end
+    else
+      Result := True;
+  end;
 end;
