@@ -25,7 +25,7 @@
 #define AppSupportIntegrationDirectory AppSupportDirectory + "\ide"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
-#define SourceDirectory "C:\dcsdk(FAKE)"
+#define SourceDirectory "C:\dcsdk"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
