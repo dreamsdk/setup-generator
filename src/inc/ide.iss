@@ -1,6 +1,7 @@
 [Code]
 type
   TCodeBlocksBackupRestoreOperation = (cbBackup, cbRestore);
+  TCodeBlocksSplashOperation = (soInstall, soUninstall, soClose);
 
 const
   CODEBLOCKS_SDK_DLL_SHA1 = 'bea660dd5dbfca817e6d06a0be04b2e7de5da34f';
@@ -13,10 +14,11 @@ const
   
   CB_BACKUP_RESTORE_FILE = '\codeblocks-backup-restore.cmd';
   CB_PATCHER_FILE = '\codeblocks-patcher.exe';
-  
+  CB_SPLASH_FILE = '\codeblocks-splash.exe';
+
   CB_INSTALL_DIR_STORE_FILE = '\..\ide.dat';
   
-  CB_LIBINFO_DIR = '\share\CodeBlocks\templates\wizard\dc\libinfo';
+  CB_LIBINFO_DIR = '\share\CodeBlocks\templates\wizard\dc\libinfo';  
 
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
@@ -100,11 +102,37 @@ begin
   Result := (Pos('is now patched!', LowerCase(Buffer)) > 0);
 end;
 
+procedure RunCodeBlocksSplash(const Operation: TCodeBlocksSplashOperation);
+var
+  AdditionalSwitch: String;
+  ResultCode: Integer;
+  ExecWait: TExecWait;
+
+begin
+  AdditionalSwitch := '';
+  ExecWait := ewNoWait;
+  
+  case Operation of
+    soInstall: AdditionalSwitch := '/install';
+    soUninstall: AdditionalSwitch := '/uninstall';
+    soClose: 
+      begin
+        AdditionalSwitch := '/close';
+        ExecWait := ewWaitUntilTerminated;
+      end;
+  end;   
+  
+  Exec(ExpandConstant(CB_PATCH_DIR) + CB_SPLASH_FILE, AdditionalSwitch, 
+    ExpandConstant(CB_PATCH_DIR), SW_SHOW, ExecWait, ResultCode)
+end;
+
+
 procedure SetupCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
 var
   Buffer: String;
 
 begin
+  RunCodeBlocksSplash(soInstall);
   SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);
   ForceDirectories(CodeBlocksBackupDirectory);
   RunCodeBlocksBackupRestore(cbBackup);  
@@ -113,10 +141,12 @@ begin
       mbCriticalError, MB_OK)
   else
     SetDirectoryRights(GetCodeBlocksInstallationDirectory + CB_LIBINFO_DIR, 'S-1-1-0', 'F');
+  RunCodeBlocksSplash(soClose);
 end;
 
 procedure UninstallCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
 begin
+  RunCodeBlocksSplash(soUninstall);
   SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);  
   if DirExists(CodeBlocksBackupDirectory) then
   begin
@@ -124,6 +154,7 @@ begin
     if FileExists(CodeBlocksInstallationDirectoryStoreFile) then
       DeleteFile(CodeBlocksInstallationDirectoryStoreFile);
   end;
+  RunCodeBlocksSplash(soClose);
 end;
 
 procedure ButtonCodeBlocksInstallationDirectoryOnClick(Sender: TObject);
