@@ -23,9 +23,11 @@
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
 #define AppSupportDirectory "{app}\support"
 #define AppSupportIntegrationDirectory AppSupportDirectory + "\ide"
+#define AppAddonsDirectory AppMainDirectory + "\addons\"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 #define SourceDirectory "C:\dcsdk"
+#define SourceAddonsDirectory "C:\dcsdk_addons"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
@@ -55,8 +57,8 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-;Compression=lzma2/ultra64
-Compression=none
+Compression=lzma2/ultra64
+;Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}uninst.ico
@@ -83,11 +85,35 @@ Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
+[Components]
+Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom; Flags: fixed
+Name: "kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
+Name: "ide"; Description: "{cm:ComponentIDE}"; ExtraDiskSpaceRequired: 52428800; Types: full
+Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
+Name: "addons\img4dc"; Description: "{cm:ComponentAdditionalTools_img4dc}"; Types: full
+Name: "addons\img4dc\cdi4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full
+Name: "addons\img4dc\mds4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full
+Name: "addons\ipcreate"; Description: "{cm:ComponentAdditionalTools_ipcreate}"; ExtraDiskSpaceRequired: 675840; Types: full
+Name: "addons\mkisofs"; Description: "{cm:ComponentAdditionalTools_mkisofs}"; ExtraDiskSpaceRequired: 131072; Types: full
+Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; ExtraDiskSpaceRequired: 143360; Types: full
+Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; ExtraDiskSpaceRequired: 811008; Types: full
+Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; ExtraDiskSpaceRequired: 2334720; Types: full
+Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; ExtraDiskSpaceRequired: 45056; Types: full
+
 [Files]
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
 Source: "..\rsrc\ide\codeblocks.bmp"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
+Source: "{#SourceAddonsDirectory}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\cdi4dc
+Source: "{#SourceAddonsDirectory}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\mds4dc
+Source: "{#SourceAddonsDirectory}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\ipcreate
+Source: "{#SourceAddonsDirectory}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\mkisofs
+Source: "{#SourceAddonsDirectory}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
+Source: "{#SourceAddonsDirectory}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion; Components: addons\txfutils
+Source: "{#SourceAddonsDirectory}\txfutils\docs\*"; DestDir: "{#AppAddonsDirectory}\docs"; Flags: ignoreversion; Components: addons\txfutils
+Source: "{#SourceAddonsDirectory}\txfutils\txf\*"; DestDir: "{#AppAddonsDirectory}\txf"; Flags: ignoreversion; Components: addons\txfutils\txflib
+Source: "{#SourceAddonsDirectory}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
 Source: "{#SourceDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
@@ -120,9 +146,19 @@ UninstallPackage=Remove {#MyAppName} from your computer
 InactiveInternetConnection=The {#MyAppName} Setup need to be connected to Internet, as some critical components are downloaded at the installation's end. Please check your Internet connection and click the Retry button or click the Cancel button to exit the installer.
 LicenseInformation={#MyAppName} License Information
 ProgramHelp={#MyAppNameHelp}
-ComponentMainFiles=Program files (Required)
-ComponentAdditionalTools=Additional tools
-ComponentIDE={#IdeCodeBlocksVerName} integrationCodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
+ComponentMain=Program files (required)
+ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
+ComponentIDE={#IdeCodeBlocksVerName} integration
+ComponentAdditionalTools=Additional command line tools
+ComponentAdditionalTools_img4dc=IMG4DC - Dreamcast Selfboot Toolkit
+ComponentAdditionalTools_img4dc_cdi4dc=CDI4DC - Padus DiscJuggler image generator (cdi4dc)
+ComponentAdditionalTools_img4dc_mds4dc=MDS4DC - Alcohol 120% image generator (mds4dc, lbacalc)
+ComponentAdditionalTools_ipcreate=IP.BIN Creator - Initial Program generator (ipcreate)
+ComponentAdditionalTools_mkisofs=Make ISO File System - ISO9660 image generator (mkisofs)
+ComponentAdditionalTools_pvr2png=PVR to PNG - PowerVR image to PNG converter (pvr2png)
+ComponentAdditionalTools_txfutils=TXF Utilities - Textured font format tools (showtxf, ttf2txf)
+ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
+ComponentAdditionalTools_vmutool=VMU Tool PC - Visual Memory data handler (vmutool)CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
 CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files? 
 LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.ButtonBrowse=Browse...
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
@@ -148,11 +184,6 @@ Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
-
-[Components]
-Name: "main"; Description: "{cm:ComponentMainFiles}"; Types: full compact custom; Flags: fixed
-Name: "ide"; Description: "{cm:ComponentIDE}"; ExtraDiskSpaceRequired: 52428800; Types: full
-;Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
 
 [Code]
 const

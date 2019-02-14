@@ -130,31 +130,32 @@ end;
 procedure SetupCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
 var
   Buffer: String;
+  IsSuccess: Boolean;
 
 begin
   RunCodeBlocksSplash(soInstall);
   SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);
   ForceDirectories(CodeBlocksBackupDirectory);
   RunCodeBlocksBackupRestore(cbBackup);  
-  if not RunCodeBlocksPatcher(Buffer) then
-    MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), 
-      mbCriticalError, MB_OK)
-  else
-    SetDirectoryRights(GetCodeBlocksInstallationDirectory + CB_LIBINFO_DIR, 'S-1-1-0', 'F');
-  RunCodeBlocksSplash(soClose);
+  IsSuccess := RunCodeBlocksPatcher(Buffer);
+  if IsSuccess then
+    SetDirectoryRights(GetCodeBlocksInstallationDirectory + CB_LIBINFO_DIR, 'S-1-1-0', 'F');  
+  RunCodeBlocksSplash(soClose);  
+  if not IsSuccess then
+    MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), mbCriticalError, MB_OK);
 end;
 
 procedure UninstallCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
-begin
-  RunCodeBlocksSplash(soUninstall);
+begin  
   SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);  
   if DirExists(CodeBlocksBackupDirectory) then
   begin
+    RunCodeBlocksSplash(soUninstall);
     RunCodeBlocksBackupRestore(cbRestore);
     if FileExists(CodeBlocksInstallationDirectoryStoreFile) then
       DeleteFile(CodeBlocksInstallationDirectoryStoreFile);
-  end;
-  RunCodeBlocksSplash(soClose);
+    RunCodeBlocksSplash(soClose);
+  end;  
 end;
 
 procedure ButtonCodeBlocksInstallationDirectoryOnClick(Sender: TObject);
