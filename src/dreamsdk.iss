@@ -3,7 +3,7 @@
 #define MyAppName "DreamSDK"
 #define MyAppVersion "R2"
 #define MyAppPublisher "The DreamSDK Team"
-#define MyAppURL "http://dreamsdk.sizious.com/"
+#define MyAppURL "http://www.dreamsdk.org/"
 #define MyAppCopyright "© Copyleft 2019"
 
 #define MyAppNameHelp MyAppName + " Help"
@@ -94,6 +94,7 @@ Name: "addons\img4dc"; Description: "{cm:ComponentAdditionalTools_img4dc}"; Type
 Name: "addons\img4dc\cdi4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full
 Name: "addons\img4dc\mds4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full
 Name: "addons\ipcreate"; Description: "{cm:ComponentAdditionalTools_ipcreate}"; ExtraDiskSpaceRequired: 675840; Types: full
+Name: "addons\ipcreate\iplogos"; Description: "{cm:ComponentAdditionalTools_ipcreate_iplogos}"; ExtraDiskSpaceRequired: 53240; Types: full
 Name: "addons\mkisofs"; Description: "{cm:ComponentAdditionalTools_mkisofs}"; ExtraDiskSpaceRequired: 131072; Types: full
 Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; ExtraDiskSpaceRequired: 143360; Types: full
 Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; ExtraDiskSpaceRequired: 811008; Types: full
@@ -107,7 +108,9 @@ Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ig
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 Source: "{#SourceAddonsDirectory}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\cdi4dc
 Source: "{#SourceAddonsDirectory}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\mds4dc
-Source: "{#SourceAddonsDirectory}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\ipcreate
+Source: "{#SourceAddonsDirectory}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion; Components: addons\ipcreate
+Source: "{#SourceAddonsDirectory}\ipcreate\docs\*"; DestDir: "{#AppAddonsDirectory}\docs"; Flags: ignoreversion; Components: addons\ipcreate
+Source: "{#SourceAddonsDirectory}\ipcreate\iplogos\*"; DestDir: "{#AppAddonsDirectory}\iplogos"; Flags: ignoreversion; Components: addons\ipcreate\iplogos
 Source: "{#SourceAddonsDirectory}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\mkisofs
 Source: "{#SourceAddonsDirectory}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
 Source: "{#SourceAddonsDirectory}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion; Components: addons\txfutils
@@ -154,6 +157,7 @@ ComponentAdditionalTools_img4dc=IMG4DC - Dreamcast Selfboot Toolkit
 ComponentAdditionalTools_img4dc_cdi4dc=CDI4DC - Padus DiscJuggler image generator (cdi4dc)
 ComponentAdditionalTools_img4dc_mds4dc=MDS4DC - Alcohol 120% image generator (mds4dc, lbacalc)
 ComponentAdditionalTools_ipcreate=IP.BIN Creator - Initial Program generator (ipcreate)
+ComponentAdditionalTools_ipcreate_iplogos=Additional ready-to-use IP logos
 ComponentAdditionalTools_mkisofs=Make ISO File System - ISO9660 image generator (mkisofs)
 ComponentAdditionalTools_pvr2png=PVR to PNG - PowerVR image to PNG converter (pvr2png)
 ComponentAdditionalTools_txfutils=TXF Utilities - Textured font format tools (showtxf, ttf2txf)
