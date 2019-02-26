@@ -154,7 +154,7 @@ begin
     Log('Checking connection to the server');
     try
       WinHttpReq := CreateOleObject('WinHttp.WinHttpRequest.5.1');
-      WinHttpReq.Open('GET', '{#MyAppURL}', False);
+      WinHttpReq.Open('GET', '{#TestConnectionURL}', False);
       WinHttpReq.Send('');
       Log(Format('Connected to the server; status: %s %s', [WinHttpReq.Status, WinHttpReq.StatusText]));
       Connected := True;

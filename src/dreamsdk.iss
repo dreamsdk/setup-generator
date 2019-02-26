@@ -3,8 +3,9 @@
 #define MyAppName "DreamSDK"
 #define MyAppVersion "R2"
 #define MyAppPublisher "The DreamSDK Team"
-#define MyAppURL "http://www.dreamsdk.org/"
+#define MyAppURL "https://www.dreamsdk.org/"
 #define MyAppCopyright "© Copyleft 2019"
+#define TestConnectionURL "http://www.dreamcast.fr/"
 
 #define MyAppNameHelp MyAppName + " Help"
 
