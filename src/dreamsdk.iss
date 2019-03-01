@@ -51,8 +51,8 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
+AppPublisherURL={#MyAppURL}#help
+AppSupportURL={#MyAppURL}help/
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
@@ -62,7 +62,7 @@ Compression=lzma2/ultra64
 ;Compression=none
 SolidCompression=False
 DisableWelcomePage=False
-UninstallDisplayIcon={#AppSupportDirectory}uninst.ico
+UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
 UninstallFilesDir={#AppSupportDirectory}
 ChangesEnvironment=True
 WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
@@ -77,6 +77,8 @@ VersionInfoProductName={#MyAppName}
 VersionInfoProductTextVersion={#MyAppVersion}
 VersionInfoDescription={#MyAppName} Setup
 VersionInfoProductVersion={#ProductVersion}
+AppComments={#BuildDateTime}
+AppReadmeFile={#AppSupportDirectory}\license.rtf
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
