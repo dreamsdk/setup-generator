@@ -8,7 +8,7 @@ const
   CODEBLOCKS_SDK_DLL_FILE = '\codeblocks.dll';    
 
   DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
-  DEFAULT_CB_CONFIG_FILE = '{userappdata}\CodeBlocks\default.conf';
+  DEFAULT_CB_CONFIG_FILE = 'CodeBlocks\default.conf';
   
   CB_PATCH_DIR = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks';
   
@@ -311,7 +311,7 @@ begin
 
   // CodeBlocksConfigurationFile
   EditCodeBlocksConfigurationFile := TEdit.Create(IntegratedDevelopmentEnvironmentPage);
-  EditCodeBlocksConfigurationFile.Text := ExpandConstant(DEFAULT_CB_CONFIG_FILE);
+  EditCodeBlocksConfigurationFile.Text := GetCurrentUserRealAppDataDirectory + DEFAULT_CB_CONFIG_FILE;
   EditCodeBlocksConfigurationFile.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
     - ButtonCodeBlocksInstallationDirectory.Width - ScaleX(8);
   EditCodeBlocksConfigurationFile.Top := RowTop2;
