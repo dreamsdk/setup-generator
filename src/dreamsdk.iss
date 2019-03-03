@@ -9,8 +9,8 @@
 
 #define MyAppNameHelp MyAppName + " Help"
 
-#define PackageVersion "2.0.0.0"
-#define ProductVersion "2.0.0.0"
+#define PackageVersion "2.0.0.1903"
+#define ProductVersion "2.0.0.1903"
 
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
