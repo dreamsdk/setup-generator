@@ -140,11 +140,10 @@ end;
 // https://stackoverflow.com/a/43248500
 function GetCurrentUserRealAppDataDirectory: String;
 var
-  Uniq: string;
   AppDataPath,
-  TempFileName: string;
-  Cmd: string;
-  Params: string;
+  TempFileName,
+  Cmd,
+  Params: String;
   ResultCode: Integer;
   Buf: AnsiString;
 
@@ -152,23 +151,21 @@ begin
   if not DirExists(CurrentUserRealAppDataDirectory) then
   begin
     AppDataPath := ExpandConstant('{userappdata}');
-    Log(Format('Default/Fallback application data path is %s', [AppDataPath]));
-    Uniq := ExtractFileName(ExpandConstant('{tmp}'));
-    TempFileName := ExpandConstant(Format('{commondocs}\is-appdata-%s.tmp', [Uniq]));
-    Params := Format('/C echo %%AppData%% > %s', [TempFileName]);
-    Log(Format('Resolving AppData using %s', [Params]));
+    Log(Format('Default/Fallback application data path: %s', [AppDataPath]));
+    TempFileName := ExpandConstant('{tmp}\is-appdata.tmp');
     Cmd := ExpandConstant('{cmd}');
-    if ExecAsOriginalUser(Cmd, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0) then
+    Params := Format('/C echo %%AppData%% > "%s"', [TempFileName]);
+    Log(Format('Resolving AppData using %s', [Params]));
+    if ExecAsOriginalUser(Cmd, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) 
+      and (ResultCode = 0) then
     begin
       if LoadStringFromFile(TempFileName, Buf) then
       begin
         AppDataPath := Trim(Buf);
         Log(Format('AppData resolved to %s', [AppDataPath]));
       end
-        else
-      begin
+      else
         Log(Format('Error reading %s', [TempFileName]));
-      end;
       DeleteFile(TempFileName);
     end
     else
