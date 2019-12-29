@@ -1,23 +1,47 @@
 ; DreamSDK Inno Setup Script
-#define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
+
+; Installer versions#define MyAppVersion "R3-dev"
+#define PackageVersion "3.0.0.2001"
+#define ProductVersion "3.0.0.2001"
+
+; Code::Blocks version
+#define IdeCodeBlocksVersion "17.12"
+; Copyright
+#define MyAppCopyright "© Copyleft 2018-2020"
+
+; Source directories
+#define SourceDirectoryBase "D:\sources_dev"
+
+#define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
+#define SourceDirectoryAddons SourceDirectoryBase + "\addons"
+#define SourceDirectoryToolchainArm SourceDirectoryBase + "\gcc-arm-eabi"
+#define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
+
+#define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
+#define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
+#define SourceDirectoryGdbPython34 SourceDirectoryBase + "\gdb-sh-elf-python-3.4"
+#define SourceDirectoryGdbPython35 SourceDirectoryBase + "\gdb-sh-elf-python-3.5"
+#define SourceDirectoryGdbPython36 SourceDirectoryBase + "\gdb-sh-elf-python-3.6"
+#define SourceDirectoryGdbPython37 SourceDirectoryBase + "\gdb-sh-elf-python-3.7"
+#define SourceDirectoryGdbPython38 SourceDirectoryBase + "\gdb-sh-elf-python-3.8"
+
+; Don't modify anything beyond this point
+
+#define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
 #define MyAppName "DreamSDK"
-#define MyAppVersion "R2"
 #define MyAppPublisher "The DreamSDK Team"
 #define MyAppURL "https://www.dreamsdk.org/"
-#define MyAppCopyright "© Copyleft 2019"
-#define TestConnectionURL "http://www.dreamcast.fr/"
+
+#define TestConnectionURL "http://www.dreamcast.fr/"
 
 #define MyAppNameHelp MyAppName + " Help"
-
-#define PackageVersion "2.0.1.1903"
-#define ProductVersion "2.0.1.1903"
-
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
 
 #define FullAppMainName MyAppName + " " + AppMainName
 #define FullAppManagerName MyAppName + " " + AppManagerName
 
+#define AppToolchainBase "{app}\msys\1.0\opt\toolchains\dc"
 #define AppMainDirectory "{app}\msys\1.0\opt\dreamsdk"
 #define AppMainExeName AppMainDirectory + "\dreamsdk.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
@@ -27,13 +51,10 @@
 #define AppAddonsDirectory AppMainDirectory + "\addons\"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
-#define SourceDirectory "C:\dcsdk"
-#define SourceAddonsDirectory "C:\dcsdk_addons"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
 #define IdeCodeBlocksName "Code::Blocks"
-#define IdeCodeBlocksVersion "17.12"
 #define IdeCodeBlocksVerName IdeCodeBlocksName + " " + IdeCodeBlocksVersion
 
 #define PSVinceLibraryFileName "psvince.dll"
@@ -44,6 +65,7 @@
 #include "inc/environ.iss"
 #include "inc/ide.iss"
 #include "inc/version.iss"
+#include "inc/gdb.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -58,8 +80,8 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-Compression=lzma2/ultra64
-;Compression=none
+;Compression=lzma2/ultra64
+Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
@@ -91,8 +113,10 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Components]
 Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom; Flags: fixed
 Name: "kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
-Name: "ide"; Description: "{cm:ComponentIDE}"; ExtraDiskSpaceRequired: 52428800; Types: full
+Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
+Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full 
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
+Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; ExtraDiskSpaceRequired: 7539; Types: full
 Name: "addons\img4dc"; Description: "{cm:ComponentAdditionalTools_img4dc}"; Types: full
 Name: "addons\img4dc\cdi4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full
 Name: "addons\img4dc\mds4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full
@@ -105,22 +129,41 @@ Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfut
 Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; ExtraDiskSpaceRequired: 45056; Types: full
 
 [Files]
+; Temporary files used for the installation
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
+Source: "..\rsrc\helpers\whereis.bat"; Flags: dontcopy noencryption nocompression
+Source: "..\rsrc\helpers\pecheck.exe"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\ide\codeblocks.bmp"; Flags: dontcopy noencryption nocompression
+Source: "..\rsrc\gdb\python.bmp"; Flags: dontcopy noencryption nocompression
+
+; Some additional resources
 Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
-Source: "{#SourceAddonsDirectory}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\cdi4dc
-Source: "{#SourceAddonsDirectory}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\mds4dc
-Source: "{#SourceAddonsDirectory}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion; Components: addons\ipcreate
-Source: "{#SourceAddonsDirectory}\ipcreate\docs\*"; DestDir: "{#AppAddonsDirectory}\docs"; Flags: ignoreversion; Components: addons\ipcreate
-Source: "{#SourceAddonsDirectory}\ipcreate\iplogos\*"; DestDir: "{#AppAddonsDirectory}\iplogos"; Flags: ignoreversion; Components: addons\ipcreate\iplogos
-Source: "{#SourceAddonsDirectory}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\mkisofs
-Source: "{#SourceAddonsDirectory}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
-Source: "{#SourceAddonsDirectory}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion; Components: addons\txfutils
-Source: "{#SourceAddonsDirectory}\txfutils\docs\*"; DestDir: "{#AppAddonsDirectory}\docs"; Flags: ignoreversion; Components: addons\txfutils
-Source: "{#SourceAddonsDirectory}\txfutils\txf\*"; DestDir: "{#AppAddonsDirectory}\txf"; Flags: ignoreversion; Components: addons\txfutils\txflib
-Source: "{#SourceAddonsDirectory}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
-Source: "{#SourceDirectory}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; MinGW Base
+Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Toolchains
+Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryToolchainSh}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; GDB
+Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
+Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27
+Source: "{#SourceDirectoryGdbPython34}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython34
+Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython35
+Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
+Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
+Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
+
+; Addons
+Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
+Source: "{#SourceDirectoryAddons}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\cdi4dc
+Source: "{#SourceDirectoryAddons}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\mds4dc
+Source: "{#SourceDirectoryAddons}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\ipcreate
+Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\mkisofs
+Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
+Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
+Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
 
 [Icons]
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
@@ -145,7 +188,8 @@ ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
 DocumentationGroupDirectory=Documentation
 InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
 PrerequisiteMissing=Sorry, but prerequisites are not fully met, some components are missing from your computer: %s%n%nPlease install all of these components, then check they are available on your PATH environment variable and finally restart the installation.
-PrerequisiteMissingPython=Python 2.7.x
+PrerequisiteOptionalMissing=You are missing some optional prerequisites: %s%n%nFor better experience, it would be nice to have them installed, even if it isn't mandatory. Continue anyway?
+PrerequisiteMissingPython=Python
 PrerequisiteMissingGit=Git
 PrerequisiteMissingSubversion=Subversion Client (SVN)
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
@@ -155,26 +199,30 @@ LicenseInformation={#MyAppName} License Information
 ProgramHelp={#MyAppNameHelp}
 ComponentMain=Program files (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
-ComponentIDE={#IdeCodeBlocksVerName} integration
+ComponentIDE=Integrated Development Environment (IDE)
+ComponentIDE_CodeBlocks={#IdeCodeBlocksVerName}
 ComponentAdditionalTools=Additional command line tools
-ComponentAdditionalTools_img4dc=IMG4DC - Dreamcast Selfboot Toolkit
-ComponentAdditionalTools_img4dc_cdi4dc=CDI4DC - Padus DiscJuggler image generator (cdi4dc)
-ComponentAdditionalTools_img4dc_mds4dc=MDS4DC - Alcohol 120% image generator (mds4dc, lbacalc)
-ComponentAdditionalTools_ipcreate=IP.BIN Creator - Initial Program generator (ipcreate)
+ComponentAdditionalTools_elevate=Elevate – Command-Line UAC Elevation Utility (elevate)
+ComponentAdditionalTools_img4dc=IMG4DC – Dreamcast Selfboot Toolkit
+ComponentAdditionalTools_img4dc_cdi4dc=CDI4DC – Padus DiscJuggler image generator (cdi4dc)
+ComponentAdditionalTools_img4dc_mds4dc=MDS4DC – Alcohol 120% image generator (mds4dc, lbacalc)
+ComponentAdditionalTools_ipcreate=IP.BIN Creator – Initial Program generator (ipcreate)
 ComponentAdditionalTools_ipcreate_iplogos=Additional ready-to-use IP logos
-ComponentAdditionalTools_mkisofs=Make ISO File System - ISO9660 image generator (mkisofs)
-ComponentAdditionalTools_pvr2png=PVR to PNG - PowerVR image to PNG converter (pvr2png)
-ComponentAdditionalTools_txfutils=TXF Utilities - Textured font format tools (showtxf, ttf2txf)
+ComponentAdditionalTools_mkisofs=Make ISO File System – ISO9660 image generator (mkisofs)
+ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pvr2png)
+ComponentAdditionalTools_txfutils=TXF Utilities – Textured font format tools (showtxf, ttf2txf)
 ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
-ComponentAdditionalTools_vmutool=VMU Tool PC - Visual Memory data handler (vmutool)CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
-CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files? 
-LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.ButtonBrowse=Browse...
+ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data handler (vmutool)
+CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
+CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
+LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
+ButtonBrowse=Browse...
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
 LabelCodeBlocksConfigurationFile=Select the {#IdeCodeBlocksName} configuration file:
 FilterCodeBlocksConfigurationFile=Configuration Files (*.conf)|*.conf|All Files (*.*)|*.*
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
 CodeBlocksConfigurationFileNotExists=The specified {#IdeCodeBlocksName} configuration file doesn't exists. Please run {#IdeCodeBlocksName} at least once.
-CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library (codeblocks.dll) in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory? 
+CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library (codeblocks.dll) in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
 CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
 CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
@@ -183,6 +231,10 @@ PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x
 VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, it need to be uninstalled first. Continue anyway?
 NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newer that the version provided in this package (%s). Setup will exit now.
 PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
+LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
+GdbTitlePage=GNU Debugger Configuration
+GdbSubtitlePage=Customize your GNU Debugger for SuperH installation.
+LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
 
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
@@ -201,6 +253,7 @@ var
   IsUninstallMode: Boolean;
   IntegratedDevelopmentEnvironmentSettingsPageID: Integer;
   BrowseForFolderExFakePageID: Integer;
+  GdbPageID: Integer;
 
 function IsModuleLoaded(modulename: AnsiString): Boolean;
 external 'IsModuleLoaded@files:{#PSVinceLibraryFileName} stdcall';
@@ -212,6 +265,7 @@ procedure InitializeWizard;
 begin
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  GdbPageID := CreateGdbPage;
 end;
 
 function IsProcessRunning(const ProcessName: String): Boolean;
@@ -254,7 +308,15 @@ begin
 
   // Check internet connection
   Result := Result and CheckInternetConnection;
+
+  // Check optional prerequisites
+  if Result and (not CheckOptionalPrerequisites) then
+  begin
+    Result := Result 
+      and (MsgBox(GenerateOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDYES);
+  end;
   
+  // This test should be the latest!
   // Check if an old version is installed
   Result := Result and HandlePreviousVersion('{#MyAppID}', '{#MyAppVersion}');
 end;

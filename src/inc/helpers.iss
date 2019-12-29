@@ -1,9 +1,6 @@
 [Code]
 type
   TPrerequisiteApplication = (paGit, paPython, paSubversion);
-  
-const
-  PYTHON_BRANCH_VERSION = '2.7';
 
 var
   IsPythonInstalled,
@@ -74,14 +71,24 @@ begin
   
   // Check Python
   PrerequisiteVersion := GetPrerequisiteVersion(paPython);    
-  IsPythonInstalled := StartsWith(PYTHON_BRANCH_VERSION, PrerequisiteVersion);
+  IsPythonInstalled := PrerequisiteVersion <> '';  
 
+  // Final result
+  Result := IsGitInstalled and IsPythonInstalled;  
+end;
+
+// Verify that all optional prerequisites are installed.
+function CheckOptionalPrerequisites: Boolean;
+var
+  PrerequisiteVersion: String;
+
+begin
   // Check Subversion
   PrerequisiteVersion := GetPrerequisiteVersion(paSubversion);
   IsSubversionInstalled := PrerequisiteVersion <> '';
 
   // Final result
-  Result := IsGitInstalled and IsPythonInstalled and IsSubversionInstalled;  
+  Result := IsSubversionInstalled;
 end;
 
 // Helper function that concat prerequisite message
@@ -90,7 +97,7 @@ begin
   Result := ActualValue + sLineBreak + ' - ' + CustomMessage(NewPrerequisite);
 end;
 
-// This func is used when one or more prerequisite is missing.
+// This func is used when one or more prerequisites is missing.
 function GeneratePrerequisiteMessage: String;
 begin
   Result := '';    
@@ -98,9 +105,16 @@ begin
     Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingGit');
   if not IsPythonInstalled then
     Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingPython');
-  if not IsSubversionInstalled then
-    Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingSubversion');    
   Result := Format(CustomMessage('PrerequisiteMissing'), [Result]); 
+end;
+
+// This func is used when one or more optional prerequisites is missing.
+function GenerateOptionalPrerequisiteMessage: String;
+begin
+  Result := '';
+  if not IsSubversionInstalled then
+    Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingSubversion');
+  Result := Format(CustomMessage('PrerequisiteOptionalMissing'), [Result]); 
 end;
 
 procedure PatchMountPoint;

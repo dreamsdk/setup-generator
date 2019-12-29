@@ -29,7 +29,7 @@ var
 
 function IsCodeBlocksIntegrationEnabled: Boolean;
 begin
-  Result := IsComponentSelected('ide');
+  Result := IsComponentSelected('ide\codeblocks');
 end;
 
 function GetCodeBlocksInstallationDirectory: String;
