@@ -1,8 +1,8 @@
 ; DreamSDK Inno Setup Script
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.0.2001"
-#define ProductVersion "3.0.0.2001"
+#define PackageVersion "3.0.4.2001"
+#define ProductVersion "3.0.4.2001"
 
 ; Code::Blocks version
 #define IdeCodeBlocksVersion "17.12"
@@ -25,6 +25,8 @@
 #define SourceDirectoryGdbPython37 SourceDirectoryBase + "\gdb-sh-elf-python-3.7"
 #define SourceDirectoryGdbPython38 SourceDirectoryBase + "\gdb-sh-elf-python-3.8"
 
+#define SourceDirectoryKallistiEmbedded SourceDirectoryBase + "\kos-embedded"
+
 ; Don't modify anything beyond this point
 
 #define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
@@ -41,13 +43,13 @@
 #define FullAppMainName MyAppName + " " + AppMainName
 #define FullAppManagerName MyAppName + " " + AppManagerName
 
-#define AppToolchainBase "{app}\msys\1.0\opt\toolchains\dc"
-#define AppMainDirectory "{app}\msys\1.0\opt\dreamsdk"
+#define AppOptBase "{app}\msys\1.0\opt"
+#define AppToolchainBase AppOptBase + "\toolchains\dc"
+#define AppMainDirectory AppOptBase + "\dreamsdk"
 #define AppMainExeName AppMainDirectory + "\dreamsdk.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
 #define AppSupportDirectory "{app}\support"
-#define AppSupportIntegrationDirectory AppSupportDirectory + "\ide"
 #define AppAddonsDirectory AppMainDirectory + "\addons\"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
@@ -66,6 +68,7 @@
 #include "inc/ide.iss"
 #include "inc/version.iss"
 #include "inc/gdb.iss"
+#include "inc/kos.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -131,10 +134,8 @@ Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; Ex
 [Files]
 ; Temporary files used for the installation
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
-Source: "..\rsrc\helpers\whereis.bat"; Flags: dontcopy noencryption nocompression
-Source: "..\rsrc\helpers\pecheck.exe"; Flags: dontcopy noencryption nocompression
-Source: "..\rsrc\ide\codeblocks.bmp"; Flags: dontcopy noencryption nocompression
-Source: "..\rsrc\gdb\python.bmp"; Flags: dontcopy noencryption nocompression
+Source: "..\rsrc\helpers\*"; Flags: dontcopy noencryption nocompression
+Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
 ; Some additional resources
 Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
@@ -164,6 +165,9 @@ Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; 
 Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
 Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
 Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
+
+; KallistiOS Embedded
+Source: "{#SourceDirectoryKallistiEmbedded}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
 
 [Icons]
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
@@ -221,7 +225,6 @@ LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installatio
 LabelCodeBlocksConfigurationFile=Select the {#IdeCodeBlocksName} configuration file:
 FilterCodeBlocksConfigurationFile=Configuration Files (*.conf)|*.conf|All Files (*.*)|*.*
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
-CodeBlocksConfigurationFileNotExists=The specified {#IdeCodeBlocksName} configuration file doesn't exists. Please run {#IdeCodeBlocksName} at least once.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library (codeblocks.dll) in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
 CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
 CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
@@ -231,10 +234,17 @@ PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x
 VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, it need to be uninstalled first. Continue anyway?
 NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newer that the version provided in this package (%s). Setup will exit now.
 PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
-LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
 GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Customize your GNU Debugger for SuperH installation.
+LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
+KallistiEmbeddedTitlePage=KallistiOS Configuration
+KallistiEmbeddedSubtitlePage=What kind of repositories do you want to use?
+LabelKallistiEmbeddedIntroduction=Introduction
+LabelKallistiEmbeddedDescription=desc
+KallistiEmbeddedOnline=Use online repositories (Highly recommanded)
+KallistiEmbeddedOffline=Use offline repositories
+KallistiEmbeddedOfflineConfirmation=This will disable the Update feature of {#FullAppManagerName}. Are you sure to use offline repositories?
 
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
@@ -251,9 +261,11 @@ const
 
 var
   IsUninstallMode: Boolean;
-  IntegratedDevelopmentEnvironmentSettingsPageID: Integer;
-  BrowseForFolderExFakePageID: Integer;
-  GdbPageID: Integer;
+
+  BrowseForFolderExFakePageID,
+  IntegratedDevelopmentEnvironmentSettingsPageID, 
+  GdbPageID,
+  KallistiEmbeddedPageID: Integer;
 
 function IsModuleLoaded(modulename: AnsiString): Boolean;
 external 'IsModuleLoaded@files:{#PSVinceLibraryFileName} stdcall';
@@ -265,6 +277,7 @@ procedure InitializeWizard;
 begin
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;
   GdbPageID := CreateGdbPage;
 end;
 
@@ -306,9 +319,6 @@ begin
   if not Result then
     MsgBox(GeneratePrerequisiteMessage, mbError, MB_OK);
 
-  // Check internet connection
-  Result := Result and CheckInternetConnection;
-
   // Check optional prerequisites
   if Result and (not CheckOptionalPrerequisites) then
   begin
@@ -347,6 +357,13 @@ begin
     Result := False;
     MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
   end;
+
+  // Checking if the user is SURE to use the embedded KOS
+  if (CurPageID = KallistiEmbeddedPageID) then
+    if IsKallistiEmbedded then
+      Result := ConfirmKallistiEmbeddedUsage
+    else
+      Result := CheckInternetConnection;
 
   // Checking if the Code::Blocks Integration page is well filled
   if (CurPageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
@@ -361,7 +378,7 @@ begin
 
     // Install Code::Blocks Integration if requested.
     if IsCodeBlocksIntegrationEnabled then
-      SetupCodeBlocksIntegration(ExpandConstant('{#AppSupportIntegrationDirectory}'));
+      InstallCodeBlocksIntegration;
   end;
 end;
 
@@ -374,7 +391,7 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if (CurUninstallStep = usUninstall) then
-    UninstallCodeBlocksIntegration(ExpandConstant('{#AppSupportIntegrationDirectory}'));
+    UninstallCodeBlocksIntegration;
   if (CurUninstallStep = usPostUninstall) then
     EnvRemovePath(ExpandConstant('{#AppMainDirectory}'));
 end;

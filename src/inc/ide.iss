@@ -1,7 +1,6 @@
 [Code]
 type
-  TCodeBlocksBackupRestoreOperation = (cbBackup, cbRestore);
-  TCodeBlocksSplashOperation = (soInstall, soUninstall, soClose);
+  TCodeBlocksPatcherOperation = (cbpInstall, cbpUninstall);
 
 const
   CODEBLOCKS_SDK_DLL_SHA1 = 'bea660dd5dbfca817e6d06a0be04b2e7de5da34f';
@@ -12,24 +11,22 @@ const
   
   CB_PATCH_DIR = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks';
   
-  CB_BACKUP_RESTORE_FILE = '\codeblocks-backup-restore.cmd';
   CB_PATCHER_FILE = '\codeblocks-patcher.exe';
-  CB_SPLASH_FILE = '\codeblocks-splash.exe';
 
-  CB_INSTALL_DIR_STORE_FILE = '\..\ide.dat';
-  
-  CB_LIBINFO_DIR = '\share\CodeBlocks\templates\wizard\dc\libinfo';  
-
+  CB_HELPER = '{tmp}\codeblocks-helper.exe';
+          
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
-  EditCodeBlocksInstallationDirectory,
-  EditCodeBlocksConfigurationFile: TEdit;
-  CodeBlocksBackupDirectory,
-  CodeBlocksInstallationDirectoryStoreFile: String;
+  EditCodeBlocksInstallationDirectory: TEdit;
 
 function IsCodeBlocksIntegrationEnabled: Boolean;
 begin
   Result := IsComponentSelected('ide\codeblocks');
+end;
+
+function IsCodeBlocksInstallationMode: Boolean;
+begin
+  Result := Assigned(EditCodeBlocksInstallationDirectory);
 end;
 
 function GetCodeBlocksInstallationDirectory: String;
@@ -37,125 +34,62 @@ var
   Buffer: AnsiString;
   IsInstallMode: Boolean;
 
-begin
-  Result := '';
+begin                        
+  Result := '';   
+  if IsCodeBlocksInstallationMode then
+    Result := RemoveBackslash(EditCodeBlocksInstallationDirectory.Text); 
+end;
 
-  IsInstallMode := Assigned(EditCodeBlocksInstallationDirectory);   
-    
-  if IsInstallMode then
+function GetCodeBlocksConfigurationFileNames: String;
+begin
+  Result := RunCommand( ExpandConstant(CB_HELPER) );
+end;
+
+function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
+  var Buffer: String): Boolean;
+var
+  PatcherSwitch,
+  ParamInstallOption: string;
+
+begin
+  PatcherSwitch := 'install';
+
+  if IsCodeBlocksInstallationMode then
   begin
-    Result := EditCodeBlocksInstallationDirectory.Text;
-    SaveStringToFile(CodeBlocksInstallationDirectoryStoreFile, Result, False);
+    ParamInstallOption := Format('--install-dir="%s" --home-dir="%s"', [
+      GetCodeBlocksInstallationDirectory,
+      ExpandConstant('{app}')
+    ]);
   end
   else
-  begin
-    LoadStringFromFile(CodeBlocksInstallationDirectoryStoreFile, Buffer);
-    Result := Buffer;
-  end;
-  
-  Result := RemoveBackslash(Result);
-end;
+    PatcherSwitch := 'uninstall';
 
-function GetCodeBlocksConfigurationFile: String;
-begin
-  Result := '';
-  if Assigned(EditCodeBlocksConfigurationFile) then
-    Result := EditCodeBlocksConfigurationFile.Text;
-end;
-
-procedure SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory: String);
-begin
-  CodeBlocksBackupDirectory := RemoveBackslash(ACodeBlocksBackupDirectory);
-  CodeBlocksInstallationDirectoryStoreFile := CodeBlocksBackupDirectory 
-    + CB_INSTALL_DIR_STORE_FILE;
-end;
-
-function RunCodeBlocksBackupRestore(const Operation: TCodeBlocksBackupRestoreOperation): Boolean;
-var
-  Switch,
-  Buffer: String;
-
-begin
-  Switch := '/B'; 
-  if Operation = cbRestore then
-    Switch := '/R';
-
-  Buffer := RunCommand(Format('"%s" %s "%s" "%s"', [
-    ExpandConstant(CB_PATCH_DIR) + CB_BACKUP_RESTORE_FILE, 
-    Switch,
-    GetCodeBlocksInstallationDirectory,
-    CodeBlocksBackupDirectory
-  ]));
-
-  Result := (Pos('done!', LowerCase(Buffer)) > 0);
-end;
-
-function RunCodeBlocksPatcher(var Buffer: String): Boolean;
-begin
-  Buffer := RunCommand(Format('"%s" "%s" "%s" "%s" %s', [
+  Buffer := RunCommand(Format('"%s" --operation=%s %s --no-logo --show-splash', [
     ExpandConstant(CB_PATCH_DIR) + CB_PATCHER_FILE,
-    GetCodeBlocksInstallationDirectory,
-    GetCodeBlocksConfigurationFile,
-    ExpandConstant('{app}'),
-    '--no-logo'
+    PatcherSwitch,
+    ParamInstallOption
   ]));
+
   Result := (Pos('is now patched!', LowerCase(Buffer)) > 0);
 end;
-
-procedure RunCodeBlocksSplash(const Operation: TCodeBlocksSplashOperation);
-var
-  AdditionalSwitch: String;
-  ResultCode: Integer;
-  ExecWait: TExecWait;
-
-begin
-  AdditionalSwitch := '';
-  ExecWait := ewNoWait;
-  
-  case Operation of
-    soInstall: AdditionalSwitch := '/install';
-    soUninstall: AdditionalSwitch := '/uninstall';
-    soClose: 
-      begin
-        AdditionalSwitch := '/close';
-        ExecWait := ewWaitUntilTerminated;
-      end;
-  end;   
-  
-  Exec(ExpandConstant(CB_PATCH_DIR) + CB_SPLASH_FILE, AdditionalSwitch, 
-    ExpandConstant(CB_PATCH_DIR), SW_SHOW, ExecWait, ResultCode)
-end;
-
-
-procedure SetupCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
+                                                                                 
+procedure InstallCodeBlocksIntegration;
 var
   Buffer: String;
   IsSuccess: Boolean;
 
-begin
-  RunCodeBlocksSplash(soInstall);
-  SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);
-  ForceDirectories(CodeBlocksBackupDirectory);
-  RunCodeBlocksBackupRestore(cbBackup);  
-  IsSuccess := RunCodeBlocksPatcher(Buffer);
-  if IsSuccess then
-    SetDirectoryRights(GetCodeBlocksInstallationDirectory + CB_LIBINFO_DIR, 'S-1-1-0', 'F');  
-  RunCodeBlocksSplash(soClose);  
+begin    
+  IsSuccess := RunCodeBlocksPatcher(cbpInstall, Buffer);
   if not IsSuccess then
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), mbCriticalError, MB_OK);
 end;
 
-procedure UninstallCodeBlocksIntegration(ACodeBlocksBackupDirectory: String);
-begin  
-  SetCodeBlocksBackupDirectory(ACodeBlocksBackupDirectory);  
-  if DirExists(CodeBlocksBackupDirectory) then
-  begin
-    RunCodeBlocksSplash(soUninstall);
-    RunCodeBlocksBackupRestore(cbRestore);
-    if FileExists(CodeBlocksInstallationDirectoryStoreFile) then
-      DeleteFile(CodeBlocksInstallationDirectoryStoreFile);
-    RunCodeBlocksSplash(soClose);
-  end;  
+procedure UninstallCodeBlocksIntegration;
+var
+  Buffer: String;
+
+begin
+  RunCodeBlocksPatcher(cbpUninstall, Buffer); 
 end;
 
 procedure ButtonCodeBlocksInstallationDirectoryOnClick(Sender: TObject);
@@ -166,17 +100,6 @@ begin
   Directory := GetCodeBlocksInstallationDirectory;
   BrowseForFolderEx(Directory);
   EditCodeBlocksInstallationDirectory.Text := Directory;
-end;
-
-procedure ButtonCodeBlocksConfigurationFileOnClick(Sender: TObject);
-var
-  FileName: String;
-
-begin
-  FileName := GetCodeBlocksConfigurationFile;
-  if GetOpenFileName('', FileName, '', 
-    CustomMessage('FilterCodeBlocksConfigurationFile'), 'conf') then
-      EditCodeBlocksConfigurationFile.Text := FileName;  
 end;
 
 function IsCodeBlocksIntegrationReady: Boolean;
@@ -198,14 +121,6 @@ begin
     Exit;
   end;
 
-  // Check if the configuration file exists                                                 
-  if not FileExists(GetCodeBlocksConfigurationFile) then
-  begin
-    Result := False;
-    MsgBox(CustomMessage('CodeBlocksConfigurationFileNotExists'), mbError, MB_OK);
-    Exit;
-  end; 
-
   // Check if codeblocks.dll exists
   if not FileExists(CodeBlocksBinaryFileName) then
   begin
@@ -224,27 +139,20 @@ var
   ButtonCodeBlocksInstallationDirectory, 
   ButtonCodeBlocksConfigurationFile: TButton;
   LabelCodeBlocksIntroduction, LabelCodeBlocksInstallationDirectory, 
-  LabelCodeBlocksConfigurationFile: TLabel;
+  LabelCodeBlocksConfigurationFile,
+  LabelCodeBlocksConfigurationFiles: TLabel;
   RowTop1, RowTop2: Integer;
   BtnImage: TBitmapImage;
+  EditCodeBlocksUsersList: TMemo;
 
 begin
-  IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectTasks, 
+  ExtractTemporaryFile('codeblocks-helper.exe');
+
+  IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectComponents, 
     CustomMessage('CodeBlocksTitlePage'),
     CustomMessage('CodeBlocksSubtitlePage'));
 
-  ExtractTemporaryFile('codeblocks.bmp');
-
-  BtnImage := TBitmapImage.Create(WizardForm);
-  with BtnImage do
-  begin
-    Parent := IntegratedDevelopmentEnvironmentPage.Surface;
-    Bitmap.LoadFromFile(ExpandConstant('{tmp}') + '\codeblocks.bmp');
-    Bitmap.AlphaFormat := afPremultiplied; 
-    AutoSize := True;
-    Left := 0;
-    Top := 0;
-  end;
+  BtnImage := SetPageIcon('codeblocks', IntegratedDevelopmentEnvironmentPage);
 
   // Introduction label
   LabelCodeBlocksIntroduction := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
@@ -286,36 +194,26 @@ begin
   EditCodeBlocksInstallationDirectory.Top := RowTop1;
   EditCodeBlocksInstallationDirectory.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
 
-  // Label for CodeBlocksConfigurationFile
-  LabelCodeBlocksConfigurationFile := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
-  LabelCodeBlocksConfigurationFile.Caption := 
-    CustomMessage('LabelCodeBlocksConfigurationFile');
-  LabelCodeBlocksConfigurationFile.AutoSize := True;
-  LabelCodeBlocksConfigurationFile.Top := ButtonCodeBlocksInstallationDirectory.Top 
-    + ButtonCodeBlocksInstallationDirectory.Height + ScaleY(8);
-  LabelCodeBlocksConfigurationFile.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  // Label for CodeBlocksInstallationDirectory
+  LabelCodeBlocksConfigurationFiles := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
+  LabelCodeBlocksConfigurationFiles.Caption := 
+    CustomMessage('LabelCodeBlocksInstallationDirectory');
+  LabelCodeBlocksConfigurationFiles.AutoSize := True;
+  LabelCodeBlocksConfigurationFiles.Top := EditCodeBlocksInstallationDirectory.Top + 
+    EditCodeBlocksInstallationDirectory.Height + ScaleY(8);
+  LabelCodeBlocksConfigurationFiles.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
 
-  RowTop2 := LabelCodeBlocksConfigurationFile.Top + LabelCodeBlocksConfigurationFile.Height + ScaleY(8);
-
-  // Browse for CodeBlocksConfigurationFile
-  ButtonCodeBlocksConfigurationFile := TButton.Create(IntegratedDevelopmentEnvironmentPage);
-  ButtonCodeBlocksConfigurationFile.Width := ScaleX(75);
-  ButtonCodeBlocksConfigurationFile.Height := ScaleY(23);
-  ButtonCodeBlocksConfigurationFile.Top := RowTop2;
-  ButtonCodeBlocksConfigurationFile.Left := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
-    - ButtonCodeBlocksInstallationDirectory.Width; 
-  ButtonCodeBlocksConfigurationFile.Caption := 
-    CustomMessage('ButtonBrowse');
-  ButtonCodeBlocksConfigurationFile.OnClick := @ButtonCodeBlocksConfigurationFileOnClick;
-  ButtonCodeBlocksConfigurationFile.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
-
-  // CodeBlocksConfigurationFile
-  EditCodeBlocksConfigurationFile := TEdit.Create(IntegratedDevelopmentEnvironmentPage);
-  EditCodeBlocksConfigurationFile.Text := GetCurrentUserRealAppDataDirectory + DEFAULT_CB_CONFIG_FILE;
-  EditCodeBlocksConfigurationFile.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
-    - ButtonCodeBlocksInstallationDirectory.Width - ScaleX(8);
-  EditCodeBlocksConfigurationFile.Top := RowTop2;
-  EditCodeBlocksConfigurationFile.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  // EditCodeBlocksUsersList
+  EditCodeBlocksUsersList := TNewMemo.Create(IntegratedDevelopmentEnvironmentPage);
+  EditCodeBlocksUsersList.Top := LabelCodeBlocksConfigurationFiles.Top 
+    + LabelCodeBlocksConfigurationFiles.Height + ScaleY(8);
+  EditCodeBlocksUsersList.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth;
+  EditCodeBlocksUsersList.Height := ScaleY(90);
+  EditCodeBlocksUsersList.ScrollBars := ssVertical;
+  EditCodeBlocksUsersList.Text := GetCodeBlocksConfigurationFileNames;
+  EditCodeBlocksUsersList.ReadOnly := True;
+  EditCodeBlocksUsersList.Color := clGreen;
+  EditCodeBlocksUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;   
 
   Result := IntegratedDevelopmentEnvironmentPage.ID;
 end;

@@ -174,3 +174,24 @@ begin
   end;
   Result := CurrentUserRealAppDataDirectory;
 end;
+
+function SetPageIcon(const Name: string; Page: TWizardPage): TBitmapImage;var
+  FileName: string;
+
+begin
+  FileName := Name + '.bmp';
+
+  ExtractTemporaryFile(FileName);
+    
+  Result := TBitmapImage.Create(Page);
+
+  with Result do
+  begin
+    Parent := Page.Surface;
+    Bitmap.LoadFromFile(ExpandConstant('{tmp}') + '\' + FileName);
+    Bitmap.AlphaFormat := afPremultiplied;
+    AutoSize := True;
+    Left := 0;
+    Top := 0;
+  end;
+end;
