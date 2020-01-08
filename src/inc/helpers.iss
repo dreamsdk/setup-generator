@@ -60,7 +60,7 @@ begin
 end;
 
 // Verify that all prerequisites are installed.
-function CheckPrerequisites: Boolean;
+function CheckOnlineMandatoryPrerequisites: Boolean;
 var
   PrerequisiteVersion: String;
 
@@ -78,7 +78,7 @@ begin
 end;
 
 // Verify that all optional prerequisites are installed.
-function CheckOptionalPrerequisites: Boolean;
+function CheckOnlineOptionalPrerequisites: Boolean;
 var
   PrerequisiteVersion: String;
 

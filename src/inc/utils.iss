@@ -196,3 +196,22 @@ begin
     Top := 0;
   end;
 end;
+
+function SetMultiLinesLabel(ControlLabel: TLabel; Lines: Integer): Boolean;
+var
+  ParentPage: TWizardPage;
+  SingleLineHeight: Integer;
+
+begin
+  ParentPage := (ControlLabel.Owner as TWizardPage);
+  Result := Assigned(ParentPage);
+
+  if Result then
+  begin
+    SingleLineHeight := ControlLabel.Height;
+    ControlLabel.AutoSize := False;
+    ControlLabel.WordWrap := True;
+    ControlLabel.Height := SingleLineHeight * Lines;
+    ControlLabel.Width := ParentPage.SurfaceWidth;
+  end;
+end;

@@ -113,12 +113,12 @@ begin
   LabelGdbDescription.WordWrap := True;  
   LabelGdbDescription.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
   LabelGdbDescription.Width := GdbPage.SurfaceWidth;
-  LabelGdbDescription.Height := ScaleY(LabelGdbIntroduction.Height * 3); // Hack to have 3 lines label... LabelGdbIntroduction.Height is only 1 line... This is BAD
+  SetMultiLinesLabel(LabelGdbDescription, 3);
     
   // No Python
   RadioButtonNone := TNewRadioButton.Create(GdbPage);
   RadioButtonNone.Parent := GdbPage.Surface;
-  RadioButtonNone.Caption := 'None';  
+  RadioButtonNone.Caption := CustomMessage('GdbPythonNone');  
   RadioButtonNone.Top := LabelGdbDescription.Top 
     + LabelGdbDescription.Height + ScaleY(4);
   RadioButtonNone.Width := GdbPage.SurfaceWidth;
@@ -127,7 +127,7 @@ begin
   // Python 2.7
   RadioButtonPython27 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython27.Parent := GdbPage.Surface;
-  RadioButtonPython27.Caption := 'Python 2.7';  
+  RadioButtonPython27.Caption := CustomMessage('GdbPython27');  
   RadioButtonPython27.Top := RadioButtonNone.Top 
     + RadioButtonNone.Height + ScaleY(4);
   RadioButtonPython27.Width := GdbPage.SurfaceWidth;
@@ -136,7 +136,7 @@ begin
   // Python 3.4
   RadioButtonPython34 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython34.Parent := GdbPage.Surface;
-  RadioButtonPython34.Caption := 'Python 3.4';  
+  RadioButtonPython34.Caption := CustomMessage('GdbPython34');  
   RadioButtonPython34.Top := RadioButtonPython27.Top 
     + RadioButtonPython27.Height + ScaleY(4);
   RadioButtonPython34.Width := GdbPage.SurfaceWidth;
@@ -145,7 +145,7 @@ begin
   // Python 3.5
   RadioButtonPython35 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython35.Parent := GdbPage.Surface;
-  RadioButtonPython35.Caption := 'Python 3.5';  
+  RadioButtonPython35.Caption := CustomMessage('GdbPython35');  
   RadioButtonPython35.Top := RadioButtonPython34.Top 
     + RadioButtonPython34.Height + ScaleY(4);
   RadioButtonPython35.Width := GdbPage.SurfaceWidth;
@@ -154,7 +154,7 @@ begin
   // Python 3.6
   RadioButtonPython36 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython36.Parent := GdbPage.Surface;
-  RadioButtonPython36.Caption := 'Python 3.6';  
+  RadioButtonPython36.Caption := CustomMessage('GdbPython36');  
   RadioButtonPython36.Top := RadioButtonPython35.Top 
     + RadioButtonPython35.Height + ScaleY(4);
   RadioButtonPython36.Width := GdbPage.SurfaceWidth;
@@ -163,7 +163,7 @@ begin
   // Python 3.7
   RadioButtonPython37 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython37.Parent := GdbPage.Surface;
-  RadioButtonPython37.Caption := 'Python 3.7';  
+  RadioButtonPython37.Caption := CustomMessage('GdbPython37');  
   RadioButtonPython37.Top := RadioButtonPython36.Top 
     + RadioButtonPython36.Height + ScaleY(4);
   RadioButtonPython37.Width := GdbPage.SurfaceWidth;
@@ -172,7 +172,7 @@ begin
   // Python 3.8
   RadioButtonPython38 := TNewRadioButton.Create(GdbPage);
   RadioButtonPython38.Parent := GdbPage.Surface;
-  RadioButtonPython38.Caption := 'Python 3.8';  
+  RadioButtonPython38.Caption := CustomMessage('GdbPython38');  
   RadioButtonPython38.Top := RadioButtonPython37.Top 
     + RadioButtonPython37.Height + ScaleY(4);
   RadioButtonPython38.Width := GdbPage.SurfaceWidth;

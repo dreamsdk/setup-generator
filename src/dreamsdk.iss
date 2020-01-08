@@ -132,9 +132,11 @@ Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfut
 Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; ExtraDiskSpaceRequired: 45056; Types: full
 
 [Files]
-; Temporary files used for the installation
+; Install helpers
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
-Source: "..\rsrc\helpers\*"; Flags: dontcopy noencryption nocompression
+
+; Temporary files used for the installation
+Source: "..\rsrc\helpers\temp\*"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
 ; Some additional resources
@@ -186,21 +188,20 @@ Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait pos
 ;Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
-AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
-ExecuteMainApplication=Start a new {#FullAppMainName} session
-ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
-DocumentationGroupDirectory=Documentation
-InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
-PrerequisiteMissing=Sorry, but prerequisites are not fully met, some components are missing from your computer: %s%n%nPlease install all of these components, then check they are available on your PATH environment variable and finally restart the installation.
-PrerequisiteOptionalMissing=You are missing some optional prerequisites: %s%n%nFor better experience, it would be nice to have them installed, even if it isn't mandatory. Continue anyway?
-PrerequisiteMissingPython=Python
-PrerequisiteMissingGit=Git
-PrerequisiteMissingSubversion=Subversion Client (SVN)
-UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
-UninstallPackage=Remove {#MyAppName} from your computer
-InactiveInternetConnection=The {#MyAppName} Setup need to be connected to Internet, as some critical components are downloaded at the installation's end. Please check your Internet connection and click the Retry button or click the Cancel button to exit the installer.
-LicenseInformation={#MyAppName} License Information
-ProgramHelp={#MyAppNameHelp}
+; Generic buttons
+ButtonBrowse=Browse...
+ButtonRefresh=Refresh
+
+; Startup messages
+PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
+PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x). You should restart your computer and run Setup again. Continue anyway?
+VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, it need to be uninstalled first. Continue anyway?
+NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newer that the version provided in this package (%s). Setup will exit now.
+PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
+
+; Destination Directory
+InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
+; Components
 ComponentMain=Program files (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
 ComponentIDE=Integrated Development Environment (IDE)
@@ -217,34 +218,60 @@ ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pv
 ComponentAdditionalTools_txfutils=TXF Utilities – Textured font format tools (showtxf, ttf2txf)
 ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
 ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data handler (vmutool)
-CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
-CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
-LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
-ButtonBrowse=Browse...
-LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
-LabelCodeBlocksConfigurationFile=Select the {#IdeCodeBlocksName} configuration file:
-FilterCodeBlocksConfigurationFile=Configuration Files (*.conf)|*.conf|All Files (*.*)|*.*
-CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
-CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library (codeblocks.dll) in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
-CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
-CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
-CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
-PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
-PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x). You should restart your computer and run Setup again. Continue anyway?
-VersionAlreadyInstalled={#MyAppName} %s is already installed. If you want to reinstall it, it need to be uninstalled first. Continue anyway?
-NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newer that the version provided in this package (%s). Setup will exit now.
-PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
+
+; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Customize your GNU Debugger for SuperH installation.
 LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
+GdbPythonNone=Don't use Python for GDB
+GdbPython27=Python 2.7
+GdbPython34=Python 3.4
+GdbPython35=Python 3.5
+GdbPython36=Python 3.6
+GdbPython37=Python 3.7
+GdbPython38=Python 3.8
+
+; KallistiOS
 KallistiEmbeddedTitlePage=KallistiOS Configuration
 KallistiEmbeddedSubtitlePage=What kind of repositories do you want to use?
 LabelKallistiEmbeddedIntroduction=Introduction
 LabelKallistiEmbeddedDescription=desc
 KallistiEmbeddedOnline=Use online repositories (Highly recommanded)
 KallistiEmbeddedOffline=Use offline repositories
-KallistiEmbeddedOfflineConfirmation=This will disable the Update feature of {#FullAppManagerName}. Are you sure to use offline repositories?
+KallistiEmbeddedOfflineConfirmation=Are you really sure to use offline repositories included in that {#MyAppName} Setup?
+InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
+PrerequisiteMissing=Sorry, but prerequisites are not fully met, some components are missing from your computer: %s%n%nPlease install all of these components, check they are available on your PATH environment variable and try again.
+PrerequisiteOptionalMissing=You are missing some optional prerequisites: %s%n%nFor better experience, it would be nice to have them installed, even if it isn't mandatory. Continue anyway?
+PrerequisiteMissingPython=Python
+PrerequisiteMissingGit=Git
+PrerequisiteMissingSubversion=Subversion Client (SVN)
+
+; Code::Blocks IDE
+CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
+CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
+LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
+LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
+LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} at once with that user to create some mandatory files.
+CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
+CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
+CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
+CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
+CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
+CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
+
+; Additional tasks
+AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
+
+; End messages
+UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
+
+; Shortcut iconsProgramHelp={#MyAppNameHelp}
+LicenseInformation={#MyAppName} License Information
+DocumentationGroupDirectory=Documentation
+ExecuteMainApplication=Start a new {#FullAppMainName} session
+ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
+UninstallPackage=Remove {#MyAppName} from your computer
 
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
@@ -313,18 +340,6 @@ begin
     Result := False;
     Exit;
   end;
-
-  // Check prerequisites
-  Result := Result and CheckPrerequisites;
-  if not Result then
-    MsgBox(GeneratePrerequisiteMessage, mbError, MB_OK);
-
-  // Check optional prerequisites
-  if Result and (not CheckOptionalPrerequisites) then
-  begin
-    Result := Result 
-      and (MsgBox(GenerateOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDYES);
-  end;
   
   // This test should be the latest!
   // Check if an old version is installed
@@ -351,24 +366,61 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
   
-  // Avoid spaces in the Installation Path
-  if (CurPageID = wpSelectDir) and (Pos(' ', WizardDirValue) > 0) then
+  // Select Directory Page
+  if (CurPageID = wpSelectDir) then
   begin
-    Result := False;
-    MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
+    // Avoid spaces in the Installation Path  
+    Result := (Pos(' ', WizardDirValue) = 0);
+    if not Result then
+    begin
+      MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
+      Exit;
+    end;
   end;
-
-  // Checking if the user is SURE to use the embedded KOS
-  if (CurPageID = KallistiEmbeddedPageID) then
-    if IsKallistiEmbedded then
-      Result := ConfirmKallistiEmbeddedUsage
-    else
-      Result := CheckInternetConnection;
 
-  // Checking if the Code::Blocks Integration page is well filled
+  // KallistiOS Page
+  if (CurPageID = KallistiEmbeddedPageID) then
+  begin
+    // Checking if the user is SURE to use the embedded KOS
+    if IsKallistiEmbedded then
+    begin
+      // Offline
+      
+      Result := ConfirmKallistiEmbeddedUsage;
+    end
+    else
+    begin
+      // Online
+      
+      // Check Internet connection
+      Result := CheckInternetConnection;
+      if not Result then
+        Exit;
+
+      // Check mandatory prerequisites
+      Result := CheckOnlineMandatoryPrerequisites;
+      if not Result then
+      begin
+        MsgBox(GeneratePrerequisiteMessage, mbError, MB_OK);
+        Exit;
+      end;
+
+      // Check optional prerequisites
+      if Result and (not CheckOnlineOptionalPrerequisites) then      
+        if (MsgBox(GenerateOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDNO) then
+        begin
+          Result := False;
+          Exit;
+        end;
+    end;
+  end;
+
+  // Code::Blocks Page
   if (CurPageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
-    if (IsCodeBlocksIntegrationEnabled) and (not IsCodeBlocksIntegrationReady) then
-      Result := False;
+  begin
+    // Checking if the Code::Blocks Integration page is well filled
+    Result := IsCodeBlocksIntegrationEnabled and IsCodeBlocksIntegrationReady;
+  end;
 
   // Finalizing the installation.
   if (CurPageID = wpInfoAfter) then

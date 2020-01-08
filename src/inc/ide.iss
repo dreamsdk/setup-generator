@@ -9,12 +9,14 @@ const
   DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
   DEFAULT_CB_CONFIG_FILE = 'CodeBlocks\default.conf';
   
-  CB_HELPER_FILE = '{tmp}\codeblocks-helper.exe';
+  CB_HELPER_FILE = '{tmp}\cbhelper.exe';
   CB_PATCH_FILE = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\codeblocks-patcher.exe';
           
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
   EditCodeBlocksInstallationDirectory: TEdit;
+  EditCodeBlocksUsersList: TMemo;
+  ButtonCodeBlocksRefreshUsersList: TButton;
 
 function IsCodeBlocksIntegrationEnabled: Boolean;
 begin
@@ -23,7 +25,12 @@ end;
 
 function IsCodeBlocksInstallationMode: Boolean;
 begin
-  Result := Assigned(EditCodeBlocksInstallationDirectory);
+  Result := Assigned( EditCodeBlocksInstallationDirectory );
+end;
+
+function IsCodeBlocksUsersAvailable: Boolean;
+begin
+  Result := (EditCodeBlocksUsersList.Lines.Count > 0);
 end;
 
 function GetCodeBlocksInstallationDirectory: String;
@@ -37,9 +44,15 @@ begin
     Result := RemoveBackslash(EditCodeBlocksInstallationDirectory.Text); 
 end;
 
-function GetCodeBlocksConfigurationFileNames: String;
+procedure RetrieveCodeBlocksUsersList;
 begin
-  Result := RunCommand( ExpandConstant(CB_HELPER_FILE) );
+  Wizardform.NextButton.Enabled := False;
+  ButtonCodeBlocksRefreshUsersList.Enabled := False;  
+  
+  EditCodeBlocksUsersList.Text := RunCommand( ExpandConstant(CB_HELPER_FILE) );
+  
+  ButtonCodeBlocksRefreshUsersList.Enabled := True;
+  Wizardform.NextButton.Enabled := True;
 end;
 
 function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
@@ -99,6 +112,11 @@ begin
   EditCodeBlocksInstallationDirectory.Text := Directory;
 end;
 
+procedure ButtonCodeBlocksRefreshUsersListOnClick(Sender: TObject);
+begin
+  RetrieveCodeBlocksUsersList;
+end;
+
 function IsCodeBlocksIntegrationReady: Boolean;
 var
   CodeBlocksBinaryFileName: String;
@@ -129,6 +147,14 @@ begin
     // Check if the SHA-1 hash of the codeblocks.dll file is correct
     Result := (MsgBox(CustomMessage('CodeBlocksBinaryHashDifferent'), mbError, MB_YESNO) = IDYES);
   end;
+
+  // Check if the users are available
+  if not IsCodeBlocksUsersAvailable then
+  begin
+    Result := False;
+    MsgBox(CustomMessage('CodeBlocksInstallationUsersUnavailable'), mbError, MB_OK);
+    Exit;
+  end;
 end;
 
 function CreateIntegratedDevelopmentEnvironmentPage: Integer;
@@ -140,12 +166,11 @@ var
   LabelCodeBlocksConfigurationFiles: TLabel;
   RowTop1, RowTop2: Integer;
   BtnImage: TBitmapImage;
-  EditCodeBlocksUsersList: TMemo;
 
 begin
   ExtractTemporaryFile('cbhelper.exe');
 
-  IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectComponents, 
+  IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectComponents,
     CustomMessage('CodeBlocksTitlePage'),
     CustomMessage('CodeBlocksSubtitlePage'));
 
@@ -191,26 +216,44 @@ begin
   EditCodeBlocksInstallationDirectory.Top := RowTop1;
   EditCodeBlocksInstallationDirectory.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
 
+  RowTop2 := EditCodeBlocksInstallationDirectory.Top + 
+    EditCodeBlocksInstallationDirectory.Height + ScaleY(16);
+
   // Label for CodeBlocksInstallationDirectory
   LabelCodeBlocksConfigurationFiles := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
   LabelCodeBlocksConfigurationFiles.Caption := 
-    CustomMessage('LabelCodeBlocksInstallationDirectory');
-  LabelCodeBlocksConfigurationFiles.AutoSize := True;
-  LabelCodeBlocksConfigurationFiles.Top := EditCodeBlocksInstallationDirectory.Top + 
-    EditCodeBlocksInstallationDirectory.Height + ScaleY(8);
+    CustomMessage('LabelCodeBlocksConfigurationFiles');   
+  LabelCodeBlocksConfigurationFiles.Top := RowTop2;
   LabelCodeBlocksConfigurationFiles.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  SetMultiLinesLabel(LabelCodeBlocksConfigurationFiles, 3);
+
+  // Refresh Code::Blocks Users List
+  ButtonCodeBlocksRefreshUsersList := TButton.Create(IntegratedDevelopmentEnvironmentPage);
+  ButtonCodeBlocksRefreshUsersList.Width := ScaleX(75);
+  ButtonCodeBlocksRefreshUsersList.Height := ScaleY(23);
+  ButtonCodeBlocksRefreshUsersList.Top := RowTop2 + (LabelCodeBlocksConfigurationFiles.Height div 2) 
+    - (ButtonCodeBlocksRefreshUsersList.Height div 2);
+  ButtonCodeBlocksRefreshUsersList.Left := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
+    - ButtonCodeBlocksRefreshUsersList.Width; 
+  ButtonCodeBlocksRefreshUsersList.Caption := 
+    CustomMessage('ButtonRefresh');
+  ButtonCodeBlocksRefreshUsersList.OnClick := @ButtonCodeBlocksRefreshUsersListOnClick;
+  ButtonCodeBlocksRefreshUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  LabelCodeBlocksConfigurationFiles.Width := 
+    LabelCodeBlocksConfigurationFiles.Width - ButtonCodeBlocksRefreshUsersList.Width - ScaleX(4);
 
   // EditCodeBlocksUsersList
   EditCodeBlocksUsersList := TNewMemo.Create(IntegratedDevelopmentEnvironmentPage);
   EditCodeBlocksUsersList.Top := LabelCodeBlocksConfigurationFiles.Top 
     + LabelCodeBlocksConfigurationFiles.Height + ScaleY(8);
   EditCodeBlocksUsersList.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth;
-  EditCodeBlocksUsersList.Height := ScaleY(90);
-  EditCodeBlocksUsersList.ScrollBars := ssVertical;
-  EditCodeBlocksUsersList.Text := GetCodeBlocksConfigurationFileNames;
+  EditCodeBlocksUsersList.Height := ScaleY(80);
+  EditCodeBlocksUsersList.ScrollBars := ssVertical;  
   EditCodeBlocksUsersList.ReadOnly := True;
   EditCodeBlocksUsersList.Color := clBtnFace;
   EditCodeBlocksUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;   
+
+  RetrieveCodeBlocksUsersList;
 
   Result := IntegratedDevelopmentEnvironmentPage.ID;
 end;
