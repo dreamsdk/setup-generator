@@ -102,6 +102,7 @@ begin
   if LoadStringFromFile(TmpFileName, ExecBuffer) then
   begin
     ExecBuffer := AdjustLineBreaks(ExecBuffer);
+    OemToCharBuff(ExecBuffer);
     Result := ExecBuffer;
     Log(Result);
   end
