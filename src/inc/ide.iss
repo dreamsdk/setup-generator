@@ -9,11 +9,8 @@ const
   DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
   DEFAULT_CB_CONFIG_FILE = 'CodeBlocks\default.conf';
   
-  CB_PATCH_DIR = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks';
-  
-  CB_PATCHER_FILE = '\codeblocks-patcher.exe';
-
-  CB_HELPER = '{tmp}\codeblocks-helper.exe';
+  CB_HELPER_FILE = '{tmp}\codeblocks-helper.exe';
+  CB_PATCH_FILE = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\codeblocks-patcher.exe';
           
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
@@ -42,7 +39,7 @@ end;
 
 function GetCodeBlocksConfigurationFileNames: String;
 begin
-  Result := RunCommand( ExpandConstant(CB_HELPER) );
+  Result := RunCommand( ExpandConstant(CB_HELPER_FILE) );
 end;
 
 function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
@@ -65,7 +62,7 @@ begin
     PatcherSwitch := 'uninstall';
 
   Buffer := RunCommand(Format('"%s" --operation=%s %s --no-logo --show-splash', [
-    ExpandConstant(CB_PATCH_DIR) + CB_PATCHER_FILE,
+    ExpandConstant(CB_PATCH_FILE),
     PatcherSwitch,
     ParamInstallOption
   ]));
@@ -146,7 +143,7 @@ var
   EditCodeBlocksUsersList: TMemo;
 
 begin
-  ExtractTemporaryFile('codeblocks-helper.exe');
+  ExtractTemporaryFile('cbhelper.exe');
 
   IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectComponents, 
     CustomMessage('CodeBlocksTitlePage'),
@@ -212,7 +209,7 @@ begin
   EditCodeBlocksUsersList.ScrollBars := ssVertical;
   EditCodeBlocksUsersList.Text := GetCodeBlocksConfigurationFileNames;
   EditCodeBlocksUsersList.ReadOnly := True;
-  EditCodeBlocksUsersList.Color := clGreen;
+  EditCodeBlocksUsersList.Color := clBtnFace;
   EditCodeBlocksUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;   
 
   Result := IntegratedDevelopmentEnvironmentPage.ID;
