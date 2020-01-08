@@ -18,11 +18,13 @@ function CreateKallistiEmbeddedPage: Integer;
 var
   KallistiEmbeddedPage: TWizardPage;
   LabelKallistiEmbeddedIntroduction, 
-  LabelKallistiEmbeddedDescription: TLabel;
+  LabelKallistiEmbeddedDescription,
+  LabelKallistiEmbeddedDescriptionOnline,
+  LabelKallistiEmbeddedDescriptionOffline: TLabel;
   BtnImage: TBitmapImage;
 
 begin
-  KallistiEmbeddedPage := CreateCustomPage(wpSelectComponents, 
+  KallistiEmbeddedPage := CreateCustomPage(wpSelectComponents,
     CustomMessage('KallistiEmbeddedTitlePage'), 
     CustomMessage('KallistiEmbeddedSubtitlePage'));
 
@@ -40,13 +42,11 @@ begin
   // Explanation of this page
   LabelKallistiEmbeddedDescription := TLabel.Create(KallistiEmbeddedPage);
   LabelKallistiEmbeddedDescription.Parent := KallistiEmbeddedPage.Surface;
-  LabelKallistiEmbeddedDescription.Caption := CustomMessage('LabelKallistiEmbeddedDescription'); 
-  LabelKallistiEmbeddedDescription.AutoSize := True;
-  LabelKallistiEmbeddedDescription.WordWrap := True;  
+  LabelKallistiEmbeddedDescription.Caption := CustomMessage('LabelKallistiEmbeddedDescription');  
   LabelKallistiEmbeddedDescription.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
   LabelKallistiEmbeddedDescription.Width := KallistiEmbeddedPage.SurfaceWidth;
-  LabelKallistiEmbeddedDescription.Height := ScaleY(LabelKallistiEmbeddedIntroduction.Height * 3); // Hack to have 3 lines label... LabelKallistiEmbeddedIntroduction.Height is only 1 line... This is BAD
-    
+  SetMultiLinesLabel(LabelKallistiEmbeddedDescription, 4);
+      
   // Online
   RadioButtonOnline := TNewRadioButton.Create(KallistiEmbeddedPage);
   RadioButtonOnline.Parent := KallistiEmbeddedPage.Surface;
@@ -55,14 +55,30 @@ begin
     + LabelKallistiEmbeddedDescription.Height + ScaleY(4);
   RadioButtonOnline.Width := KallistiEmbeddedPage.SurfaceWidth;
   RadioButtonOnline.Checked := True;
-  
+  RadioButtonOnline.Font.Style := [fsBold];
+
+  LabelKallistiEmbeddedDescriptionOnline := TLabel.Create(KallistiEmbeddedPage);
+  LabelKallistiEmbeddedDescriptionOnline.Parent := KallistiEmbeddedPage.Surface;
+  LabelKallistiEmbeddedDescriptionOnline.Caption := CustomMessage('LabelKallistiEmbeddedDescriptionOnline'); 
+  LabelKallistiEmbeddedDescriptionOnline.Top := RadioButtonOnline.Top + RadioButtonOnline.Height + ScaleY(4);
+  LabelKallistiEmbeddedDescriptionOnline.Width := KallistiEmbeddedPage.SurfaceWidth;
+  SetMultiLinesLabel(LabelKallistiEmbeddedDescriptionOnline, 3);  
+
   // Offline
   RadioButtonOffline := TNewRadioButton.Create(KallistiEmbeddedPage);
   RadioButtonOffline.Parent := KallistiEmbeddedPage.Surface;
   RadioButtonOffline.Caption := CustomMessage('KallistiEmbeddedOffline');  
-  RadioButtonOffline.Top := RadioButtonOnline.Top 
-    + RadioButtonOnline.Height + ScaleY(4);
+  RadioButtonOffline.Top := LabelKallistiEmbeddedDescriptionOnline.Top 
+    + LabelKallistiEmbeddedDescriptionOnline.Height + ScaleY(4);
   RadioButtonOffline.Width := KallistiEmbeddedPage.SurfaceWidth;
+  RadioButtonOffline.Font.Style := [fsBold];
+
+  LabelKallistiEmbeddedDescriptionOffline := TLabel.Create(KallistiEmbeddedPage);
+  LabelKallistiEmbeddedDescriptionOffline.Parent := KallistiEmbeddedPage.Surface;
+  LabelKallistiEmbeddedDescriptionOffline.Caption := CustomMessage('LabelKallistiEmbeddedDescriptionOffline'); 
+  LabelKallistiEmbeddedDescriptionOffline.Top := RadioButtonOffline.Top + RadioButtonOffline.Height + ScaleY(4);
+  LabelKallistiEmbeddedDescriptionOffline.Width := KallistiEmbeddedPage.SurfaceWidth;
+  SetMultiLinesLabel(LabelKallistiEmbeddedDescriptionOffline, 3);  
 
   Result := KallistiEmbeddedPage.ID;
 end;

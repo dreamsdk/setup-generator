@@ -34,10 +34,6 @@ begin
 end;
 
 function GetCodeBlocksInstallationDirectory: String;
-var
-  Buffer: AnsiString;
-  IsInstallMode: Boolean;
-
 begin                        
   Result := '';   
   if IsCodeBlocksInstallationMode then
@@ -159,10 +155,8 @@ end;
 
 function CreateIntegratedDevelopmentEnvironmentPage: Integer;
 var
-  ButtonCodeBlocksInstallationDirectory, 
-  ButtonCodeBlocksConfigurationFile: TButton;
+  ButtonCodeBlocksInstallationDirectory: TButton;
   LabelCodeBlocksIntroduction, LabelCodeBlocksInstallationDirectory, 
-  LabelCodeBlocksConfigurationFile,
   LabelCodeBlocksConfigurationFiles: TLabel;
   RowTop1, RowTop2: Integer;
   BtnImage: TBitmapImage;

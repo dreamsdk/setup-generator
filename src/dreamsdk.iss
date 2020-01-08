@@ -115,9 +115,11 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Components]
 Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom; Flags: fixed
-Name: "kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
+Name: "main\base"; Description: "{cm:ComponentBase}"; ExtraDiskSpaceRequired: 293601280; Types: full compact custom; Flags: fixed
+Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; ExtraDiskSpaceRequired: 1214186581; Types: full compact custom; Flags: fixed
+Name: "main\kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
 Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
-Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full 
+Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
 Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; ExtraDiskSpaceRequired: 7539; Types: full
 Name: "addons\img4dc"; Description: "{cm:ComponentAdditionalTools_img4dc}"; Types: full
@@ -192,6 +194,14 @@ Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait pos
 ButtonBrowse=Browse...
 ButtonRefresh=Refresh
 
+; Prerequisites
+PrerequisiteMissing=%s is missing.
+PrerequisiteMissingHintMandatory=Please install it, check its availability in PATH environment variable then try again.
+PrerequisiteMissingHintOptional=For better experience, it would be nice to have it installed. Continue anyway?
+PrerequisiteMissingPython=Python
+PrerequisiteMissingGit=Git
+PrerequisiteMissingSubversion=Subversion Client (SVN)
+
 ; Startup messages
 PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
 PreviousVersionUninstallFailed=Failed to uninstall {#MyAppName} %s (Error 0x%.8x). You should restart your computer and run Setup again. Continue anyway?
@@ -200,9 +210,12 @@ NewerVersionAlreadyInstalled={#MyAppName} %s is already installed, which is newe
 PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. The uninstall command was not retrieved from the registry! Continue anyway?
 
 ; Destination Directory
-InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
+InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
+
 ; Components
-ComponentMain=Program files (required)
+ComponentMain=Base program files (required)
+ComponentBase=MinGW/MSYS and Win32 toolchain (required)
+ComponentToolchains=Super-H and AICA toolchains (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
 ComponentIDE=Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksVerName}
@@ -233,19 +246,16 @@ GdbPython37=Python 3.7
 GdbPython38=Python 3.8
 
 ; KallistiOS
-KallistiEmbeddedTitlePage=KallistiOS Configuration
-KallistiEmbeddedSubtitlePage=What kind of repositories do you want to use?
-LabelKallistiEmbeddedIntroduction=Introduction
-LabelKallistiEmbeddedDescription=desc
-KallistiEmbeddedOnline=Use online repositories (Highly recommanded)
+KallistiEmbeddedTitlePage=Sega Dreamcast Libraries Configuration
+KallistiEmbeddedSubtitlePage=From where do you want to retrieve the libraries?
+LabelKallistiEmbeddedIntroduction=Configure where do you want to retrieve the required components.                                                                                                        <
+LabelKallistiEmbeddedDescription={#MyAppName} needs KallistiOS (kos), KallistiOS Ports (kos-ports) and Dreamcast-Tool (dcload-serial, dcload-ip) in order to work properly. These components are libraries used for the Sega Dreamcast development, in addition of the provided toolchains.
+KallistiEmbeddedOnline=Use online repositories (highly recommended)
 KallistiEmbeddedOffline=Use offline repositories
 KallistiEmbeddedOfflineConfirmation=Are you really sure to use offline repositories included in that {#MyAppName} Setup?
 InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
-PrerequisiteMissing=Sorry, but prerequisites are not fully met, some components are missing from your computer: %s%n%nPlease install all of these components, check they are available on your PATH environment variable and try again.
-PrerequisiteOptionalMissing=You are missing some optional prerequisites: %s%n%nFor better experience, it would be nice to have them installed, even if it isn't mandatory. Continue anyway?
-PrerequisiteMissingPython=Python
-PrerequisiteMissingGit=Git
-PrerequisiteMissingSubversion=Subversion Client (SVN)
+LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-date by using the online repositories. This will requires an Internet connection, Git and optionally the Subversion Client (SVN).
+LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions of the required Sega Dreamcast libraries. Use this option only if you don't have an active Internet connection or you want to manage the required, mandatory libraries manually.
 
 ; Code::Blocks IDE
 CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
@@ -261,12 +271,13 @@ CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
 
 ; Additional tasks
-AddToPathEnvironmentVariable=Add {#MyAppName} to PATH variable
+AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment variable
 
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 
-; Shortcut iconsProgramHelp={#MyAppNameHelp}
+; Shortcut icons
+ProgramHelp={#MyAppNameHelp}
 LicenseInformation={#MyAppName} License Information
 DocumentationGroupDirectory=Documentation
 ExecuteMainApplication=Start a new {#FullAppMainName} session
@@ -340,6 +351,14 @@ begin
     Result := False;
     Exit;
   end;
+
+  // Check mandatory prerequisites
+  Result := CheckMandatoryPrerequisites;
+  if not Result then
+  begin
+    MsgBox(GenerateMandatoryPrerequisiteMessage, mbError, MB_OK);
+    Exit;
+  end;
   
   // This test should be the latest!
   // Check if an old version is installed
@@ -401,13 +420,13 @@ begin
       Result := CheckOnlineMandatoryPrerequisites;
       if not Result then
       begin
-        MsgBox(GeneratePrerequisiteMessage, mbError, MB_OK);
+        MsgBox(GenerateOnlinePrerequisiteMessage, mbError, MB_OK);
         Exit;
       end;
 
       // Check optional prerequisites
       if Result and (not CheckOnlineOptionalPrerequisites) then      
-        if (MsgBox(GenerateOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDNO) then
+        if (MsgBox(GenerateOnlineOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDNO) then
         begin
           Result := False;
           Exit;
@@ -463,4 +482,3 @@ begin
     Log(Format('Should Skip Page IDE: %d', [Result]));
   end;
 end;
-

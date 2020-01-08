@@ -59,6 +59,19 @@ begin
     DeleteFile(TmpFileName);
 end;
 
+function CheckMandatoryPrerequisites: Boolean;
+var
+  PrerequisiteVersion: String;
+
+begin
+  // Check Python
+  PrerequisiteVersion := GetPrerequisiteVersion(paPython);    
+  IsPythonInstalled := PrerequisiteVersion <> '';
+  
+  // Final result
+  Result := IsPythonInstalled; 
+end;
+
 // Verify that all prerequisites are installed.
 function CheckOnlineMandatoryPrerequisites: Boolean;
 var
@@ -69,12 +82,8 @@ begin
   PrerequisiteVersion := GetPrerequisiteVersion(paGit);
   IsGitInstalled := PrerequisiteVersion <> '';
   
-  // Check Python
-  PrerequisiteVersion := GetPrerequisiteVersion(paPython);    
-  IsPythonInstalled := PrerequisiteVersion <> '';  
-
   // Final result
-  Result := IsGitInstalled and IsPythonInstalled;  
+  Result := IsGitInstalled;  
 end;
 
 // Verify that all optional prerequisites are installed.
@@ -91,30 +100,41 @@ begin
   Result := IsSubversionInstalled;
 end;
 
-// Helper function that concat prerequisite message
-function MakePrerequisiteMessage(const ActualValue, NewPrerequisite: String): string;
+function MakePrerequisiteMessage(Prerequisite: String; Mandatory: Boolean): String;
+var
+  Message: String;
+
 begin
-  Result := ActualValue + sLineBreak + ' - ' + CustomMessage(NewPrerequisite);
+  Message := CustomMessage('PrerequisiteMissing') + ' ';
+  if Mandatory then
+    Message := Message + CustomMessage('PrerequisiteMissingHintMandatory')
+  else
+    Message := Message + CustomMessage('PrerequisiteMissingHintOptional');
+  Result := Format(Message, [CustomMessage(Prerequisite)]);
 end;
 
 // This func is used when one or more prerequisites is missing.
-function GeneratePrerequisiteMessage: String;
+function GenerateMandatoryPrerequisiteMessage: String;
+begin
+  Result := '';    
+  if not IsPythonInstalled then
+    Result := MakePrerequisiteMessage('PrerequisiteMissingPython', True);
+end;
+
+// Online: This func is used when one or more optional prerequisites is missing. 
+function GenerateOnlinePrerequisiteMessage: String;
 begin
   Result := '';    
   if not IsGitInstalled then
-    Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingGit');
-  if not IsPythonInstalled then
-    Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingPython');
-  Result := Format(CustomMessage('PrerequisiteMissing'), [Result]); 
+    Result := MakePrerequisiteMessage('PrerequisiteMissingGit', True); 
 end;
 
-// This func is used when one or more optional prerequisites is missing.
-function GenerateOptionalPrerequisiteMessage: String;
+// Online: This func is used when one or more optional prerequisites is missing.
+function GenerateOnlineOptionalPrerequisiteMessage: String;
 begin
   Result := '';
   if not IsSubversionInstalled then
-    Result := MakePrerequisiteMessage(Result, 'PrerequisiteMissingSubversion');
-  Result := Format(CustomMessage('PrerequisiteOptionalMissing'), [Result]); 
+    Result := MakePrerequisiteMessage('PrerequisiteMissingSubversion', False); 
 end;
 
 procedure PatchMountPoint;
