@@ -46,7 +46,7 @@
 #define AppOptBase "{app}\msys\1.0\opt"
 #define AppToolchainBase AppOptBase + "\toolchains\dc"
 #define AppMainDirectory AppOptBase + "\dreamsdk"
-#define AppMainExeName AppMainDirectory + "\dreamsdk.exe"
+#define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
 #define AppSupportDirectory "{app}\support"
@@ -149,8 +149,9 @@ Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ig
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 
 ; MinGW Base
-Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; Toolchains
+Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample"
+
+; Toolchains
 Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#SourceDirectoryToolchainSh}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -277,7 +278,7 @@ CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
 CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
 LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
-LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} one time with that user to create some mandatory files.
+LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} one time with that user to create the required files.
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
 CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
