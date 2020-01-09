@@ -1,11 +1,8 @@
 [Code]
+
 const
   sLineBreak = #13#10;
   MAX_RAND_SEED = $FFFFFFFF;  
-
-var
-  BrowseForFolderExFakePage: TInputDirWizardPage;
-  CurrentUserRealAppDataDirectory: String;
     
 // Thanks Michel (Phidels.com)
 function Left(SubStr, S: String): String;
@@ -21,6 +18,15 @@ begin
 end;
 
 // Thanks Michel (Phidels.com)
+function ExtremeRight(SubStr: string; S: string): string;
+begin
+  Repeat
+    S:= Right(substr,s);
+  until pos(substr,s)=0;
+  result:=S;
+end;
+
+// Thanks Michel (Phidels.com)
 function ExtractStr(LeftSubStr, RightSubStr, S: String): String;
 begin
   Result := Left(RightSubStr, Right(LeftSubStr, S));
@@ -29,6 +35,25 @@ end;
 function IsInString(const SubStr, S: string): Boolean;
 begin
   Result := Pos(LowerCase(SubStr), LowerCase(S)) > 0;
+end;
+
+// Replace the last occurrence of a substring in a string with something else
+const
+  EXTREME_RIGHT_SEPARATOR = '§§';
+
+function ReplaceLastOccurrence(S, OldSubStr, NewSubStr: String): String;
+var
+  i: Integer;
+  Temp,
+  LeftPart,
+  RightPart: String;
+
+begin  
+  Temp := S;  
+  RightPart := ExtremeRight(OldSubStr, Temp);
+  StringChangeEx(Temp, OldSubStr + RightPart, EXTREME_RIGHT_SEPARATOR + RightPart, True);                                     
+  LeftPart := Left(EXTREME_RIGHT_SEPARATOR, Temp);
+  Result := LeftPart + NewSubStr + RightPart;
 end;
 
 function AdjustLineBreaks(const S: String): String;
@@ -66,21 +91,6 @@ begin
       Buffer.Free;
     end;
   end;
-end;
-
-function CreateBrowseForFolderExFakePage: Integer;
-begin
-  // Create BrowseForFolderExFakePage
-  BrowseForFolderExFakePage := CreateInputDirPage(wpWelcome, '', '', '', False, SetupMessage(msgButtonNewFolder));
-  BrowseForFolderExFakePage.Add('');
-  Result := BrowseForFolderExFakePage.ID;
-end;
-
-procedure BrowseForFolderEx(var Directory: String);
-begin
-  BrowseForFolderExFakePage.Values[0] := Directory;
-  BrowseForFolderExFakePage.Buttons[0].OnClick(BrowseForFolderExFakePage.Buttons[0]);
-  Directory := BrowseForFolderExFakePage.Values[0];
 end;
 
 function RunCommand(const CommandLine: String): String;
@@ -138,80 +148,40 @@ begin
   end;
 end;
 
-// https://stackoverflow.com/a/43248500
-function GetCurrentUserRealAppDataDirectory: String;
+// https://stackoverflow.com/a/39291592/3726096
+function CheckInternetConnection: Boolean;
 var
-  AppDataPath,
-  TempFileName,
-  Cmd,
-  Params: String;
-  ResultCode: Integer;
-  Buf: AnsiString;
+  WinHttpReq: Variant;
+  Connected: Boolean;
 
 begin
-  if not DirExists(CurrentUserRealAppDataDirectory) then
-  begin
-    AppDataPath := ExpandConstant('{userappdata}');
-    Log(Format('Default/Fallback application data path: %s', [AppDataPath]));
-    TempFileName := ExpandConstant('{tmp}\is-appdata.tmp');
-    Cmd := ExpandConstant('{cmd}');
-    Params := Format('/C echo %%AppData%% > "%s"', [TempFileName]);
-    Log(Format('Resolving AppData using %s', [Params]));
-    if ExecAsOriginalUser(Cmd, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) 
-      and (ResultCode = 0) then
-    begin
-      if LoadStringFromFile(TempFileName, Buf) then
+  Connected := False;
+  repeat
+    Log('Checking connection to the server');
+    try
+      WinHttpReq := CreateOleObject('WinHttp.WinHttpRequest.5.1');
+      WinHttpReq.Open('GET', '{#TestConnectionURL}', False);
+      WinHttpReq.Send('');
+      Log(Format('Connected to the server; status: %s %s', [WinHttpReq.Status, WinHttpReq.StatusText]));
+      Connected := True;
+    except
+      Log(Format('Error connecting to the server: %s', [GetExceptionMessage]));
+      if WizardSilent then
       begin
-        AppDataPath := Trim(Buf);
-        Log(Format('AppData resolved to %s', [AppDataPath]));
+        Log('Connection to the server is not available, aborting silent installation');
+        Result := False;
+        Exit;
       end
-      else
-        Log(Format('Error reading %s', [TempFileName]));
-      DeleteFile(TempFileName);
-    end
-    else
-      Log(Format('Error %d resolving AppData', [ResultCode]));
-    CurrentUserRealAppDataDirectory := AddBackslash(AppDataPath);
-  end;
-  Result := CurrentUserRealAppDataDirectory;
-end;
-
-function SetPageIcon(const Name: string; Page: TWizardPage): TBitmapImage;var
-  FileName: string;
-
-begin
-  FileName := Name + '.bmp';
-
-  ExtractTemporaryFile(FileName);
-    
-  Result := TBitmapImage.Create(Page);
-
-  with Result do
-  begin
-    Parent := Page.Surface;
-    Bitmap.LoadFromFile(ExpandConstant('{tmp}') + '\' + FileName);
-    Bitmap.AlphaFormat := afPremultiplied;
-    AutoSize := True;
-    Left := 0;
-    Top := 0;
-  end;
-end;
-
-function SetMultiLinesLabel(ControlLabel: TLabel; Lines: Integer): Boolean;
-var
-  ParentPage: TWizardPage;
-  SingleLineHeight: Integer;
-
-begin
-  ParentPage := (ControlLabel.Owner as TWizardPage);
-  Result := Assigned(ParentPage);
-
-  if Result then
-  begin
-    SingleLineHeight := ControlLabel.Height;
-    ControlLabel.AutoSize := False;
-    ControlLabel.WordWrap := True;
-    ControlLabel.Height := SingleLineHeight * Lines;
-    ControlLabel.Width := ParentPage.SurfaceWidth;
-  end;
+      else 
+        if MsgBox(CustomMessage('InactiveInternetConnection'), mbError, MB_RETRYCANCEL) = IDRETRY then
+          Log('Retrying')
+        else
+        begin
+          Log('Aborting');
+          Result := False;
+          Exit;
+        end;
+    end;
+  until Connected;
+  Result := True;
 end;

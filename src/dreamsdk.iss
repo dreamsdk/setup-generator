@@ -62,8 +62,11 @@
 #define PSVinceLibraryFileName "psvince.dll"
 #define PSVinceLibrary AppSupportDirectory + "\" + PSVinceLibraryFileName
 
+; Includes
 #include "inc/utils.iss"
 #include "inc/helpers.iss"
+#include "inc/preq.iss"
+#include "inc/ui.iss"
 #include "inc/environ.iss"
 #include "inc/ide.iss"
 #include "inc/version.iss"
@@ -195,9 +198,16 @@ ButtonBrowse=Browse...
 ButtonRefresh=Refresh
 
 ; Prerequisites
-PrerequisiteMissing=%s is missing.
-PrerequisiteMissingHintMandatory=Please install it, check its availability in PATH environment variable then try again.
-PrerequisiteMissingHintOptional=For better experience, it would be nice to have it installed. Continue anyway?
+PrerequisiteMissing=%s %s missing.
+PrerequisiteMissingLink=and
+PrerequisiteMissingVerbSingle=is
+PrerequisiteMissingVerbMultiple=are
+PrerequisiteMissingHintMandatory=Please install %s, check %s availability in PATH environment variable then try again.
+PrerequisiteMissingHintOptional=For better experience, install %s and check %s availability in PATH environment variable. Continue anyway?
+PrerequisiteMissingHintLink1Single=it
+PrerequisiteMissingHintLink1Multiple=them
+PrerequisiteMissingHintLink2Single=its
+PrerequisiteMissingHintLink2Multiple=their
 PrerequisiteMissingPython=Python
 PrerequisiteMissingGit=Git
 PrerequisiteMissingSubversion=Subversion Client (SVN)
@@ -237,7 +247,7 @@ GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Customize your GNU Debugger for SuperH installation.
 LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
-GdbPythonNone=Don't use Python for GDB
+GdbPythonNone=Don't enable Python for GDB
 GdbPython27=Python 2.7
 GdbPython34=Python 3.4
 GdbPython35=Python 3.5
@@ -251,9 +261,9 @@ KallistiEmbeddedSubtitlePage=From where do you want to retrieve the libraries?
 LabelKallistiEmbeddedIntroduction=Configure where do you want to retrieve the required components.                                                                                                        <
 LabelKallistiEmbeddedDescription={#MyAppName} needs KallistiOS (kos), KallistiOS Ports (kos-ports) and Dreamcast-Tool (dcload-serial, dcload-ip) in order to work properly. These components are libraries used for the Sega Dreamcast development, in addition of the provided toolchains.
 KallistiEmbeddedOnline=Use online repositories (highly recommended)
+InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
 KallistiEmbeddedOffline=Use offline repositories
 KallistiEmbeddedOfflineConfirmation=Are you really sure to use offline repositories included in that {#MyAppName} Setup?
-InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
 LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-date by using the online repositories. This will requires an Internet connection, Git and optionally the Subversion Client (SVN).
 LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions of the required Sega Dreamcast libraries. Use this option only if you don't have an active Internet connection or you want to manage the required, mandatory libraries manually.
 
@@ -262,7 +272,7 @@ CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
 CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
 LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
-LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} at once with that user to create some mandatory files.
+LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} one time with that user to create some mandatory files.
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
 CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
@@ -332,10 +342,10 @@ begin
   Result := False;
 
   // Check if Code::Blocks is running
-  if IsProcessRunning(CODEBLOCKS_EXE_NAME) then
+  Result := IsProcessRunning(CODEBLOCKS_EXE_NAME);
+  if Result then
   begin
     MsgBox(CustomMessage('CodeBlocksRunning'), mbError, MB_OK);
-    Result := True;
     Exit;    
   end;   
 end;
@@ -351,18 +361,17 @@ begin
     Result := False;
     Exit;
   end;
-
-  // Check mandatory prerequisites
-  Result := CheckMandatoryPrerequisites;
-  if not Result then
-  begin
-    MsgBox(GenerateMandatoryPrerequisiteMessage, mbError, MB_OK);
-    Exit;
-  end;
   
   // This test should be the latest!
   // Check if an old version is installed
   Result := Result and HandlePreviousVersion('{#MyAppID}', '{#MyAppVersion}');
+end;
+
+procedure FinalizeSetup;
+begin
+  SetPackageVersion;
+  PatchMountPoint;
+  SetupApplication;
 end;
 
 function InitializeUninstall: Boolean;
@@ -403,34 +412,41 @@ begin
     // Checking if the user is SURE to use the embedded KOS
     if IsKallistiEmbedded then
     begin
-      // Offline
+      { Offline }
       
+      // Sure to continue?
       Result := ConfirmKallistiEmbeddedUsage;
-    end
-    else
-    begin
-      // Online
-      
-      // Check Internet connection
-      Result := CheckInternetConnection;
       if not Result then
         Exit;
 
       // Check mandatory prerequisites
-      Result := CheckOnlineMandatoryPrerequisites;
+      Result := CheckOfflinePrerequisitesMandatory;
       if not Result then
-      begin
-        MsgBox(GenerateOnlinePrerequisiteMessage, mbError, MB_OK);
         Exit;
-      end;
 
       // Check optional prerequisites
-      if Result and (not CheckOnlineOptionalPrerequisites) then      
-        if (MsgBox(GenerateOnlineOptionalPrerequisiteMessage, mbConfirmation, MB_YESNO) = IDNO) then
-        begin
-          Result := False;
-          Exit;
-        end;
+      Result := CheckOfflinePrerequisitesOptional;
+      if not Result then      
+        Exit;     
+    end
+    else
+    begin
+      { Online }
+      
+      // Check Internet connection
+      Result := CheckInternetConnection;
+      if not Result then 
+        Exit;
+
+      // Check mandatory prerequisites
+      Result := CheckOnlinePrerequisitesMandatory;
+      if not Result then
+        Exit;
+
+      // Check optional prerequisites
+      Result := CheckOnlinePrerequisitesOptional;
+      if not Result then      
+        Exit;
     end;
   end;
 
@@ -453,6 +469,22 @@ begin
   end;
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin 
+  Result := False;
+
+  // Always skip BrowseForFolderExFakePage...
+  if (PageID = BrowseForFolderExFakePageID) then
+    Result := True;
+    
+  // Display IDE Page only if needed
+  if (PageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
+  begin
+    Result := not IsCodeBlocksIntegrationEnabled;
+    Log(Format('Should Skip Page IDE: %d', [Result]));
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and IsTaskSelected('envpath') then
@@ -465,20 +497,4 @@ begin
     UninstallCodeBlocksIntegration;
   if (CurUninstallStep = usPostUninstall) then
     EnvRemovePath(ExpandConstant('{#AppMainDirectory}'));
-end;
-
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin 
-  Result := False;
-
-  // Skip BrowseForFolderExFakePage...
-  if (PageID = BrowseForFolderExFakePageID) then
-    Result := True;
-    
-  // Display IDE Page only if needed
-  if (PageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
-  begin
-    Result := not IsCodeBlocksIntegrationEnabled;
-    Log(Format('Should Skip Page IDE: %d', [Result]));
-  end;
 end;
