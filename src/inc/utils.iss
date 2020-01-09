@@ -43,7 +43,6 @@ const
 
 function ReplaceLastOccurrence(S, OldSubStr, NewSubStr: String): String;
 var
-  i: Integer;
   Temp,
   LeftPart,
   RightPart: String;

@@ -69,7 +69,7 @@ begin
   RadioButtonOffline.Parent := KallistiEmbeddedPage.Surface;
   RadioButtonOffline.Caption := CustomMessage('KallistiEmbeddedOffline');  
   RadioButtonOffline.Top := LabelKallistiEmbeddedDescriptionOnline.Top 
-    + LabelKallistiEmbeddedDescriptionOnline.Height + ScaleY(4);
+    + LabelKallistiEmbeddedDescriptionOnline.Height + ScaleY(8);
   RadioButtonOffline.Width := KallistiEmbeddedPage.SurfaceWidth;
   RadioButtonOffline.Font.Style := [fsBold];
 
