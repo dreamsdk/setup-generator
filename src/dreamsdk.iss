@@ -16,6 +16,8 @@
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
 #define SourceDirectoryToolchainArm SourceDirectoryBase + "\gcc-arm-eabi"
 #define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
+#define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
+#define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\dreamsdk-system-objects"
 
 #define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
 #define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
@@ -43,7 +45,8 @@
 #define FullAppMainName MyAppName + " " + AppMainName
 #define FullAppManagerName MyAppName + " " + AppManagerName
 
-#define AppOptBase "{app}\msys\1.0\opt"
+#define AppMsysBase "{app}\msys\1.0"
+#define AppOptBase AppMsysBase + "\opt"
 #define AppToolchainBase AppOptBase + "\toolchains\dc"
 #define AppMainDirectory AppOptBase + "\dreamsdk"
 #define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
@@ -163,6 +166,10 @@ Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainBase}"; Flags
 Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
 Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
 Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
+
+; DreamSDK
+Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
