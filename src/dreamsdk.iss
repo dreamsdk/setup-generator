@@ -10,9 +10,11 @@
 #define MyAppCopyright "© Copyleft 2018-2020"
 
 ; Source directories
+;#define SourceDirectoryBase "D:\sources"
 #define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
+#define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
 #define SourceDirectoryToolchainArm SourceDirectoryBase + "\gcc-arm-eabi"
 #define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
@@ -89,8 +91,8 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-;Compression=lzma2/ultra64
-Compression=none
+Compression=lzma2/ultra64
+;Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
@@ -110,9 +112,10 @@ VersionInfoDescription={#MyAppName} Setup
 VersionInfoProductVersion={#ProductVersion}
 AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
+AllowUNCPath=False
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
+Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
 
 [Tasks]
 Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}" 
@@ -152,7 +155,9 @@ Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ig
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 
 ; MinGW Base
-Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample"
+Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
+Source: "{#SourceDirectoryMinGW}\bin\gcc.exe"; DestDir: "{app}\bin"; DestName: "cc.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Toolchains
 Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -190,10 +195,17 @@ Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "
 Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
 
-; Documentation shortcuts
+; Documentation
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:KallistiOfficialDocumentation}"; Filename: "http://gamedev.allusion.net/docs/kos-2.0.0/"
+
+; Useful Links
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast" 
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"                                                                                                                                   
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filename: "http://mc.pp.se/dc"
 
 ; Additional shortcuts
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
@@ -206,6 +218,21 @@ Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait pos
 ;Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
+; Shortcut icons
+ProgramHelp={#MyAppNameHelp}
+LicenseInformation={#MyAppName} License Information
+DocumentationGroupDirectory=Documentation
+KallistiOfficialDocumentation=KallistiOS Official Documentation
+ExecuteMainApplication=Start a new {#FullAppMainName} session
+ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
+UninstallPackage=Remove {#MyAppName} from your computer
+
+UsefulLinksGroupDirectory=Useful Links
+LinkAwesomeDreamcast=Awesome Dreamcast
+LinkSimulantDiscordChannel=Simulant Engine Discord Channel
+LinkDCEmulationProgrammingDiscussion=DCEmulation Programming Discussion
+LinkMarcusDreamcast=Dreamcast Programming by Marcus Comstedt
+
 ; Generic buttons
 ButtonBrowse=Browse...
 ButtonRefresh=Refresh
@@ -299,13 +326,7 @@ AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment var
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 
-; Shortcut icons
-ProgramHelp={#MyAppNameHelp}
-LicenseInformation={#MyAppName} License Information
-DocumentationGroupDirectory=Documentation
-ExecuteMainApplication=Start a new {#FullAppMainName} session
-ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
-UninstallPackage=Remove {#MyAppName} from your computer
+
 
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue

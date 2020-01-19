@@ -7,11 +7,12 @@ const
   CODEBLOCKS_SDK_DLL_FILE = '\codeblocks.dll';    
 
   DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
-  DEFAULT_CB_CONFIG_FILE = 'CodeBlocks\default.conf';
   
   CB_HELPER_FILE = '{tmp}\cbhelper.exe';
   CB_PATCH_FILE = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\codeblocks-patcher.exe';
-          
+   
+  CB_BACKUP_DIR = '{app}\support\ide\codeblocks';
+        
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
   EditCodeBlocksInstallationDirectory: TEdit;
@@ -62,9 +63,10 @@ begin
 
   if IsCodeBlocksInstallationMode then
   begin
-    ParamInstallOption := Format('--install-dir="%s" --home-dir="%s"', [
+    ParamInstallOption := Format('--install-dir="%s" --home-dir="%s" --backup-dir="%s"', [
       GetCodeBlocksInstallationDirectory,
-      ExpandConstant('{app}')
+      ExpandConstant('{app}'),
+      ExpandConstant(CB_BACKUP_DIR)
     ]);
   end
   else
