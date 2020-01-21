@@ -10,8 +10,8 @@
 #define MyAppCopyright "© Copyleft 2018-2020"
 
 ; Source directories
-;#define SourceDirectoryBase "D:\sources"
-#define SourceDirectoryBase "D:\sources_dev"
+#define SourceDirectoryBase "D:\sources"
+;#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
 #define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
@@ -91,8 +91,8 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-Compression=lzma2/ultra64
-;Compression=none
+;Compression=lzma2/ultra64
+Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
@@ -113,6 +113,8 @@ VersionInfoProductVersion={#ProductVersion}
 AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
