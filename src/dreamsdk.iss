@@ -1,8 +1,8 @@
 ; DreamSDK Inno Setup Script
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2001"
-#define ProductVersion "3.0.4.2001"
+#define PackageVersion "3.0.4.2002"
+#define ProductVersion "3.0.4.2002"
 
 ; Code::Blocks version
 #define IdeCodeBlocksVersion "17.12"
@@ -54,6 +54,7 @@
 #define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
+#define AppGettingStartedFile AppMainDirectory + "\getstart.rtf"
 #define AppSupportDirectory "{app}\support"
 #define AppAddonsDirectory AppMainDirectory + "\addons\"
 
@@ -196,6 +197,7 @@ Source: "{#SourceDirectoryKallistiEmbedded}\*"; DestDir: "{#AppToolchainBase}"; 
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
+Name: "{group}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"
 
 ; Documentation
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
@@ -215,15 +217,16 @@ Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainNam
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
 
 [Run]
+Filename: "{#AppGettingStartedFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent shellexec; Description: "{cm:LaunchGettingStarted}"
 Filename: "{#AppManagerExeName}"; Parameters: "--first-run --directory ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
 Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:LaunchProgram,{#StringChange(MyAppNameHelp, '&', '&&')}}"
-;Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppMainName, '&', '&&')}}"
 
 [CustomMessages]
 ; Shortcut icons
 ProgramHelp={#MyAppNameHelp}
 LicenseInformation={#MyAppName} License Information
 DocumentationGroupDirectory=Documentation
+GettingStarted=Getting Started
 KallistiOfficialDocumentation=KallistiOS Official Documentation
 ExecuteMainApplication=Start a new {#FullAppMainName} session
 ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
@@ -327,8 +330,7 @@ AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment var
 
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
-
-
+LaunchGettingStarted=Open the Getting Started guide
 
 [Registry]
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
