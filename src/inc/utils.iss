@@ -184,3 +184,33 @@ begin
   until Connected;
   Result := True;
 end;
+
+// Split a string into an array using passed delimeter.
+// Thanks to: https://stackoverflow.com/a/36895908/3726096
+function Split(Expression, Delimiter: String): TArrayOfString;
+var
+  i: Integer;
+  tmpArray : TArrayOfString;
+  curString : String;
+
+begin
+  i := 0;
+  curString := Expression;
+
+  repeat
+    SetArrayLength(tmpArray, i+1);
+    If Pos(Delimiter, curString) > 0 then
+    begin
+      tmpArray[i] := Copy(curString, 1, Pos(Delimiter, curString)-1);
+      curString := Copy(curString, Pos(Delimiter,curString) + Length(Delimiter), Length(curString));
+      Inc(i);
+    end 
+    else 
+    begin
+      tmpArray[i] := curString;
+      curString := '';
+    end;
+  until Length(curString) = 0;
+
+  Result:= tmpArray;
+end;

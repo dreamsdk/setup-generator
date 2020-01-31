@@ -10,8 +10,8 @@
 #define MyAppCopyright "© Copyleft 2018-2020"
 
 ; Source directories
-#define SourceDirectoryBase "D:\sources"
-;#define SourceDirectoryBase "D:\sources_dev"
+;#define SourceDirectoryBase "D:\sources"
+#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
 #define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
@@ -78,6 +78,7 @@
 #include "inc/version.iss"
 #include "inc/gdb.iss"
 #include "inc/kos.iss"
+#include "inc/cpnt.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -286,6 +287,11 @@ ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pv
 ComponentAdditionalTools_txfutils=TXF Utilities – Textured font format tools (showtxf, ttf2txf)
 ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
 ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data handler (vmutool)
+ComponentMessageWarningStart=You have deselected some additional components. Pay attention:%n
+ComponentMessageWarning_img4dc=IMG4DC is used in the 'makedisc' script.
+ComponentMessageWarning_ipcreate=IP.BIN Creator may be necessary for generating Sega Dreamcast disc images.
+ComponentMessageWarning_mkisofs=Make ISO File System is used by the 'makedisc' script and by {#IdeCodeBlocksName}.
+ComponentMessageWarningEnd=%nAre you sure to continue with these components disabled?
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
@@ -444,6 +450,14 @@ begin
     end;
   end;
 
+  // Select Components Page
+  if (CurPageID = wpSelectComponents) then
+  begin
+    Result := CheckComponents;
+    if not Result then
+      Exit;
+  end;
+  
   // KallistiOS Page
   if (CurPageID = KallistiEmbeddedPageID) then
   begin
