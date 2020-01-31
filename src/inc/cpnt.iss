@@ -2,7 +2,7 @@
 
 const
   COMPONENTS_SEPARATOR = ';';
-  COMPONENTS_CODES = 'addons\img4dc;addons\ipcreate;addons\mkisofs';
+  COMPONENTS_CODES = 'helpers\img4dc;helpers\ipcreate;helpers\mkisofs';
   COMPONENTS_MESSAGES = 'ComponentMessageWarning_img4dc;ComponentMessageWarning_ipcreate;ComponentMessageWarning_mkisofs'; 
  
 function CheckComponents: Boolean;
@@ -10,8 +10,8 @@ var
   Codes,
   Messages: TArrayOfString;
   i: Integer;
-  TextMessage,
-  TextSeparator: string;
+  TextMessage: string;
+  Buffer: TStringList;
 
 begin
   Result := True;
@@ -19,13 +19,16 @@ begin
   Codes := Split(COMPONENTS_CODES, COMPONENTS_SEPARATOR);
   Messages := Split(COMPONENTS_MESSAGES, COMPONENTS_SEPARATOR);
 
-  TextMessage := '';
-  TextSeparator := '';  
-  for i := Low(Codes) to High(Codes) do
-  begin
-    if not IsComponentSelected(Codes[i]) then
-      TextMessage := TextMessage + TextSeparator + CustomMessage(Messages[i]);
-    TextSeparator := sLineBreak;
+  Buffer := TStringList.Create;
+  try 
+    for i := Low(Codes) to High(Codes) do
+    begin
+      if not IsComponentSelected(Codes[i]) then
+        Buffer.Add(CustomMessage(Messages[i]));
+    end;
+    TextMessage := Buffer.Text;
+  finally
+    Buffer.Free;
   end;
 
   if TextMessage <> '' then

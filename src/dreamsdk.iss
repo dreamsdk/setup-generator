@@ -10,8 +10,8 @@
 #define MyAppCopyright "© Copyleft 2018-2020"
 
 ; Source directories
-;#define SourceDirectoryBase "D:\sources"
-#define SourceDirectoryBase "D:\sources_dev"
+#define SourceDirectoryBase "D:\sources"
+;#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
 #define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
@@ -135,16 +135,17 @@ Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
 Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
 Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; ExtraDiskSpaceRequired: 7539; Types: full
-Name: "addons\img4dc"; Description: "{cm:ComponentAdditionalTools_img4dc}"; Types: full
-Name: "addons\img4dc\cdi4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full
-Name: "addons\img4dc\mds4dc"; Description: "{cm:ComponentAdditionalTools_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full
-Name: "addons\ipcreate"; Description: "{cm:ComponentAdditionalTools_ipcreate}"; ExtraDiskSpaceRequired: 675840; Types: full
-Name: "addons\ipcreate\iplogos"; Description: "{cm:ComponentAdditionalTools_ipcreate_iplogos}"; ExtraDiskSpaceRequired: 53240; Types: full
-Name: "addons\mkisofs"; Description: "{cm:ComponentAdditionalTools_mkisofs}"; ExtraDiskSpaceRequired: 131072; Types: full
 Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; ExtraDiskSpaceRequired: 143360; Types: full
 Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; ExtraDiskSpaceRequired: 811008; Types: full
 Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; ExtraDiskSpaceRequired: 2334720; Types: full
 Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; ExtraDiskSpaceRequired: 45056; Types: full
+Name: "helpers"; Description: "{cm:ComponentHelpers}"; Types: full compact
+Name: "helpers\img4dc"; Description: "{cm:ComponentHelpers_img4dc}"; Types: full compact
+Name: "helpers\img4dc\cdi4dc"; Description: "{cm:ComponentHelpers_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full compact
+Name: "helpers\img4dc\mds4dc"; Description: "{cm:ComponentHelpers_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full compact
+Name: "helpers\ipcreate"; Description: "{cm:ComponentHelpers_ipcreate}"; ExtraDiskSpaceRequired: 675840; Types: full compact
+Name: "helpers\ipcreate\iplogos"; Description: "{cm:ComponentHelpers_ipcreate_iplogos}"; ExtraDiskSpaceRequired: 53240; Types: full compact
+Name: "helpers\mkisofs"; Description: "{cm:ComponentHelpers_mkisofs}"; ExtraDiskSpaceRequired: 131072; Types: full compact
 
 [Files]
 ; Install helpers
@@ -182,10 +183,10 @@ Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
-Source: "{#SourceDirectoryAddons}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\cdi4dc
-Source: "{#SourceDirectoryAddons}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\img4dc\mds4dc
-Source: "{#SourceDirectoryAddons}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\ipcreate
-Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\mkisofs
+Source: "{#SourceDirectoryAddons}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\cdi4dc
+Source: "{#SourceDirectoryAddons}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\mds4dc
+Source: "{#SourceDirectoryAddons}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\ipcreate
+Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
 Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
 Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
 Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
@@ -277,21 +278,22 @@ ComponentIDE=Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksVerName}
 ComponentAdditionalTools=Additional command line tools
 ComponentAdditionalTools_elevate=Elevate – Command-Line UAC Elevation Utility (elevate)
-ComponentAdditionalTools_img4dc=IMG4DC – Dreamcast Selfboot Toolkit
-ComponentAdditionalTools_img4dc_cdi4dc=CDI4DC – Padus DiscJuggler image generator (cdi4dc)
-ComponentAdditionalTools_img4dc_mds4dc=MDS4DC – Alcohol 120% image generator (mds4dc, lbacalc)
-ComponentAdditionalTools_ipcreate=IP.BIN Creator – Initial Program generator (ipcreate)
-ComponentAdditionalTools_ipcreate_iplogos=Additional ready-to-use IP logos
-ComponentAdditionalTools_mkisofs=Make ISO File System – ISO9660 image generator (mkisofs)
 ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pvr2png)
 ComponentAdditionalTools_txfutils=TXF Utilities – Textured font format tools (showtxf, ttf2txf)
 ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
 ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data handler (vmutool)
-ComponentMessageWarningStart=You have deselected some additional components. Pay attention:%n
+ComponentHelpers=Critical helpers components
+ComponentHelpers_img4dc=IMG4DC – Dreamcast Selfboot Toolkit
+ComponentHelpers_img4dc_cdi4dc=CDI4DC – Padus DiscJuggler image generator (cdi4dc)
+ComponentHelpers_img4dc_mds4dc=MDS4DC – Alcohol 120% image generator (mds4dc, lbacalc)
+ComponentHelpers_ipcreate=IP.BIN Creator – Initial Program generator (ipcreate)
+ComponentHelpers_ipcreate_iplogos=Additional ready-to-use IP logos
+ComponentHelpers_mkisofs=Make ISO File System – ISO9660 image generator (mkisofs)
+ComponentMessageWarningStart=You have unselected some critical helpers components. Pay attention:%n
 ComponentMessageWarning_img4dc=IMG4DC is used in the 'makedisc' script.
 ComponentMessageWarning_ipcreate=IP.BIN Creator may be necessary for generating Sega Dreamcast disc images.
 ComponentMessageWarning_mkisofs=Make ISO File System is used by the 'makedisc' script and by {#IdeCodeBlocksName}.
-ComponentMessageWarningEnd=%nAre you sure to continue with these components disabled?
+ComponentMessageWarningEnd=Are you sure to continue with these components disabled?
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
