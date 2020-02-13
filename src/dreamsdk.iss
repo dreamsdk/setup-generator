@@ -183,13 +183,15 @@ Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
+Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
+Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
+Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
+
+; Helpers
 Source: "{#SourceDirectoryAddons}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\cdi4dc
 Source: "{#SourceDirectoryAddons}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\mds4dc
 Source: "{#SourceDirectoryAddons}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\ipcreate
 Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
-Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
-Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
-Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
 
 ; KallistiOS Embedded
 Source: "{#SourceDirectoryKallistiEmbedded}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
@@ -220,7 +222,7 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}
 
 [Run]
 Filename: "{#AppGettingStartedFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent shellexec; Description: "{cm:LaunchGettingStarted}"
-Filename: "{#AppManagerExeName}"; Parameters: "--first-run --directory ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
+Filename: "{#AppManagerExeName}"; Parameters: "--home-dir ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
 Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:LaunchProgram,{#StringChange(MyAppNameHelp, '&', '&&')}}"
 
 [CustomMessages]
@@ -345,6 +347,7 @@ Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environm
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
+Type: dirifempty; Name: "C:\DreamSDK\support\ide\codeblocks\*"
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"

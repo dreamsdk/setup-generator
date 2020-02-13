@@ -15,12 +15,16 @@ end;
 procedure SetupApplication;
 var
   ResultCode: Integer;
-  ManagerFileName: String;
+  ManagerFileName,
+  Parameters: String;
 
 begin
   ManagerFileName := ExpandConstant('{#AppManagerExeName}');
-  if not ExecAsOriginalUser(ManagerFileName, '--post-install', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
-    MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
+  Parameters := Format('--post-install --home-dir "%s"', [
+    ExpandConstant('{app}')]);
+  if not ExecAsOriginalUser(ManagerFileName, Parameters, '', SW_SHOWNORMAL,
+    ewWaitUntilTerminated, ResultCode) then
+      MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
 end;
 
 procedure SetPackageVersion;
