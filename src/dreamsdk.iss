@@ -93,8 +93,8 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-;Compression=lzma2/ultra64
-Compression=none
+Compression=lzma2/ultra64
+;Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
@@ -115,7 +115,7 @@ VersionInfoProductVersion={#ProductVersion}
 AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
-DiskSpanning=True
+;DiskSpanning=True
 DiskSliceSize=736000000
 
 [Languages]
@@ -517,12 +517,16 @@ begin
   // Finalizing the installation.
   if (CurPageID = wpInfoAfter) then
   begin
+    WizardForm.NextButton.Enabled := False;
+
     // Patch fstab and setup KallistiOS.
     FinalizeSetup;
 
     // Install Code::Blocks Integration if requested.
     if IsCodeBlocksIntegrationEnabled then
       InstallCodeBlocksIntegration;
+
+    WizardForm.NextButton.Enabled := True;
   end;
 end;
 

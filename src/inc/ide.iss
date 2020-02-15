@@ -43,13 +43,13 @@ end;
 
 procedure RetrieveCodeBlocksUsersList;
 begin
-  Wizardform.NextButton.Enabled := False;
+  WizardForm.NextButton.Enabled := False;
   ButtonCodeBlocksRefreshUsersList.Enabled := False;  
   
   EditCodeBlocksUsersList.Text := RunCommand( ExpandConstant(CB_HELPER_FILE) );
   
   ButtonCodeBlocksRefreshUsersList.Enabled := True;
-  Wizardform.NextButton.Enabled := True;
+  WizardForm.NextButton.Enabled := True;
 end;
 
 function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
