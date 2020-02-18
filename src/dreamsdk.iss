@@ -20,6 +20,7 @@
 #define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
 #define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\dreamsdk-system-objects"
+#define SourceDirectoryHelpers SourceDirectoryBase + "\helpers"
 
 #define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
 #define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
@@ -93,8 +94,6 @@ DefaultDirName={sd}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
-Compression=lzma2/ultra64
-;Compression=none
 SolidCompression=False
 DisableWelcomePage=False
 UninstallDisplayIcon={#AppSupportDirectory}\uninst.ico
@@ -115,8 +114,14 @@ VersionInfoProductVersion={#ProductVersion}
 AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
+
+; Release mode
+Compression=lzma2/ultra64
+
+; Debug mode
+;Compression=none
 ;DiskSpanning=True
-DiskSliceSize=736000000
+;DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -187,11 +192,11 @@ Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; 
 Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
 Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
 
-; Helpers
-Source: "{#SourceDirectoryAddons}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\cdi4dc
-Source: "{#SourceDirectoryAddons}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\mds4dc
-Source: "{#SourceDirectoryAddons}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\ipcreate
-Source: "{#SourceDirectoryAddons}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
+; Helpers (these will copy to AppAddonsDirectory too!)
+Source: "{#SourceDirectoryHelpers}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\cdi4dc
+Source: "{#SourceDirectoryHelpers}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\mds4dc
+Source: "{#SourceDirectoryHelpers}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\ipcreate
+Source: "{#SourceDirectoryHelpers}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
 
 ; KallistiOS Embedded
 Source: "{#SourceDirectoryKallistiEmbedded}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
@@ -519,12 +524,12 @@ begin
   begin
     WizardForm.NextButton.Enabled := False;
 
-    // Patch fstab and setup KallistiOS.
-    FinalizeSetup;
-
     // Install Code::Blocks Integration if requested.
     if IsCodeBlocksIntegrationEnabled then
       InstallCodeBlocksIntegration;
+
+    // Patch fstab and setup KallistiOS.
+    FinalizeSetup;
 
     WizardForm.NextButton.Enabled := True;
   end;
