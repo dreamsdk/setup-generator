@@ -16,12 +16,21 @@ procedure SetupApplication;
 var
   ResultCode: Integer;
   ManagerFileName,
-  Parameters: String;
+  Parameters,
+  RubySwitch: String;
 
 begin
   ManagerFileName := ExpandConstant('{#AppManagerExeName}');
-  Parameters := Format('--post-install --home-dir "%s"', [
-    ExpandConstant('{app}')]);
+  
+  RubySwitch := '';
+  if IsRubyEnabled then
+    RubySwitch := ' --enable-ruby';
+
+  Parameters := Format('--post-install --home-dir "%s"%s', [
+    ExpandConstant('{app}'), RubySwitch]);
+
+  Log(Format('%s %s', [ManagerFileName, Parameters]));
+
   if not ExecAsOriginalUser(ManagerFileName, Parameters, '', SW_SHOWNORMAL,
     ewWaitUntilTerminated, ResultCode) then
       MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);

@@ -30,7 +30,9 @@
 #define SourceDirectoryGdbPython37 SourceDirectoryBase + "\gdb-sh-elf-python-3.7"
 #define SourceDirectoryGdbPython38 SourceDirectoryBase + "\gdb-sh-elf-python-3.8"
 
-#define SourceDirectoryKallistiEmbedded SourceDirectoryBase + "\kos-embedded"
+#define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
+#define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
+#define SourceDirectoryEmbeddedRuby SourceDirectoryEmbedded + "\ruby"
 
 ; Don't modify anything beyond this point
 
@@ -71,15 +73,15 @@
 
 ; Includes
 #include "inc/utils.iss"
-#include "inc/helpers.iss"
 #include "inc/preq.iss"
 #include "inc/ui.iss"
 #include "inc/environ.iss"
 #include "inc/ide.iss"
 #include "inc/version.iss"
-#include "inc/gdb.iss"
 #include "inc/kos.iss"
 #include "inc/cpnt.iss"
+#include "inc/ruby.iss"
+#include "inc/gdb.iss"#include "inc/helpers.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -116,12 +118,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-Compression=lzma2/ultra64
+;Compression=lzma2/ultra64
 
 ; Debug mode
-;Compression=none
-;DiskSpanning=True
-;DiskSliceSize=736000000
+Compression=none
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -199,26 +201,34 @@ Source: "{#SourceDirectoryHelpers}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"
 Source: "{#SourceDirectoryHelpers}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
 
 ; KallistiOS Embedded
-Source: "{#SourceDirectoryKallistiEmbedded}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
+Source: "{#SourceDirectoryEmbeddedKallisti}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
+Source: "{#SourceDirectoryEmbeddedRuby}\mruby\*"; DestDir: "{#AppOptBase}\mruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRubyEmbedded
+Source: "{#SourceDirectoryEmbeddedRuby}\samples\*"; DestDir: "{#AppToolchainBase}\ruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRubyEmbedded
 
 [Icons]
 ; Main shortcuts
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
-Name: "{group}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"
 
 ; Documentation
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"
 Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:KallistiOfficialDocumentation}"; Filename: "http://gamedev.allusion.net/docs/kos-2.0.0/"
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:SegaDreamcastWikiDocumentation}"; Filename: "https://dreamcast.wiki"
 
 ; Useful Links
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast" 
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"                                                                                                                                   
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkCodeBlocks}"; Filename: "http://www.codeblocks.org"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"                                                                                                                                  
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAppGitHub}"; Filename: "https://github.com/dreamsdk"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filename: "http://mc.pp.se/dc"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"
 
 ; Additional shortcuts
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
@@ -234,18 +244,27 @@ Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait pos
 ; Shortcut icons
 ProgramHelp={#MyAppNameHelp}
 LicenseInformation={#MyAppName} License Information
-DocumentationGroupDirectory=Documentation
-GettingStarted=Getting Started
-KallistiOfficialDocumentation=KallistiOS Official Documentation
 ExecuteMainApplication=Start a new {#FullAppMainName} session
 ExecuteManagerApplication=Configure and manage your {#MyAppName} installation
 UninstallPackage=Remove {#MyAppName} from your computer
 
+; Documentation
+DocumentationGroupDirectory=Documentation
+GettingStarted=Getting Started
+KallistiOfficialDocumentation=KallistiOS Official Documentation
+SegaDreamcastWikiDocumentation=Sega Dreamcast Wiki
+
+; Useful links
 UsefulLinksGroupDirectory=Useful Links
 LinkAwesomeDreamcast=Awesome Dreamcast
-LinkSimulantDiscordChannel=Simulant Engine Discord Channel
-LinkDCEmulationProgrammingDiscussion=DCEmulation Programming Discussion
-LinkMarcusDreamcast=Dreamcast Programming by Marcus Comstedt
+LinkCodeBlocks=CodeBlocks
+LinkDCEmulation=DCEmulation
+LinkDCEmulationProgrammingDiscussion=DCEmulation - Programming Discussion
+LinkAppGitHub={#MyAppName} GitHub
+LinkMarcusDreamcast=Marcus Comstedt (zeldin) - Dreamcast Programming
+LinkSegaDreamcastGitHub=Sega Dreamcast GitHub
+LinkSimulantDiscordChannel=Simulant Engine - Discord Channel
+LinkSiZiOUS=SiZiOUS Serial Koder
 
 ; Generic buttons
 ButtonBrowse=Browse...
@@ -265,6 +284,7 @@ PrerequisiteMissingHintLink2Multiple=their
 PrerequisiteMissingPython=Python
 PrerequisiteMissingGit=Git
 PrerequisiteMissingSubversion=Subversion Client (SVN)
+PrerequisiteMissingRuby=Ruby
 
 ; Startup messages
 PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
@@ -304,8 +324,8 @@ ComponentMessageWarningEnd=Are you sure to continue with these components disabl
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
-GdbSubtitlePage=Customize your GNU Debugger for SuperH installation.
-LabelGdbIntroduction=Do you want to enable Python extensions of GDB for SuperH?
+GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
+LabelGdbIntroduction=Customize your GNU Debugger for SuperH installation.
 LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
 GdbPythonNone=Don't enable Python for GDB
 GdbPython27=Python 2.7
@@ -315,10 +335,21 @@ GdbPython36=Python 3.6
 GdbPython37=Python 3.7
 GdbPython38=Python 3.8
 
+; Ruby
+RubyEnableConfirmation=Ruby support for the Sega Dreamcast is experimental. Are you sure to continue?
+RubyTitlePage=Ruby Configuration
+RubySubtitlePage=Do you want to enable Ruby support for the Sega Dreamcast?
+LabelRubyIntroduction=You may use RubyInstaller for Windows to set up Ruby on your computer.
+LabelRubyDescription=Ruby may be used for Sega Dreamcast programming, but this is experimental. This feature uses mruby, the lightweight Ruby implementation which may be embedded in C/C++ programs. Sample projects are provided, you may use them as templates.
+RubyEnabled=Enable Ruby (experimental)
+LabelRubyDescriptionEnabled=Enable Ruby support for the Sega Dreamcast. This is experimental. Ruby projects are not supported in {#IdeCodeBlocksName}.
+RubyDisabled=Don't enable Ruby
+LabelRubyDescriptionDisabled=Don't enable Ruby support for the Sega Dreamcast. You may activate it later in {#FullAppManagerName} if you change your mind.
+
 ; KallistiOS
 KallistiEmbeddedTitlePage=Sega Dreamcast Libraries Configuration
 KallistiEmbeddedSubtitlePage=From where do you want to retrieve the libraries?
-LabelKallistiEmbeddedIntroduction=Configure where do you want to retrieve the required components.
+LabelKallistiEmbeddedIntroduction=Configure from where do you want to retrieve the required components.
 LabelKallistiEmbeddedDescription={#MyAppName} needs KallistiOS (kos), KallistiOS Ports (kos-ports) and Dreamcast Tool (dcload-serial, dcload-ip) in order to work properly. These components are libraries used for the Sega Dreamcast development, in addition of the provided toolchains.
 KallistiEmbeddedOnline=Use online repositories (highly recommended)
 InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
@@ -337,7 +368,8 @@ CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} inst
 CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
 CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
-CodeBlocksIntegrationSetupFailed=Error when patching Code::Blocks!%n%n%s
+CodeBlocksIntegrationSetupFailed=Error when patching {#IdeCodeBlocksName}!%n%n%s
+CodeBlocksIntegrationRemoveFailed=Error when restoring {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
 
 ; Additional tasks
@@ -351,11 +383,13 @@ LaunchGettingStarted=Open the Getting Started guide
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
-Type: dirifempty; Name: "C:\DreamSDK\support\ide\codeblocks\*"
+Type: dirifempty; Name: "{app}\support\ide\codeblocks"
+Type: dirifempty; Name: "{app}\support\ide"
+Type: dirifempty; Name: "{app}\support"
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
+Type: filesandordirs; Name: "{app}\msys\1.0\opt\mruby\*"
 
 [Code]
 const
@@ -367,7 +401,8 @@ var
   BrowseForFolderExFakePageID,
   IntegratedDevelopmentEnvironmentSettingsPageID, 
   GdbPageID,
-  KallistiEmbeddedPageID: Integer;
+  KallistiEmbeddedPageID,
+  RubyPageID: Integer;
 
 function IsModuleLoaded(modulename: AnsiString): Boolean;
 external 'IsModuleLoaded@files:{#PSVinceLibraryFileName} stdcall';
@@ -379,7 +414,8 @@ procedure InitializeWizard;
 begin
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
-  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;
+  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
+  RubyPageID := CreateRubyPage;
   GdbPageID := CreateGdbPage;
 end;
 
@@ -466,6 +502,23 @@ begin
     Result := CheckComponents;
     if not Result then
       Exit;
+  end;
+
+  // Ruby Page
+  if (CurPageID = RubyPageID) then
+  begin
+    if IsRubyEnabled then
+    begin
+      // Sure to continue?
+      Result := ConfirmRubyUsage;
+      if not Result then
+        Exit;
+
+      // Check Ruby prerequisites
+      Result := CheckRubyPrerequisites;
+      if not Result then
+        Exit;
+    end;  
   end;
   
   // KallistiOS Page

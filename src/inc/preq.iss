@@ -1,7 +1,7 @@
 [Code]
 
 type
-  TPrerequisiteApplication = (paGit, paPython, paSubversion);
+  TPrerequisiteApplication = (paGit, paPython, paSubversion, paRuby); // Please add new items to CheckPrerequisites...
   TPrerequisiteApplicationSet = set of TPrerequisiteApplication;
   
 function PrerequisiteToCommand(const Prerequisite: TPrerequisiteApplication): String;
@@ -14,6 +14,8 @@ begin
       Result := 'python';
     paSubversion:
       Result := 'svn';
+    paRuby:
+      Result := 'rake';
   end;
 end;
 
@@ -27,6 +29,8 @@ begin
       Result := 'PrerequisiteMissingPython';
     paSubversion:
       Result := 'PrerequisiteMissingSubversion';
+    paRuby:
+      Result := 'PrerequisiteMissingRuby';
   end;
   Result := CustomMessage(Result);
 end;
@@ -36,11 +40,13 @@ begin
   Result := '';
   case Prerequisite of
     paGit:
-      Result := 'git version';                  
+      Result := 'version';                  
     paPython:
       Result := 'Python';
     paSubversion:
-      Result := 'svn, version';
+      Result := 'version';
+    paRuby:
+      Result := 'version';
   end;
 end;
 
@@ -63,7 +69,7 @@ begin
   begin
     ExecBuffer := AdjustLineBreaks(ExecBuffer);
     Result := Trim(ExtractStr(ExtractionTag, sLineBreak, ExecBuffer));
-    Log(Format('Prerequisite %s version: %s.', [PrerequisiteName, Result]));
+    Log(Format('Prerequisite %s version: "%s".', [PrerequisiteName, Result]));
   end;
   
   if FileExists(TmpFileName) then
@@ -112,6 +118,10 @@ begin
     if not CheckPrerequisite(Prerequisites, paSubversion) then
       PrerequisitesList.Add(PrerequisiteToString(paSubversion));
 
+    // Check Ruby
+    if not CheckPrerequisite(Prerequisites, paRuby) then
+      PrerequisitesList.Add(PrerequisiteToString(paRuby));
+      
     // Computing the text
     if PrerequisitesList.Count > 0 then
     begin
@@ -189,4 +199,11 @@ end;
 function CheckOfflinePrerequisitesOptional: Boolean;
 begin
   Result := CheckPrerequisites([paPython], True);
+end;
+
+{ Ruby prerequisites }
+
+function CheckRubyPrerequisites: Boolean;
+begin
+  Result := CheckPrerequisites([paRuby], True);
 end;

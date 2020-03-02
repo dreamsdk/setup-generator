@@ -46,7 +46,11 @@ begin
   WizardForm.NextButton.Enabled := False;
   ButtonCodeBlocksRefreshUsersList.Enabled := False;  
   
-  EditCodeBlocksUsersList.Text := RunCommand( ExpandConstant(CB_HELPER_FILE) );
+  EditCodeBlocksUsersList.Text := RunCommand( Format('%s %s', [
+      ExpandConstant(CB_HELPER_FILE),
+      '--get-available-users' 
+    ])
+  );
   
   ButtonCodeBlocksRefreshUsersList.Enabled := True;
   WizardForm.NextButton.Enabled := True;
@@ -56,29 +60,28 @@ function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
   var Buffer: String): Boolean;
 var
   PatcherSwitch,
-  ParamInstallOption: string;
+  ParamExtraOption: string;
 
 begin
-  PatcherSwitch := 'install';
+  PatcherSwitch := 'uninstall';
 
   if IsCodeBlocksInstallationMode then
   begin
-    ParamInstallOption := Format('--install-dir="%s" --home-dir="%s" --backup-dir="%s"', [
-      GetCodeBlocksInstallationDirectory,
-      ExpandConstant('{app}'),
+    PatcherSwitch := 'install';
+    ParamExtraOption := Format('--install-dir="%s" --backup-dir="%s"', [
+      GetCodeBlocksInstallationDirectory,      
       ExpandConstant(CB_BACKUP_DIR)
     ]);
-  end
-  else
-    PatcherSwitch := 'uninstall';
+  end;
 
-  Buffer := RunCommand(Format('"%s" --operation=%s %s --no-logo --show-splash', [
+  Buffer := RunCommand(Format('"%s" --operation=%s --home-dir="%s" %s --no-logo --show-splash --verbose', [
     ExpandConstant(CB_PATCH_FILE),
     PatcherSwitch,
-    ParamInstallOption
+    ExpandConstant('{app}'),
+    ParamExtraOption
   ]));
-
-  Result := (Pos('is now patched!', LowerCase(Buffer)) > 0);
+            
+  Result := IsInString('is now ', Buffer);
 end;
                                                                                  
 procedure InstallCodeBlocksIntegration;
@@ -86,7 +89,16 @@ var
   Buffer: String;
   IsSuccess: Boolean;
 
-begin    
+begin
+  // Cleanup previous C::B for DreamSDK install if necessary
+  RunCommand(
+    Format('%s %s', [
+      ExpandConstant(CB_HELPER_FILE),
+      '--cleanup' 
+    ])
+  );
+  
+  // Executing the Patcher  
   IsSuccess := RunCodeBlocksPatcher(cbpInstall, Buffer);
   if not IsSuccess then
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), mbCriticalError, MB_OK);
@@ -95,9 +107,13 @@ end;
 procedure UninstallCodeBlocksIntegration;
 var
   Buffer: String;
+  IsSuccess: Boolean;
 
 begin
-  RunCodeBlocksPatcher(cbpUninstall, Buffer); 
+  IsSuccess := RunCodeBlocksPatcher(cbpUninstall, Buffer);
+  IsSuccess := IsSuccess or IsInString('nothing to uninstall', Buffer);
+  if not IsSuccess then
+    MsgBox(Format(CustomMessage('CodeBlocksIntegrationRemoveFailed'), [Buffer]), mbCriticalError, MB_OK); 
 end;
 
 procedure ButtonCodeBlocksInstallationDirectoryOnClick(Sender: TObject);
