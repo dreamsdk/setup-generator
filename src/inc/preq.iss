@@ -198,7 +198,7 @@ end;
 // Offline optional prerequisites 
 function CheckOfflinePrerequisitesOptional: Boolean;
 begin
-  Result := CheckPrerequisites([paPython], True);
+  Result := CheckPrerequisites([paPython], False);
 end;
 
 { Ruby prerequisites }

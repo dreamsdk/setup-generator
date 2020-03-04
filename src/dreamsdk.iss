@@ -1,8 +1,8 @@
 ; DreamSDK Inno Setup Script
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2002"
-#define ProductVersion "3.0.4.2002"
+#define PackageVersion "3.0.4.2003"
+#define ProductVersion "3.0.4.2003"
 
 ; Code::Blocks version
 #define IdeCodeBlocksVersion "17.12"
@@ -118,12 +118,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-;Compression=lzma2/ultra64
+Compression=lzma2/ultra64
 
 ; Debug mode
-Compression=none
-DiskSpanning=True
-DiskSliceSize=736000000
+;Compression=none
+;DiskSpanning=True
+;DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -509,13 +509,13 @@ begin
   begin
     if IsRubyEnabled then
     begin
-      // Sure to continue?
-      Result := ConfirmRubyUsage;
+      // Check Ruby prerequisites
+      Result := CheckRubyPrerequisites;
       if not Result then
         Exit;
 
-      // Check Ruby prerequisites
-      Result := CheckRubyPrerequisites;
+      // Sure to continue?
+      Result := ConfirmRubyUsage;
       if not Result then
         Exit;
     end;  
@@ -527,12 +527,7 @@ begin
     // Checking if the user is SURE to use the embedded KOS
     if IsKallistiEmbedded then
     begin
-      { Offline }
-      
-      // Sure to continue?
-      Result := ConfirmKallistiEmbeddedUsage;
-      if not Result then
-        Exit;
+      { Offline }     
 
       // Check mandatory prerequisites
       Result := CheckOfflinePrerequisitesMandatory;
@@ -542,7 +537,12 @@ begin
       // Check optional prerequisites
       Result := CheckOfflinePrerequisitesOptional;
       if not Result then      
-        Exit;     
+        Exit;
+        
+      // Sure to continue?
+      Result := ConfirmKallistiEmbeddedUsage;
+      if not Result then
+        Exit;             
     end
     else
     begin
