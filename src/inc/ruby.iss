@@ -8,11 +8,6 @@ begin
   Result := RadioButtonRubyEnabled.Checked;
 end;
 
-function IsRubyEmbedded: Boolean;
-begin
-  Result := IsKallistiEmbedded and IsRubyEnabled;
-end;
-
 function IsRubyOnline: Boolean;
 begin
   Result := (not IsKallistiEmbedded) and IsRubyEnabled;

@@ -202,8 +202,8 @@ Source: "{#SourceDirectoryHelpers}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}";
 
 ; KallistiOS Embedded
 Source: "{#SourceDirectoryEmbeddedKallisti}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
-Source: "{#SourceDirectoryEmbeddedRuby}\mruby\*"; DestDir: "{#AppOptBase}\mruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRubyEmbedded
-Source: "{#SourceDirectoryEmbeddedRuby}\samples\*"; DestDir: "{#AppToolchainBase}\ruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsRubyEmbedded
+Source: "{#SourceDirectoryEmbeddedRuby}\mruby\*"; DestDir: "{#AppOptBase}\mruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
+Source: "{#SourceDirectoryEmbeddedRuby}\samples\*"; DestDir: "{#AppToolchainBase}\ruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
 
 [Icons]
 ; Main shortcuts
@@ -275,8 +275,8 @@ PrerequisiteMissing=%s %s missing.
 PrerequisiteMissingLink=and
 PrerequisiteMissingVerbSingle=is
 PrerequisiteMissingVerbMultiple=are
-PrerequisiteMissingHintMandatory=Please install %s, check %s availability in PATH environment variable then try again.
-PrerequisiteMissingHintOptional=For better experience, install %s and check %s availability in PATH environment variable. Continue anyway?
+PrerequisiteMissingHintMandatory=Please install %s, check %s availability in PATH global environment variable then try again.
+PrerequisiteMissingHintOptional=For better experience, install %s and check %s availability in PATH global environment variable. Continue anyway?
 PrerequisiteMissingHintLink1Single=it
 PrerequisiteMissingHintLink1Multiple=them
 PrerequisiteMissingHintLink2Single=its
