@@ -20,7 +20,6 @@
 #define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
 #define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\dreamsdk-system-objects"
-#define SourceDirectoryHelpers SourceDirectoryBase + "\helpers"
 
 #define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
 #define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
@@ -33,6 +32,8 @@
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
 #define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
 #define SourceDirectoryEmbeddedRuby SourceDirectoryEmbedded + "\ruby"
+
+#define SourceDirectoryTools SourceDirectoryBase + "\addons-gui"
 
 ; Don't modify anything beyond this point
 
@@ -59,7 +60,8 @@
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
 #define AppGettingStartedFile AppMainDirectory + "\getstart.rtf"
 #define AppSupportDirectory "{app}\support"
-#define AppAddonsDirectory AppMainDirectory + "\addons\"
+#define AppAddonsDirectory AppMainDirectory + "\addons"
+#define AppToolsDirectory AppMainDirectory + "\tools"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 
@@ -79,7 +81,6 @@
 #include "inc/ide.iss"
 #include "inc/version.iss"
 #include "inc/kos.iss"
-#include "inc/cpnt.iss"
 #include "inc/ruby.iss"
 #include "inc/gdb.iss"#include "inc/helpers.iss"
 
@@ -118,12 +119,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-Compression=lzma2/ultra64
+;Compression=lzma2/ultra64
 
 ; Debug mode
-;Compression=none
-;DiskSpanning=True
-;DiskSliceSize=736000000
+Compression=none
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -134,25 +135,43 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Components]
+; Main
 Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom; Flags: fixed
-Name: "main\base"; Description: "{cm:ComponentBase}"; ExtraDiskSpaceRequired: 293601280; Types: full compact custom; Flags: fixed
-Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; ExtraDiskSpaceRequired: 1214186581; Types: full compact custom; Flags: fixed
+Name: "main\base"; Description: "{cm:ComponentBase}"; Types: full compact custom; Flags: fixed
+Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
 Name: "main\kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
+
+; IDE
 Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
 Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
+
+; Addons
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
-Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; ExtraDiskSpaceRequired: 7539; Types: full
-Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; ExtraDiskSpaceRequired: 143360; Types: full
-Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; ExtraDiskSpaceRequired: 811008; Types: full
-Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; ExtraDiskSpaceRequired: 2334720; Types: full
-Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; ExtraDiskSpaceRequired: 45056; Types: full
-Name: "helpers"; Description: "{cm:ComponentHelpers}"; Types: full compact
-Name: "helpers\img4dc"; Description: "{cm:ComponentHelpers_img4dc}"; Types: full compact
-Name: "helpers\img4dc\cdi4dc"; Description: "{cm:ComponentHelpers_img4dc_cdi4dc}"; ExtraDiskSpaceRequired: 45056; Types: full compact
-Name: "helpers\img4dc\mds4dc"; Description: "{cm:ComponentHelpers_img4dc_mds4dc}"; ExtraDiskSpaceRequired: 57344; Types: full compact
-Name: "helpers\ipcreate"; Description: "{cm:ComponentHelpers_ipcreate}"; ExtraDiskSpaceRequired: 675840; Types: full compact
-Name: "helpers\ipcreate\iplogos"; Description: "{cm:ComponentHelpers_ipcreate_iplogos}"; ExtraDiskSpaceRequired: 53240; Types: full compact
-Name: "helpers\mkisofs"; Description: "{cm:ComponentHelpers_mkisofs}"; ExtraDiskSpaceRequired: 131072; Types: full compact
+Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; Types: full
+Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; Types: full
+Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; Types: full
+Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; Types: full
+Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; Types: full
+
+; Tools
+Name: "tools"; Description: "{cm:ComponentUtilities}"; Types: full
+Name: "tools\checker"; Description: "{cm:ComponentUtilities_checker}"; Types: full
+Name: "tools\bdreams"; Description: "{cm:ComponentUtilities_bdreams}"; Types: full
+Name: "tools\ipwriter"; Description: "{cm:ComponentUtilities_ipwriter}"; Types: full
+Name: "tools\ipwriter\iplogos"; Description: "{cm:ComponentUtilities_ipwriter_iplogos}"; Types: full
+Name: "tools\mrwriter"; Description: "{cm:ComponentUtilities_mrwriter}"; Types: full
+Name: "tools\buildsbi"; Description: "{cm:ComponentUtilities_buildsbi}"; Types: full
+Name: "tools\sbinducr"; Description: "{cm:ComponentUtilities_sbinducr}"; Types: full
+Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: full
+
+; Helpers
+;Name: "helpers"; Description: "{cm:ComponentHelpers}"; Types: full compact
+;Name: "helpers\img4dc"; Description: "{cm:ComponentHelpers_img4dc}"; Types: full compact
+;Name: "helpers\img4dc\cdi4dc"; Description: "{cm:ComponentHelpers_img4dc_cdi4dc}"; Types: full compact
+;Name: "helpers\img4dc\mds4dc"; Description: "{cm:ComponentHelpers_img4dc_mds4dc}"; Types: full compact
+;Name: "helpers\ipcreate"; Description: "{cm:ComponentHelpers_ipcreate}"; Types: full compact
+;Name: "helpers\ipcreate\iplogos"; Description: "{cm:ComponentHelpers_ipcreate_iplogos}"; Types: full compact
+;Name: "helpers\mkisofs"; Description: "{cm:ComponentHelpers_mkisofs}"; Types: full compact
 
 [Files]
 ; Install helpers
@@ -167,13 +186,13 @@ Source: "..\rsrc\text\license.rtf"; DestDir: "{#AppSupportDirectory}"; Flags: ig
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion
 
 ; MinGW Base
-Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
-Source: "{#SourceDirectoryMinGW}\bin\gcc.exe"; DestDir: "{app}\bin"; DestName: "cc.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
+Source: "{#SourceDirectoryMinGW}\bin\gcc.exe"; DestDir: "{app}\bin"; DestName: "cc.exe"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Toolchains
-Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#SourceDirectoryToolchainSh}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\toolchains
+Source: "{#SourceDirectoryToolchainSh}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\toolchains
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -185,25 +204,30 @@ Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags
 Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
 
 ; DreamSDK
-Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
 Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
 Source: "{#SourceDirectoryAddons}\txfutils\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils
+Source: "{#SourceDirectoryAddons}\txfutils-txflib\*"; DestDir: "{#AppAddonsDirectory}\txflib"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\txfutils\txflib
 Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\vmutool
-
-; Helpers (these will copy to AppAddonsDirectory too!)
-Source: "{#SourceDirectoryHelpers}\img4dc\cdi4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\cdi4dc
-Source: "{#SourceDirectoryHelpers}\img4dc\mds4dc\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\img4dc\mds4dc
-Source: "{#SourceDirectoryHelpers}\ipcreate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\ipcreate
-Source: "{#SourceDirectoryHelpers}\mkisofs\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: helpers\mkisofs
 
 ; KallistiOS Embedded
 Source: "{#SourceDirectoryEmbeddedKallisti}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
 Source: "{#SourceDirectoryEmbeddedRuby}\mruby\*"; DestDir: "{#AppOptBase}\mruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
 Source: "{#SourceDirectoryEmbeddedRuby}\samples\*"; DestDir: "{#AppToolchainBase}\ruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
+
+; GUI Tools
+Source: "{#SourceDirectoryTools}\bdreams\*"; DestDir: "{#AppToolsDirectory}\bdreams"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\bdreams
+Source: "{#SourceDirectoryTools}\checker\*"; DestDir: "{#AppToolsDirectory}\checker"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\checker
+Source: "{#SourceDirectoryTools}\ipwriter\*"; DestDir: "{#AppToolsDirectory}\ipwriter"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\ipwriter
+Source: "{#SourceDirectoryTools}\ipwriter-iplogos\*"; DestDir: "{#AppToolsDirectory}\ipwriter\iplogos"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\ipwriter\iplogos
+Source: "{#SourceDirectoryTools}\mrwriter\*"; DestDir: "{#AppToolsDirectory}\mrwriter"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\mrwriter
+Source: "{#SourceDirectoryTools}\buildsbi\*"; DestDir: "{#AppToolsDirectory}\buildsbi"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\buildsbi
+Source: "{#SourceDirectoryTools}\sbinducr\*"; DestDir: "{#AppToolsDirectory}\sbinducr"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\sbinducr
+Source: "{#SourceDirectoryTools}\vmutool\*"; DestDir: "{#AppToolsDirectory}\vmutool"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\vmutool
 
 [Icons]
 ; Main shortcuts
@@ -221,7 +245,7 @@ Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:SegaDreamcastWikiDocumentati
 ; Useful Links
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkCodeBlocks}"; Filename: "http://www.codeblocks.org"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"                                                                                                                                  
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAppGitHub}"; Filename: "https://github.com/dreamsdk"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
@@ -229,6 +253,41 @@ Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filenam
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"
+
+;
+; Tools
+;
+
+; Tools: 1ST_READ.BIN Checker
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkChecker}"; Filename: "{#AppToolsDirectory}\checker\checker.exe"; WorkingDir: "{#AppToolsDirectory}\checker"; Comment: "{cm:ComponentUtilities_checker}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkCheckerReadme}"; Filename: "{#AppToolsDirectory}\checker\readme.txt"; WorkingDir: "{#AppToolsDirectory}\checker"
+
+; Tools: BootDreams
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkBootDreams}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.exe"; WorkingDir: "{#AppToolsDirectory}\bdreams"; Comment: "{cm:ComponentUtilities_bdreams}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkBootDreamsHelp}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.chm"; WorkingDir: "{#AppToolsDirectory}\bdreams"
+
+; Tools: IP.BIN Writer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkIpWriter}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.exe"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; Comment: "{cm:ComponentUtilities_ipwriter}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkIpWriterHelp}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.chm"; WorkingDir: "{#AppToolsDirectory}\ipwriter"
+
+; Tools: MR Writer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkMRWriter}"; Filename: "{#AppToolsDirectory}\mrwriter\mrwriter.exe"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; Comment: "{cm:ComponentUtilities_mrwriter}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkMRWriterReadme}"; Filename: "{#AppToolsDirectory}\mrwriter\readme.txt"; WorkingDir: "{#AppToolsDirectory}\mrwriter"
+
+; Tools: SBI Builder
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSbiBuilder}"; Filename: "{#AppToolsDirectory}\buildsbi\buildsbi.exe"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Comment: "{cm:ComponentUtilities_buildsbi}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderChanges}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\changes.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderReadme}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"
+
+; Tools: Selfboot Inducer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSelfbootInducer}"; Filename: "{#AppToolsDirectory}\sbinducr\sbinducr.exe"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Comment: "{cm:ComponentUtilities_sbinducr}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerReadme}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerChanges}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\whatsnew.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"
+
+; Tools: VMU Tool PC
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkVmuTool}"; Filename: "{#AppToolsDirectory}\vmutool\vmutool.exe"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Comment: "{cm:ComponentUtilities_vmutool}"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolHelp}"; Filename: "{#AppToolsDirectory}\vmutool\help\vmutool.chm"; WorkingDir: "{#AppToolsDirectory}\vmutool"
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolReadme}"; Filename: "{#AppToolsDirectory}\vmutool\help\readme.rtf"; WorkingDir: "{#AppToolsDirectory}\vmutool"
 
 ; Additional shortcuts
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
@@ -266,6 +325,29 @@ LinkSegaDreamcastGitHub=Sega Dreamcast GitHub
 LinkSimulantDiscordChannel=Simulant Engine - Discord Channel
 LinkSiZiOUS=SiZiOUS Serial Koder
 
+; Tools
+ToolsGroupDirectory=Tools
+ToolsDocumentationGroupDirectory=Tools Documentation
+LinkBootDreams=BootDreams
+LinkSbiBuilder=SBI Builder
+LinkChecker=1ST_READ.BIN Checker
+LinkIpWriter=IP.BIN Writer
+LinkMRWriter=MR Writer
+LinkSelfbootInducer=Selfboot Inducer
+LinkVmuTool=VMU Tool PC
+
+; Tools documentation
+LinkBootDreamsHelp=BootDreams - Help
+LinkSbiBuilderChanges=SBI Builder - Changes
+LinkSbiBuilderReadme=SBI Builder - Read Me
+LinkCheckerReadme=1ST_READ.BIN Checker - Read Me
+LinkIpWriterHelp=IP.BIN Writer - Help
+LinkMRWriterReadme=MR Writer - Read Me
+LinkSelfbootInducerReadme=Selfboot Inducer - Read Me
+LinkSelfbootInducerChanges=Selfboot Inducer - Changes
+LinkVmuToolHelp=VMU Tool PC - Help
+LinkVmuToolReadme=VMU Tool PC - Read Me
+                  
 ; Generic buttons
 ButtonBrowse=Browse...
 ButtonRefresh=Refresh
@@ -296,7 +378,7 @@ PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. 
 ; Destination Directory
 InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
 
-; Components
+; Components: List
 ComponentMain=Base program files (required)
 ComponentBase=MinGW/MSYS and Win32 toolchain (required)
 ComponentToolchains=Super-H and AICA toolchains (required)
@@ -304,23 +386,20 @@ ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
 ComponentIDE=Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksVerName}
 ComponentAdditionalTools=Additional command line tools
-ComponentAdditionalTools_elevate=Elevate – Command-Line UAC Elevation Utility (elevate)
+ComponentAdditionalTools_elevate=Elevate – Command-line UAC elevation utility (elevate)
 ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pvr2png)
 ComponentAdditionalTools_txfutils=TXF Utilities – Textured font format tools (showtxf, ttf2txf)
 ComponentAdditionalTools_txfutils_txflib=Additional ready-to-use TXF fonts files
-ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data handler (vmutool)
-ComponentHelpers=Critical helpers components
-ComponentHelpers_img4dc=IMG4DC – Dreamcast Selfboot Toolkit
-ComponentHelpers_img4dc_cdi4dc=CDI4DC – Padus DiscJuggler image generator (cdi4dc)
-ComponentHelpers_img4dc_mds4dc=MDS4DC – Alcohol 120% image generator (mds4dc, lbacalc)
-ComponentHelpers_ipcreate=IP.BIN Creator – Initial Program generator (ipcreate)
-ComponentHelpers_ipcreate_iplogos=Additional ready-to-use IP logos
-ComponentHelpers_mkisofs=Make ISO File System – ISO9660 image generator (mkisofs)
-ComponentMessageWarningStart=You have unselected some critical helpers components. Pay attention:%n
-ComponentMessageWarning_img4dc=IMG4DC is used in the 'makedisc' script.
-ComponentMessageWarning_ipcreate=IP.BIN Creator may be necessary for generating Sega Dreamcast disc images.
-ComponentMessageWarning_mkisofs=Make ISO File System is used by the 'makedisc' script and by {#IdeCodeBlocksName}.
-ComponentMessageWarningEnd=Are you sure to continue with these components disabled?
+ComponentAdditionalTools_vmutool=VMU Tool PC – Visual Memory data manager (vmutool)
+ComponentUtilities=Additional graphical tools
+ComponentUtilities_bdreams=BootDreams – Selfboot image generator frontend
+ComponentUtilities_buildsbi=SBI Builder – Selfboot Inducer package generator
+ComponentUtilities_checker=1ST_READ.BIN Checker – Binary program state checker
+ComponentUtilities_ipwriter=IP.BIN Writer – Initial Program manipulation tool
+ComponentUtilities_ipwriter_iplogos=Additional ready-to-use Initial Program logos
+ComponentUtilities_mrwriter=MR Writer – Initial Program picture format management tool
+ComponentUtilities_sbinducr=Selfboot Inducer – DreamInducer disc generator
+ComponentUtilities_vmutool=VMU Tool PC – Visual Memory data manager (GUI)
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
@@ -494,14 +573,6 @@ begin
       MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
       Exit;
     end;
-  end;
-
-  // Select Components Page
-  if (CurPageID = wpSelectComponents) then
-  begin
-    Result := CheckComponents;
-    if not Result then
-      Exit;
   end;
 
   // Ruby Page
