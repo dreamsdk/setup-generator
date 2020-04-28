@@ -14,6 +14,7 @@
 ;#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
+#define SourceDirectoryAdditionalBinaries SourceDirectoryBase + "\mingw-additional-binaries"
 #define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
 #define SourceDirectoryToolchainArm SourceDirectoryBase + "\gcc-arm-eabi"
@@ -164,15 +165,6 @@ Name: "tools\buildsbi"; Description: "{cm:ComponentUtilities_buildsbi}"; Types: 
 Name: "tools\sbinducr"; Description: "{cm:ComponentUtilities_sbinducr}"; Types: full
 Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: full
 
-; Helpers
-;Name: "helpers"; Description: "{cm:ComponentHelpers}"; Types: full compact
-;Name: "helpers\img4dc"; Description: "{cm:ComponentHelpers_img4dc}"; Types: full compact
-;Name: "helpers\img4dc\cdi4dc"; Description: "{cm:ComponentHelpers_img4dc_cdi4dc}"; Types: full compact
-;Name: "helpers\img4dc\mds4dc"; Description: "{cm:ComponentHelpers_img4dc_mds4dc}"; Types: full compact
-;Name: "helpers\ipcreate"; Description: "{cm:ComponentHelpers_ipcreate}"; Types: full compact
-;Name: "helpers\ipcreate\iplogos"; Description: "{cm:ComponentHelpers_ipcreate_iplogos}"; Types: full compact
-;Name: "helpers\mkisofs"; Description: "{cm:ComponentHelpers_mkisofs}"; Types: full compact
-
 [Files]
 ; Install helpers
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
@@ -187,7 +179,7 @@ Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: i
 
 ; MinGW Base
 Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
-Source: "{#SourceDirectoryMinGW}\bin\gcc.exe"; DestDir: "{app}\bin"; DestName: "cc.exe"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectoryAdditionalBinaries}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Toolchains

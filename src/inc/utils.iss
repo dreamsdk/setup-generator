@@ -116,7 +116,7 @@ begin
     Log(Result);
   end
   else
-    Log('Run Command Error: No output catch!');
+    Log('Run Command Error: No output catched!');
   
   if FileExists(TmpFileName) then
     DeleteFile(TmpFileName);
