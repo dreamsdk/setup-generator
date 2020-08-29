@@ -1,8 +1,8 @@
 ; DreamSDK Inno Setup Script
 
-; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2003"
-#define ProductVersion "3.0.4.2003"
+; Installer versions#define MyAppVersion "R3"
+#define PackageVersion "3.0.4.2008"
+#define ProductVersion "3.0.4.2008"
 
 ; Code::Blocks version
 #define IdeCodeBlocksVersion "17.12"
@@ -120,12 +120,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-;Compression=lzma2/ultra64
+Compression=lzma2/ultra64
 
 ; Debug mode
-Compression=none
-DiskSpanning=True
-DiskSliceSize=736000000
+;Compression=none
+;DiskSpanning=True
+;DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -339,7 +339,7 @@ LinkSelfbootInducerReadme=Selfboot Inducer - Read Me
 LinkSelfbootInducerChanges=Selfboot Inducer - Changes
 LinkVmuToolHelp=VMU Tool PC - Help
 LinkVmuToolReadme=VMU Tool PC - Read Me
-                  
+
 ; Generic buttons
 ButtonBrowse=Browse...
 ButtonRefresh=Refresh
@@ -349,8 +349,8 @@ PrerequisiteMissing=%s %s missing.
 PrerequisiteMissingLink=and
 PrerequisiteMissingVerbSingle=is
 PrerequisiteMissingVerbMultiple=are
-PrerequisiteMissingHintMandatory=Please install %s, check %s availability in PATH global environment variable then try again.
-PrerequisiteMissingHintOptional=For better experience, install %s and check %s availability in PATH global environment variable. Continue anyway?
+PrerequisiteMissingHintMandatory=Please install %s, check %s availability in PATH system-wide environment variable then try again.
+PrerequisiteMissingHintOptional=For better experience, install %s and check %s availability in PATH system-wide environment variable. Continue anyway?
 PrerequisiteMissingHintLink1Single=it
 PrerequisiteMissingHintLink1Multiple=them
 PrerequisiteMissingHintLink2Single=its
