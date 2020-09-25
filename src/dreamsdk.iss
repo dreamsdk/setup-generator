@@ -1,8 +1,10 @@
+; =============================================================================
 ; DreamSDK Inno Setup Script
+; =============================================================================
 
 ; Installer versions#define MyAppVersion "R3"
-#define PackageVersion "3.0.4.2008"
-#define ProductVersion "3.0.4.2008"
+#define PackageVersion "3.0.4.2009"
+#define ProductVersion "3.0.4.2009"
 
 ; Code::Blocks version
 #define IdeCodeBlocksVersion "17.12"
@@ -17,11 +19,15 @@
 #define SourceDirectoryAdditionalBinaries SourceDirectoryBase + "\mingw-additional-binaries"
 #define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
-#define SourceDirectoryToolchainArm SourceDirectoryBase + "\gcc-arm-eabi"
-#define SourceDirectoryToolchainSh SourceDirectoryBase + "\gcc-sh-elf"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
 #define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\dreamsdk-system-objects"
+; Toolchains
+#define SourceDirectoryToolchainArmStable SourceDirectoryBase + "\gcc-arm-eabi-stable"
+#define SourceDirectoryToolchainShStable SourceDirectoryBase + "\gcc-sh-elf-stable"
+#define SourceDirectoryToolchainArmExperimental SourceDirectoryBase + "\gcc-arm-eabi-experimental"
+#define SourceDirectoryToolchainShExperimental SourceDirectoryBase + "\gcc-sh-elf-experimental"
 
+; GDB
 #define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
 #define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
 #define SourceDirectoryGdbPython34 SourceDirectoryBase + "\gdb-sh-elf-python-3.4"
@@ -84,6 +90,7 @@
 #include "inc/kos.iss"
 #include "inc/ruby.iss"
 #include "inc/gdb.iss"#include "inc/helpers.iss"
+#include "inc/toolchains.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -120,12 +127,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-Compression=lzma2/ultra64
+;Compression=lzma2/ultra64
 
 ; Debug mode
-;Compression=none
-;DiskSpanning=True
-;DiskSliceSize=736000000
+Compression=none
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -183,8 +190,10 @@ Source: "{#SourceDirectoryAdditionalBinaries}\*"; DestDir: "{app}"; Flags: ignor
 Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Toolchains
-Source: "{#SourceDirectoryToolchainArm}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\toolchains
-Source: "{#SourceDirectoryToolchainSh}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\toolchains
+Source: "{#SourceDirectoryToolchainArmStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
+Source: "{#SourceDirectoryToolchainShStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
+Source: "{#SourceDirectoryToolchainArmExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
+Source: "{#SourceDirectoryToolchainShExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -393,6 +402,17 @@ ComponentUtilities_mrwriter=MR Writer – Initial Program picture format managemen
 ComponentUtilities_sbinducr=Selfboot Inducer – DreamInducer disc generator
 ComponentUtilities_vmutool=VMU Tool PC – Visual Memory data manager (GUI)
 
+; Toolchains
+ToolchainsTitlePage=Toolchains Configuration
+ToolchainsSubtitlePage=Which toolchains build do you want to use?
+LabelToolchainsIntroduction=Customize your toolchains installation.
+LabelToolchainsDescription=Toolchains are the set of tools used to produces Sega Dreamcast programs. Please choose below your prefered version. If you are unsure, please choose Stable.
+ToolchainsStable=Stable (recommanded)
+LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 4.7.4 with Newlib 2.0.0. It's the most well tested combinaison and the current versions officially supported.
+ToolchainsExperimental=Experimental
+LabelToolchainsDescriptionExperimental=Experimental toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.4.0 for AICA. It's much newer but not well tested. Use this at your own risk.
+ToolchainsExperimentalConfirmation=Are you sure to use the experimental toolchains?
+
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
@@ -407,7 +427,6 @@ GdbPython37=Python 3.7
 GdbPython38=Python 3.8
 
 ; Ruby
-RubyEnableConfirmation=Ruby support for the Sega Dreamcast is experimental. Are you sure to continue?
 RubyTitlePage=Ruby Configuration
 RubySubtitlePage=Do you want to enable Ruby support for the Sega Dreamcast?
 LabelRubyIntroduction=You may use RubyInstaller for Windows to set up Ruby on your computer.
@@ -416,6 +435,7 @@ RubyEnabled=Enable Ruby (experimental)
 LabelRubyDescriptionEnabled=Enable Ruby support for the Sega Dreamcast. This is experimental. Ruby projects are not supported in {#IdeCodeBlocksName}.
 RubyDisabled=Don't enable Ruby
 LabelRubyDescriptionDisabled=Don't enable Ruby support for the Sega Dreamcast. You may activate it later in {#FullAppManagerName} if you change your mind.
+RubyEnableConfirmation=Ruby support for the Sega Dreamcast is experimental. Are you sure to continue?
 
 ; KallistiOS
 KallistiEmbeddedTitlePage=Sega Dreamcast Libraries Configuration
@@ -473,7 +493,8 @@ var
   IntegratedDevelopmentEnvironmentSettingsPageID, 
   GdbPageID,
   KallistiEmbeddedPageID,
-  RubyPageID: Integer;
+  RubyPageID,
+  ToolchainsPageID: Integer;
 
 function IsModuleLoaded(modulename: AnsiString): Boolean;
 external 'IsModuleLoaded@files:{#PSVinceLibraryFileName} stdcall';
@@ -488,6 +509,7 @@ begin
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
   RubyPageID := CreateRubyPage;
   GdbPageID := CreateGdbPage;
+  ToolchainsPageID := CreateToolchainsPage;
 end;
 
 function IsProcessRunning(const ProcessName: String): Boolean;
@@ -564,6 +586,18 @@ begin
     begin
       MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
       Exit;
+    end;
+  end;
+
+  // Toolchains Page
+  if (CurPageID = ToolchainsPageID) then
+  begin
+    if IsToolchainsExperimental then
+    begin
+      // Sure to use experimental toolchain?
+      Result := ConfirmExperimentalToolchainsUsage;
+      if not Result then
+        Exit;
     end;
   end;
 
