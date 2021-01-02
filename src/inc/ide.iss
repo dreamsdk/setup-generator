@@ -2,12 +2,7 @@
 type
   TCodeBlocksPatcherOperation = (cbpInstall, cbpUninstall);
 
-const
-  CODEBLOCKS_SDK_DLL_SHA1 = 'bea660dd5dbfca817e6d06a0be04b2e7de5da34f';
-  CODEBLOCKS_SDK_DLL_FILE = '\codeblocks.dll';    
-
-  DEFAULT_CB_INSTALL_DIR = '{pf32}\CodeBlocks';
-  
+const  
   CB_HELPER_FILE = '{tmp}\cbhelper.exe';
   CB_PATCH_FILE = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\codeblocks-patcher.exe';
    
@@ -18,6 +13,7 @@ var
   EditCodeBlocksInstallationDirectory: TEdit;
   EditCodeBlocksUsersList: TMemo;
   ButtonCodeBlocksRefreshUsersList: TButton;
+  LabelCodeBlocksDetectedVersion: TLabel;
 
 function IsCodeBlocksIntegrationEnabled: Boolean;
 begin
@@ -49,7 +45,8 @@ begin
   EditCodeBlocksUsersList.Text := RunCommand( Format('%s %s', [
       ExpandConstant(CB_HELPER_FILE),
       '--get-available-users' 
-    ])
+    ]),
+    False
   );
   
   ButtonCodeBlocksRefreshUsersList.Enabled := True;
@@ -74,12 +71,15 @@ begin
     ]);
   end;
 
-  Buffer := RunCommand(Format('"%s" --operation=%s --home-dir="%s" %s --no-logo --show-splash --verbose', [
-    ExpandConstant(CB_PATCH_FILE),
-    PatcherSwitch,
-    ExpandConstant('{app}'),
-    ParamExtraOption
-  ]));
+  Buffer := RunCommand(
+    Format('"%s" --operation=%s --home-dir="%s" %s --no-logo --show-splash --verbose', [
+      ExpandConstant(CB_PATCH_FILE),
+      PatcherSwitch,
+      ExpandConstant('{app}'),
+      ParamExtraOption
+    ]),
+    False
+  );
             
   Result := IsInString('is now ', Buffer);
 end;
@@ -95,7 +95,8 @@ begin
     Format('%s %s', [
       ExpandConstant(CB_HELPER_FILE),
       '--cleanup' 
-    ])
+    ]),
+    False
   );
   
   // Executing the Patcher  
@@ -116,6 +117,25 @@ begin
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationRemoveFailed'), [Buffer]), mbCriticalError, MB_OK); 
 end;
 
+function GetCodeBlocksVersion: String;
+begin  
+  Result := RunCommand(
+    Format('%s %s "%s"', [
+      ExpandConstant(CB_HELPER_FILE),
+      '--version',
+      GetCodeBlocksInstallationDirectory 
+    ]),
+    True
+  );
+end;
+
+function RetrieveCodeBlocksVersion: String;
+begin
+  Result := GetCodeBlocksVersion;
+  LabelCodeBlocksDetectedVersion.Caption :=
+    Format(CustomMessage('LabelCodeBlocksDetectedVersion'), [Result]);
+end;
+
 procedure ButtonCodeBlocksInstallationDirectoryOnClick(Sender: TObject);
 var
   Directory: String;
@@ -124,23 +144,26 @@ begin
   Directory := GetCodeBlocksInstallationDirectory;
   BrowseForFolderEx(Directory);
   EditCodeBlocksInstallationDirectory.Text := Directory;
+  RetrieveCodeBlocksVersion;
 end;
 
 procedure ButtonCodeBlocksRefreshUsersListOnClick(Sender: TObject);
 begin
   RetrieveCodeBlocksUsersList;
+  RetrieveCodeBlocksVersion;
+end;
+
+procedure EditCodeBlocksInstallationDirectoryOnChange(Sender: TObject);
+begin
+  LabelCodeBlocksDetectedVersion.Caption := '';
 end;
 
 function IsCodeBlocksIntegrationReady: Boolean;
 var
-  CodeBlocksBinaryFileName: String;
+  CodeBlocksVersion: String;
 
 begin
   Result := True;
-
-  // codeblocks.dll will be used to check if we are on 17.12 stock release
-  CodeBlocksBinaryFileName := GetCodeBlocksInstallationDirectory + 
-    CODEBLOCKS_SDK_DLL_FILE;
 
   // Check existence of the installation folder
   if not DirExists(GetCodeBlocksInstallationDirectory) then
@@ -150,15 +173,17 @@ begin
     Exit;
   end;
 
-  // Check if codeblocks.dll exists
-  if not FileExists(CodeBlocksBinaryFileName) then
+  // Handle the detected C::B version
+  CodeBlocksVersion := RetrieveCodeBlocksVersion;
+  if CodeBlocksVersion = '(Undefined)' then
   begin
+    // C::B is not installed in this directory
     Result := False;
     MsgBox(CustomMessage('CodeBlocksBinaryFileNameNotExists'), mbError, MB_OK);
   end
-  else if LowerCase(GetSHA1OfFile(CodeBlocksBinaryFileName)) <> CODEBLOCKS_SDK_DLL_SHA1 then
+  else if CodeBlocksVersion = '(Unknown)' then
   begin
-    // Check if the SHA-1 hash of the codeblocks.dll file is correct
+    // C::B is installed, but its version is unknown
     Result := (MsgBox(CustomMessage('CodeBlocksBinaryHashDifferent'), mbError, MB_YESNO) = IDYES);
   end;
 
@@ -169,6 +194,17 @@ begin
     MsgBox(CustomMessage('CodeBlocksInstallationUsersUnavailable'), mbError, MB_OK);
     Exit;
   end;
+end;
+
+function GetCodeBlocksDefaultInstallationDirectory: String;
+begin  
+  Result := RunCommand(
+    Format('%s %s', [
+      ExpandConstant(CB_HELPER_FILE),
+      '--detect'      
+    ]),
+    True
+  );
 end;
 
 function CreateIntegratedDevelopmentEnvironmentPage: Integer;
@@ -222,14 +258,23 @@ begin
 
   // CodeBlocksInstallationDirectory
   EditCodeBlocksInstallationDirectory := TEdit.Create(IntegratedDevelopmentEnvironmentPage);
-  EditCodeBlocksInstallationDirectory.Text := ExpandConstant(DEFAULT_CB_INSTALL_DIR);
+  EditCodeBlocksInstallationDirectory.Text := ExpandConstant(GetCodeBlocksDefaultInstallationDirectory);
   EditCodeBlocksInstallationDirectory.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
     - ButtonCodeBlocksInstallationDirectory.Width - ScaleX(8);
   EditCodeBlocksInstallationDirectory.Top := RowTop1;
   EditCodeBlocksInstallationDirectory.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  EditCodeBlocksInstallationDirectory.OnChange := @EditCodeBlocksInstallationDirectoryOnChange;
+
+  // LabelCodeBlocksDetectedVersion
+  LabelCodeBlocksDetectedVersion := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
+  LabelCodeBlocksDetectedVersion.Font.Style := [fsBold];
+  LabelCodeBlocksDetectedVersion.AutoSize := True;
+  LabelCodeBlocksDetectedVersion.Top := EditCodeBlocksInstallationDirectory.Top 
+    + EditCodeBlocksInstallationDirectory.Height + ScaleY(4);
+  LabelCodeBlocksDetectedVersion.Parent := IntegratedDevelopmentEnvironmentPage.Surface; 
 
   RowTop2 := EditCodeBlocksInstallationDirectory.Top + 
-    EditCodeBlocksInstallationDirectory.Height + ScaleY(16);
+    EditCodeBlocksInstallationDirectory.Height + ScaleY(24);
 
   // Label for CodeBlocksInstallationDirectory
   LabelCodeBlocksConfigurationFiles := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
@@ -259,13 +304,14 @@ begin
   EditCodeBlocksUsersList.Top := LabelCodeBlocksConfigurationFiles.Top 
     + LabelCodeBlocksConfigurationFiles.Height + ScaleY(8);
   EditCodeBlocksUsersList.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth;
-  EditCodeBlocksUsersList.Height := ScaleY(80);
+  EditCodeBlocksUsersList.Height := ScaleY(68);
   EditCodeBlocksUsersList.ScrollBars := ssVertical;  
   EditCodeBlocksUsersList.ReadOnly := True;
   EditCodeBlocksUsersList.Color := clBtnFace;
   EditCodeBlocksUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;   
 
   RetrieveCodeBlocksUsersList;
+  RetrieveCodeBlocksVersion;
 
   Result := IntegratedDevelopmentEnvironmentPage.ID;
 end;

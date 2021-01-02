@@ -96,7 +96,7 @@ function RunCommand(const CommandLine: String; const AutoTrim: Boolean): String;
 var
   TmpFileName, Executable, RealCommandLine: String;
   ExecBuffer: AnsiString;
-  ResultCode: Integer; 
+  ResultCode: Integer;
 
 begin
   Executable := ExpandConstant('{cmd}');

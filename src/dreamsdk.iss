@@ -3,17 +3,14 @@
 ; =============================================================================
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2010"
-#define ProductVersion "3.0.4.2010"
-
-; Code::Blocks version
-#define IdeCodeBlocksVersion "17.12"
+#define PackageVersion "3.0.4.2101"
+#define ProductVersion "3.0.4.2101"
 ; Copyright
 #define MyAppCopyright "© Copyleft 2018-2020"
 
 ; Source directories
-#define SourceDirectoryBase "D:\sources"
-;#define SourceDirectoryBase "D:\sources_dev"
+;#define SourceDirectoryBase "D:\sources"
+#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
 #define SourceDirectoryAdditionalBinaries SourceDirectoryBase + "\mingw-additional-binaries"
@@ -35,6 +32,7 @@
 #define SourceDirectoryGdbPython36 SourceDirectoryBase + "\gdb-sh-elf-python-3.6"
 #define SourceDirectoryGdbPython37 SourceDirectoryBase + "\gdb-sh-elf-python-3.7"
 #define SourceDirectoryGdbPython38 SourceDirectoryBase + "\gdb-sh-elf-python-3.8"
+#define SourceDirectoryGdbPython39 SourceDirectoryBase + "\gdb-sh-elf-python-3.9"
 
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
 #define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
@@ -75,7 +73,7 @@
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
 #define IdeCodeBlocksName "Code::Blocks"
-#define IdeCodeBlocksVerName IdeCodeBlocksName + " " + IdeCodeBlocksVersion
+#define IdeCodeBlocksSupportedVersions "17.12 or 20.03"
 
 #define PSVinceLibraryFileName "psvince.dll"
 #define PSVinceLibrary AppSupportDirectory + "\" + PSVinceLibraryFileName
@@ -127,12 +125,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-Compression=lzma2/ultra64
+;Compression=lzma2/ultra64
 
 ; Debug mode
-;Compression=none
-;DiskSpanning=True
-;DiskSliceSize=736000000
+Compression=none
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -203,6 +201,7 @@ Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainBase}"; Flags
 Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
 Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
 Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
+Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
 
 ; DreamSDK
 Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
@@ -385,7 +384,7 @@ ComponentBase=MinGW/MSYS and Win32 toolchain (required)
 ComponentToolchains=Super-H and AICA toolchains (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
 ComponentIDE=Integrated Development Environment (IDE)
-ComponentIDE_CodeBlocks={#IdeCodeBlocksVerName}
+ComponentIDE_CodeBlocks={#IdeCodeBlocksName}
 ComponentAdditionalTools=Additional command line tools
 ComponentAdditionalTools_elevate=Elevate – Command-line UAC elevation utility (elevate)
 ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pvr2png)
@@ -417,7 +416,7 @@ ToolchainsExperimentalConfirmation=Experimental toolchains may be unstable. Are 
 GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbIntroduction=Customize your GNU Debugger for SuperH installation.
-LabelGdbDescription=Only Python 32-bits is supported. If Python options are disabled, please install a 32-bits Python runtime (it can be installed with Python 64-bits) then run Setup again.
+LabelGdbDescription=You may enable Python extensions for your GDB for SuperH. Only Python 32-bits is supported. If the Python options below are disabled then please install a 32-bits Python runtime on your computer and run Setup again.
 GdbPythonNone=Don't enable Python for GDB
 GdbPython27=Python 2.7
 GdbPython34=Python 3.4
@@ -425,6 +424,7 @@ GdbPython35=Python 3.5
 GdbPython36=Python 3.6
 GdbPython37=Python 3.7
 GdbPython38=Python 3.8
+GdbPython39=Python 3.9
 
 ; Ruby
 RubyTitlePage=Ruby Configuration
@@ -450,15 +450,16 @@ LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-
 LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions of the required Sega Dreamcast component libraries. Use this option only if you don't have an active Internet connection or you don't want to use the up-to-date online repositories.
 
 ; Code::Blocks IDE
-CodeBlocksTitlePage={#IdeCodeBlocksVerName} Integration
+CodeBlocksTitlePage={#IdeCodeBlocksName} Plug-in Integration
 CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
-LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.
+LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.%nCurrently, only {#IdeCodeBlocksSupportedVersions} versions are supported.
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
 LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} one time with that user to create the required files.
+LabelCodeBlocksDetectedVersion=Detected {#IdeCodeBlocksName} version: %s
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
 CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
-CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version seems NOT to be the expected {#IdeCodeBlocksVersion}. There is no guarantee that it will work. Continue anyway?
+CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version need to be {#IdeCodeBlocksSupportedVersions}. There is no guarantee that it will work with your current installed version. Continue anyway?
 CodeBlocksIntegrationSetupFailed=Error when patching {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksIntegrationRemoveFailed=Error when restoring {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
@@ -504,12 +505,12 @@ external 'IsModuleLoaded@{#PSVinceLibrary} stdcall uninstallonly';
 
 procedure InitializeWizard;
 begin
-  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;
-  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
   RubyPageID := CreateRubyPage;
   GdbPageID := CreateGdbPage;
   ToolchainsPageID := CreateToolchainsPage;
+  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
 end;
 
 function IsProcessRunning(const ProcessName: String): Boolean;
