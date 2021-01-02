@@ -92,7 +92,7 @@ begin
   end;
 end;
 
-function RunCommand(const CommandLine: String): String;
+function RunCommand(const CommandLine: String; const AutoTrim: Boolean): String;
 var
   TmpFileName, Executable, RealCommandLine: String;
   ExecBuffer: AnsiString;
@@ -120,6 +120,9 @@ begin
   
   if FileExists(TmpFileName) then
     DeleteFile(TmpFileName);
+
+  if AutoTrim then
+    Result := Trim(Result);
 end;
 
 function SetDirectoryRights(DirectoryName, SID, Rights: String): Boolean;
