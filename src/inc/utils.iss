@@ -175,13 +175,21 @@ begin
         Exit;
       end
       else 
-        if MsgBox(CustomMessage('InactiveInternetConnection'), mbError, MB_RETRYCANCEL) = IDRETRY then
-          Log('Retrying')
-        else
-        begin
-          Log('Aborting');
-          Result := False;
-          Exit;
+        case MsgBox(CustomMessage('InactiveInternetConnection'), mbError, MB_ABORTRETRYIGNORE) of
+          IDRETRY:
+            Log('Retrying');
+          IDABORT:
+            begin
+              Log('Aborting');
+              Result := False;
+              Exit;
+            end;
+           IDIGNORE:
+            begin
+              Log('Ignoring');
+              Result := True;
+              Exit;
+            end;
         end;
     end;
   until Connected;
