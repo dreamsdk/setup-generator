@@ -115,8 +115,10 @@ begin
       PrerequisitesList.Add(PrerequisiteToString(paPython));
 
     // Check SVN
-    if not CheckPrerequisite(Prerequisites, paSubversion) then
-      PrerequisitesList.Add(PrerequisiteToString(paSubversion));
+    // Update: SVN was needed for libtremor kos-ports, but it has been moved
+    // on Git. So no need to install this prerequisite now.
+    (*if not CheckPrerequisite(Prerequisites, paSubversion) then
+      PrerequisitesList.Add(PrerequisiteToString(paSubversion));*)
 
     // Check Ruby
     if not CheckPrerequisite(Prerequisites, paRuby) then
