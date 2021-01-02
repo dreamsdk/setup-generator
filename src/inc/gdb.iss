@@ -10,13 +10,12 @@ var
 
 function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
 begin
-  Result := Trim(
-    RunCommand(
+  Result := RunCommand(
       ExpandConstant(
         Format('{tmp}\%s "%s"', [CommandName, PythonFileName])
-      )
-    )
-  );  
+      ),
+      True
+    );  
 end;
 
 function TestPythonVersion(Version: string): Boolean;
