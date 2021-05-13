@@ -3,21 +3,20 @@
 ; =============================================================================
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2101"
-#define ProductVersion "3.0.4.2101"
+#define PackageVersion "3.0.4.2104"
+#define ProductVersion "3.0.4.2104"
 ; Copyright
-#define MyAppCopyright "© Copyleft 2018-2020"
+#define MyAppCopyright "© Copyleft 2018-2021"
 
 ; Source directories
-;#define SourceDirectoryBase "D:\sources"
-#define SourceDirectoryBase "D:\sources_dev"
+#define SourceDirectoryBase "D:\sources"
+;#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
-#define SourceDirectoryAdditionalBinaries SourceDirectoryBase + "\mingw-additional-binaries"
-#define SourceDirectoryAdditionalLibraries SourceDirectoryBase + "\mingw-additional-libraries"
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
-#define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\dreamsdk-system-objects"
+#define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\system-objects"
+#define SourceDirectoryAppSystemObjectsConfiguration SourceDirectoryBase + "\system-objects-configuration"
 ; Toolchains
 #define SourceDirectoryToolchainArmStable SourceDirectoryBase + "\gcc-arm-eabi-stable"
 #define SourceDirectoryToolchainShStable SourceDirectoryBase + "\gcc-sh-elf-stable"
@@ -184,8 +183,6 @@ Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: i
 
 ; MinGW Base
 Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
-Source: "{#SourceDirectoryAdditionalBinaries}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
-Source: "{#SourceDirectoryAdditionalLibraries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Toolchains
 Source: "{#SourceDirectoryToolchainArmStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
@@ -204,8 +201,9 @@ Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags
 Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
 
 ; DreamSDK
+Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
-Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
