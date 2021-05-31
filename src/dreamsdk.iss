@@ -3,8 +3,8 @@
 ; =============================================================================
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2104"
-#define ProductVersion "3.0.4.2104"
+#define PackageVersion "3.0.4.2106"
+#define ProductVersion "3.0.4.2106"
 ; Copyright
 #define MyAppCopyright "© Copyleft 2018-2021"
 
@@ -124,12 +124,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-;Compression=lzma2/ultra64
+Compression=lzma2/ultra64
 
 ; Debug mode
-Compression=none
-DiskSpanning=True
-DiskSliceSize=736000000
+;Compression=none
+;DiskSpanning=True
+;DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -381,7 +381,7 @@ ComponentMain=Base program files (required)
 ComponentBase=MinGW/MSYS and Win32 toolchain (required)
 ComponentToolchains=Super-H and AICA toolchains (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
-ComponentIDE=Integrated Development Environment (IDE)
+ComponentIDE=Support for Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksName}
 ComponentAdditionalTools=Additional command line tools
 ComponentAdditionalTools_elevate=Elevate – Command-line UAC elevation utility (elevate)
@@ -450,10 +450,11 @@ LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions o
 ; Code::Blocks IDE
 CodeBlocksTitlePage={#IdeCodeBlocksName} Plug-in Integration
 CodeBlocksSubtitlePage=Where are located the {#IdeCodeBlocksName} files?
-LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.%nCurrently, only {#IdeCodeBlocksSupportedVersions} versions are supported.
+LabelCodeBlocksIntroduction={#IdeCodeBlocksName} must be installed before {#MyAppName} to enable the integration.%nCurrently, only {#IdeCodeBlocksSupportedVersions} binaries versions are supported.
 LabelCodeBlocksInstallationDirectory=Select the {#IdeCodeBlocksName} installation directory:
-LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, it means that you must run {#IdeCodeBlocksName} one time with that user to create the required files.
+LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlocksName} for all the users listed below. If an user is missing from that list, you can run {#IdeCodeBlocksName} one time with that user or you may click on the Initialize button.
 LabelCodeBlocksDetectedVersion=Detected {#IdeCodeBlocksName} version: %s
+ButtonCodeBlocksInitialize=Initialize...
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
 CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
@@ -461,6 +462,7 @@ CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version need to
 CodeBlocksIntegrationSetupFailed=Error when patching {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksIntegrationRemoveFailed=Error when restoring {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
+CodeBlocksInitializeConfirmation=This will create the required files to enable {#IdeCodeBlocksName} integration for all the users on this computer. Continue?
 
 ; Additional tasks
 AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment variable

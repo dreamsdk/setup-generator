@@ -12,7 +12,8 @@ var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;
   EditCodeBlocksInstallationDirectory: TEdit;
   EditCodeBlocksUsersList: TMemo;
-  ButtonCodeBlocksRefreshUsersList: TButton;
+  ButtonCodeBlocksRefreshUsersList,
+  ButtonCodeBlocksInitialize: TButton;
   LabelCodeBlocksDetectedVersion: TLabel;
 
 function IsCodeBlocksIntegrationEnabled: Boolean;
@@ -37,20 +38,41 @@ begin
     Result := RemoveBackslash(EditCodeBlocksInstallationDirectory.Text); 
 end;
 
-procedure RetrieveCodeBlocksUsersList;
+procedure HandleCodeBlocksUsersList(InitializeProfiles: Boolean);
+var
+  Switches: String;
+
 begin
   WizardForm.NextButton.Enabled := False;
-  ButtonCodeBlocksRefreshUsersList.Enabled := False;  
+  ButtonCodeBlocksRefreshUsersList.Enabled := False;
+  ButtonCodeBlocksInitialize.Enabled := False;  
   
+  Switches := '';
+  if InitializeProfiles then
+    Switches := '--initialize ';
+
+  Switches := Switches + '--get-available-users';
+
   EditCodeBlocksUsersList.Text := RunCommand( Format('%s %s', [
       ExpandConstant(CB_HELPER_FILE),
-      '--get-available-users' 
+      Switches
     ]),
     False
   );
   
+  ButtonCodeBlocksInitialize.Enabled := True;
   ButtonCodeBlocksRefreshUsersList.Enabled := True;
   WizardForm.NextButton.Enabled := True;
+end;
+
+procedure RetrieveCodeBlocksUsersList;
+begin
+  HandleCodeBlocksUsersList(False);
+end;
+
+procedure InitializeCodeBlocks;
+begin
+  HandleCodeBlocksUsersList(True);
 end;
 
 function RunCodeBlocksPatcher(const Operation: TCodeBlocksPatcherOperation;
@@ -145,6 +167,12 @@ begin
   BrowseForFolderEx(Directory);
   EditCodeBlocksInstallationDirectory.Text := Directory;
   RetrieveCodeBlocksVersion;
+end;
+
+procedure ButtonCodeBlocksInitializeOnClick(Sender: TObject);
+begin  
+  if MsgBox(CustomMessage('CodeBlocksInitializeConfirmation'), mbError, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+    InitializeCodeBlocks;
 end;
 
 procedure ButtonCodeBlocksRefreshUsersListOnClick(Sender: TObject);
@@ -276,7 +304,7 @@ begin
   RowTop2 := EditCodeBlocksInstallationDirectory.Top + 
     EditCodeBlocksInstallationDirectory.Height + ScaleY(24);
 
-  // Label for CodeBlocksInstallationDirectory
+  // Label for Refresh button and Users List
   LabelCodeBlocksConfigurationFiles := TLabel.Create(IntegratedDevelopmentEnvironmentPage);
   LabelCodeBlocksConfigurationFiles.Caption := 
     CustomMessage('LabelCodeBlocksConfigurationFiles');   
@@ -284,27 +312,42 @@ begin
   LabelCodeBlocksConfigurationFiles.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
   SetMultiLinesLabel(LabelCodeBlocksConfigurationFiles, 3);
 
+  // ButtonCodeBlocksInitialize
+  ButtonCodeBlocksInitialize := TButton.Create(IntegratedDevelopmentEnvironmentPage);
+  ButtonCodeBlocksInitialize.Width := ScaleX(75);
+  ButtonCodeBlocksInitialize.Height := ScaleY(23);
+  ButtonCodeBlocksInitialize.Top := RowTop2 + (ButtonCodeBlocksInitialize.Height div 2) 
+    - (ButtonCodeBlocksInitialize.Height div 2);
+  ButtonCodeBlocksInitialize.Left := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
+    - ButtonCodeBlocksInitialize.Width; 
+  ButtonCodeBlocksInitialize.Caption :=
+    CustomMessage('ButtonCodeBlocksInitialize');
+  ButtonCodeBlocksInitialize.OnClick := @ButtonCodeBlocksInitializeOnClick;
+  ButtonCodeBlocksInitialize.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+
   // Refresh Code::Blocks Users List
   ButtonCodeBlocksRefreshUsersList := TButton.Create(IntegratedDevelopmentEnvironmentPage);
   ButtonCodeBlocksRefreshUsersList.Width := ScaleX(75);
   ButtonCodeBlocksRefreshUsersList.Height := ScaleY(23);
-  ButtonCodeBlocksRefreshUsersList.Top := RowTop2 + (LabelCodeBlocksConfigurationFiles.Height div 2) 
-    - (ButtonCodeBlocksRefreshUsersList.Height div 2);
+  ButtonCodeBlocksRefreshUsersList.Top := ButtonCodeBlocksInitialize.Top 
+    + ButtonCodeBlocksInitialize.Height + ScaleY(2);
   ButtonCodeBlocksRefreshUsersList.Left := IntegratedDevelopmentEnvironmentPage.SurfaceWidth 
     - ButtonCodeBlocksRefreshUsersList.Width; 
   ButtonCodeBlocksRefreshUsersList.Caption := 
     CustomMessage('ButtonRefresh');
   ButtonCodeBlocksRefreshUsersList.OnClick := @ButtonCodeBlocksRefreshUsersListOnClick;
   ButtonCodeBlocksRefreshUsersList.Parent := IntegratedDevelopmentEnvironmentPage.Surface;
+  
+  // Update LabelCodeBlocksConfigurationFiles 
   LabelCodeBlocksConfigurationFiles.Width := 
     LabelCodeBlocksConfigurationFiles.Width - ButtonCodeBlocksRefreshUsersList.Width - ScaleX(4);
 
   // EditCodeBlocksUsersList
   EditCodeBlocksUsersList := TNewMemo.Create(IntegratedDevelopmentEnvironmentPage);
   EditCodeBlocksUsersList.Top := LabelCodeBlocksConfigurationFiles.Top 
-    + LabelCodeBlocksConfigurationFiles.Height + ScaleY(8);
+    + LabelCodeBlocksConfigurationFiles.Height + ScaleY(12);
   EditCodeBlocksUsersList.Width := IntegratedDevelopmentEnvironmentPage.SurfaceWidth;
-  EditCodeBlocksUsersList.Height := ScaleY(68);
+  EditCodeBlocksUsersList.Height := ScaleY(64);
   EditCodeBlocksUsersList.ScrollBars := ssVertical;  
   EditCodeBlocksUsersList.ReadOnly := True;
   EditCodeBlocksUsersList.Color := clBtnFace;
