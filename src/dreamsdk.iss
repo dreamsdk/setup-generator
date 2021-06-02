@@ -9,8 +9,8 @@
 #define MyAppCopyright "© Copyleft 2018-2021"
 
 ; Source directories
-#define SourceDirectoryBase "D:\sources"
-;#define SourceDirectoryBase "D:\sources_dev"
+;#define SourceDirectoryBase "D:\sources"
+#define SourceDirectoryBase "D:\sources_dev"
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons"
@@ -456,7 +456,7 @@ LabelCodeBlocksConfigurationFiles={#MyAppName} will be enabled in {#IdeCodeBlock
 LabelCodeBlocksDetectedVersion=Detected {#IdeCodeBlocksName} version: %s
 ButtonCodeBlocksInitialize=Initialize...
 CodeBlocksInstallationDirectoryNotExists=The specified {#IdeCodeBlocksName} installation directory doesn't exists. Please install {#IdeCodeBlocksName} and run it at least once.
-CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}.
+CodeBlocksInstallationUsersUnavailable=No profiles where found for {#IdeCodeBlocksName}. Please run {#IdeCodeBlocksName} at least once for each profile where you want to use {#MyAppName}, or you may click on the Initialize button.
 CodeBlocksBinaryFileNameNotExists=There is no {#IdeCodeBlocksName} SDK dynamic library in the specified directory. Are you sure that you have installed {#IdeCodeBlocksName} in that directory?
 CodeBlocksBinaryHashDifferent=The installed {#IdeCodeBlocksName} version need to be {#IdeCodeBlocksSupportedVersions}. There is no guarantee that it will work with your current installed version. Continue anyway?
 CodeBlocksIntegrationSetupFailed=Error when patching {#IdeCodeBlocksName}!%n%n%s

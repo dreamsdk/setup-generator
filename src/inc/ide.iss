@@ -203,7 +203,7 @@ begin
 
   // Handle the detected C::B version
   CodeBlocksVersion := RetrieveCodeBlocksVersion;
-  if CodeBlocksVersion = '(Undefined)' then
+  if CodeBlocksVersion = '(Undetected)' then
   begin
     // C::B is not installed in this directory
     Result := False;
