@@ -1,12 +1,12 @@
 @echo off
 
-rem WhereIS by Claus
+rem WhereIS by Claus, fixed by Gurce
 rem https://superuser.com/a/544988/436364
 
 setlocal enabledelayedexpansion
 set var_a=%1
 call :sub %var_a%
-if exist %var_b% goto exit
+if exist "%var_b%" goto exit
 for %%i in ( .com .exe .cmd .bat) do (
  call :sub %var_a%%%i
  if exist !var_b! goto exit
