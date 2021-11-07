@@ -1,2 +1,4 @@
 bin/
 rsrc/helpers/temp/*.exe
+*.log
+.sources
