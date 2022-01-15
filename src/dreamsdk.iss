@@ -3,41 +3,46 @@
 ; =============================================================================
 
 ; Installer versions#define MyAppVersion "R3-dev"
-#define PackageVersion "3.0.4.2106"
-#define ProductVersion "3.0.4.2106"
+#define PackageVersion "3.0.4.2201"
+#define ProductVersion "3.0.4.2201"
 ; Copyright
-#define MyAppCopyright "© Copyleft 2018-2021"
+#define MyAppCopyright "© Copyleft 2018-2022"
 
 ; Source directories
-;#define SourceDirectoryBase "D:\sources"
-#define SourceDirectoryBase "D:\sources_dev"
+#define SourceDirectoryBase "..\.sources"
 
-#define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"  
-#define SourceDirectoryAddons SourceDirectoryBase + "\addons"
+#define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"
+#define SourceDirectoryMSYS SourceDirectoryBase + "\msys-base"
+#define SourceDirectoryAddons SourceDirectoryBase + "\addons-cmd"
+#define SourceDirectoryTools SourceDirectoryBase + "\addons-gui"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
 #define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\system-objects"
 #define SourceDirectoryAppSystemObjectsConfiguration SourceDirectoryBase + "\system-objects-configuration"
 ; Toolchains
-#define SourceDirectoryToolchainArmStable SourceDirectoryBase + "\gcc-arm-eabi-stable"
-#define SourceDirectoryToolchainShStable SourceDirectoryBase + "\gcc-sh-elf-stable"
-#define SourceDirectoryToolchainArmExperimental SourceDirectoryBase + "\gcc-arm-eabi-experimental"
-#define SourceDirectoryToolchainShExperimental SourceDirectoryBase + "\gcc-sh-elf-experimental"
+#define SourceDirectoryToolchainStable SourceDirectoryBase + "\toolchain-stable"
+#define SourceDirectoryToolchainExperimental SourceDirectoryBase + "\toolchain-experimental"
 
 ; GDB
-#define SourceDirectoryGdb SourceDirectoryBase + "\gdb-sh-elf"
-#define SourceDirectoryGdbPython27 SourceDirectoryBase + "\gdb-sh-elf-python-2.7"
-#define SourceDirectoryGdbPython34 SourceDirectoryBase + "\gdb-sh-elf-python-3.4"
-#define SourceDirectoryGdbPython35 SourceDirectoryBase + "\gdb-sh-elf-python-3.5"
-#define SourceDirectoryGdbPython36 SourceDirectoryBase + "\gdb-sh-elf-python-3.6"
-#define SourceDirectoryGdbPython37 SourceDirectoryBase + "\gdb-sh-elf-python-3.7"
-#define SourceDirectoryGdbPython38 SourceDirectoryBase + "\gdb-sh-elf-python-3.8"
-#define SourceDirectoryGdbPython39 SourceDirectoryBase + "\gdb-sh-elf-python-3.9"
+#define SourceDirectoryGdb SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-no-python"
+#define SourceDirectoryGdbPython27 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-2.7"
+#define SourceDirectoryGdbPython33 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.3"
+#define SourceDirectoryGdbPython34 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.4"
+#define SourceDirectoryGdbPython35 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.5"
+#define SourceDirectoryGdbPython36 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.6"
+#define SourceDirectoryGdbPython37 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.7"
+#define SourceDirectoryGdbPython38 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.8"
+#define SourceDirectoryGdbPython39 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.9"
+#define SourceDirectoryGdbPython310 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.10"
+#define SourceDirectoryGdbPython311 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.11"
 
+; Embedded libraries
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
 #define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
 #define SourceDirectoryEmbeddedRuby SourceDirectoryEmbedded + "\ruby"
 
-#define SourceDirectoryTools SourceDirectoryBase + "\addons-gui"
+; Packages
+#define SourcePackagesBinary SourceDirectoryBase + "\binary-packages"
+#define SourcePackagesSource SourceDirectoryBase + "\source-packages"
 
 ; Don't modify anything beyond this point
 
@@ -66,6 +71,7 @@
 #define AppSupportDirectory "{app}\support"
 #define AppAddonsDirectory AppMainDirectory + "\addons"
 #define AppToolsDirectory AppMainDirectory + "\tools"
+#define AppPackagesDirectory AppMainDirectory + "\packages"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 
@@ -124,12 +130,12 @@ AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
 ; Release mode
-Compression=lzma2/ultra64
+;Compression=lzma2/ultra64
 
 ; Debug mode
-;Compression=none
-;DiskSpanning=True
-;DiskSliceSize=736000000
+Compression=none
+DiskSpanning=True
+DiskSliceSize=736000000
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -175,6 +181,7 @@ Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirec
 
 ; Temporary files used for the installation
 Source: "..\rsrc\helpers\temp\*"; Flags: dontcopy noencryption nocompression
+Source: "..\.helpers\*"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
 ; Some additional resources
@@ -184,11 +191,12 @@ Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{#AppSupportDirectory}"; Flags: i
 ; MinGW Base
 Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
 
+; MSYS Base
+Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+
 ; Toolchains
-Source: "{#SourceDirectoryToolchainArmStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
-Source: "{#SourceDirectoryToolchainShStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
-Source: "{#SourceDirectoryToolchainArmExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
-Source: "{#SourceDirectoryToolchainShExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
+Source: "{#SourceDirectoryToolchainStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
+Source: "{#SourceDirectoryToolchainExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -202,8 +210,10 @@ Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags
 
 ; DreamSDK
 Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
-Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{#AppMsysBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{#AppMainDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourcePackagesBinary}\*"; DestDir: "{#AppPackagesDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourcePackagesSource}\*"; DestDir: "{#AppPackagesDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{#AppAddonsDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate

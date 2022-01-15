@@ -33,7 +33,7 @@ begin
     CustomMessage('ToolchainsTitlePage'), 
     CustomMessage('ToolchainsSubtitlePage'));
 
-  BtnImage := SetPageIcon('Toolchains', ToolchainsPage);
+  BtnImage := SetPageIcon('toolchains', ToolchainsPage);
 
   // Introduction label
   LabelToolchainsIntroduction := TLabel.Create(ToolchainsPage);
