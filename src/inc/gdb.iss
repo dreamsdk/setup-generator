@@ -1,13 +1,17 @@
 [code]
 var
+  GdbPage: TWizardPage;
   RadioButtonNone,
   RadioButtonPython27,
+  RadioButtonPython33,
   RadioButtonPython34,
   RadioButtonPython35,
   RadioButtonPython36,
   RadioButtonPython37,
   RadioButtonPython38,
-  RadioButtonPython39: TNewRadioButton;
+  RadioButtonPython39,
+  RadioButtonPython310,
+  RadioButtonPython311: TNewRadioButton;
 
 function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
 begin
@@ -19,7 +23,7 @@ begin
     );  
 end;
 
-function TestPythonVersion(Version: string): Boolean;
+function TestPythonVersion(Version: String): Boolean;
 var
   PythonFileName, PythonBitness, PythonFilePath, VersionWithoutDot: String;
 
@@ -54,6 +58,11 @@ begin
   Result := RadioButtonPython27.Checked;
 end;
 
+function IsGdbPython33: Boolean;
+begin
+  Result := RadioButtonPython33.Checked;
+end;
+
 function IsGdbPython34: Boolean;
 begin
   Result := RadioButtonPython34.Checked;
@@ -84,13 +93,46 @@ begin
   Result := RadioButtonPython39.Checked;
 end;
 
+function IsGdbPython310: Boolean;
+begin
+  Result := RadioButtonPython310.Checked;
+end;
+
+function IsGdbPython311: Boolean;
+begin
+  Result := RadioButtonPython311.Checked;
+end;
+
+function CreateGdbPythonButton(Version: String; ButtonLeft: Integer;
+  var FromButton: TNewRadioButton; FirstRow: Boolean): TNewRadioButton;
+var
+  ButtonLabel: String;
+  ScaleValue: Integer;
+
+begin
+  ButtonLabel := Version;
+  StringChangeEx(ButtonLabel, '.', '', True);
+  ButtonLabel := 'GdbPython' + ButtonLabel;
+  
+  ScaleValue := 4;
+  if FirstRow then
+    ScaleValue := 8;
+      
+  Result := TNewRadioButton.Create(GdbPage);
+  Result.Parent := GdbPage.Surface;
+  Result.Caption := CustomMessage(ButtonLabel);  
+  Result.Top := FromButton.Top + FromButton.Height + ScaleY(ScaleValue);
+  Result.Left := ButtonLeft;
+  Result.Width := GdbPage.SurfaceWidth;
+  Result.Enabled := TestPythonVersion(Version);  
+end;
+
 function CreateGdbPage: Integer;
 var
-  GdbPage: TWizardPage;
   LabelGdbIntroduction, 
   LabelGdbDescription: TLabel;
   BtnImage: TBitmapImage;
-  Row2Left: Integer;
+  RowLeft1, RowLeft2: Integer;
 
 begin
   GdbPage := CreateCustomPage(wpSelectComponents, 
@@ -100,7 +142,8 @@ begin
   ExtractTemporaryFile('whereis.bat');
   ExtractTemporaryFile('pecheck.exe');
  
-  Row2Left := GdbPage.SurfaceWidth div 2;
+  RowLeft1 := 0;
+  RowLeft2 := GdbPage.SurfaceWidth div 2;
 
   BtnImage := SetPageIcon('gdb', GdbPage);
 
@@ -132,71 +175,40 @@ begin
   RadioButtonNone.Width := GdbPage.SurfaceWidth;
   RadioButtonNone.Font.Style := [fsBold];
   RadioButtonNone.Checked := True;
-  
+
+  // Row 1
+
   // Python 2.7
-  RadioButtonPython27 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython27.Parent := GdbPage.Surface;
-  RadioButtonPython27.Caption := CustomMessage('GdbPython27');  
-  RadioButtonPython27.Top := RadioButtonNone.Top 
-    + RadioButtonNone.Height + ScaleY(16);
-  RadioButtonPython27.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython27.Enabled := TestPythonVersion('2.7');
+  RadioButtonPython27 := CreateGdbPythonButton('2.7', RowLeft1, RadioButtonNone, True);
+
+  // Python 3.3
+  RadioButtonPython33 := CreateGdbPythonButton('3.3', RowLeft1, RadioButtonPython27, False);
 
   // Python 3.4
-  RadioButtonPython34 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython34.Parent := GdbPage.Surface;
-  RadioButtonPython34.Caption := CustomMessage('GdbPython34');  
-  RadioButtonPython34.Top := RadioButtonPython27.Top 
-    + RadioButtonPython27.Height + ScaleY(4);
-  RadioButtonPython34.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython34.Enabled := TestPythonVersion('3.4');
+  RadioButtonPython34 := CreateGdbPythonButton('3.4', RowLeft1, RadioButtonPython33, False);
 
   // Python 3.5
-  RadioButtonPython35 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython35.Parent := GdbPage.Surface;
-  RadioButtonPython35.Caption := CustomMessage('GdbPython35');  
-  RadioButtonPython35.Top := RadioButtonPython34.Top 
-    + RadioButtonPython34.Height + ScaleY(4);
-  RadioButtonPython35.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython35.Enabled := TestPythonVersion('3.5');
+  RadioButtonPython35 := CreateGdbPythonButton('3.5', RowLeft1, RadioButtonPython34, False);
 
   // Python 3.6
-  RadioButtonPython36 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython36.Parent := GdbPage.Surface;
-  RadioButtonPython36.Caption := CustomMessage('GdbPython36');  
-  RadioButtonPython36.Top := RadioButtonPython35.Top 
-    + RadioButtonPython35.Height + ScaleY(4);
-  RadioButtonPython36.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython36.Enabled := TestPythonVersion('3.6');
+  RadioButtonPython36 := CreateGdbPythonButton('3.6', RowLeft1, RadioButtonPython35, False);
 
   // Row 2
 
   // Python 3.7
-  RadioButtonPython37 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython37.Parent := GdbPage.Surface;
-  RadioButtonPython37.Caption := CustomMessage('GdbPython37');  
-  RadioButtonPython37.Top := RadioButtonPython27.Top;
-  RadioButtonPython37.Left := Row2Left;
-  RadioButtonPython37.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython37.Enabled := TestPythonVersion('3.7');
+  RadioButtonPython37 := CreateGdbPythonButton('3.7', RowLeft2, RadioButtonNone, True);
 
   // Python 3.8
-  RadioButtonPython38 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython38.Parent := GdbPage.Surface;
-  RadioButtonPython38.Caption := CustomMessage('GdbPython38');  
-  RadioButtonPython38.Top := RadioButtonPython34.Top;
-  RadioButtonPython38.Left := Row2Left;
-  RadioButtonPython38.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython38.Enabled := TestPythonVersion('3.8');
+  RadioButtonPython38 := CreateGdbPythonButton('3.8', RowLeft2, RadioButtonPython27, False);
 
   // Python 3.9
-  RadioButtonPython39 := TNewRadioButton.Create(GdbPage);
-  RadioButtonPython39.Parent := GdbPage.Surface;
-  RadioButtonPython39.Caption := CustomMessage('GdbPython39');  
-  RadioButtonPython39.Top := RadioButtonPython35.Top;
-  RadioButtonPython39.Left := Row2Left;
-  RadioButtonPython39.Width := GdbPage.SurfaceWidth;
-  RadioButtonPython39.Enabled := TestPythonVersion('3.9');
+  RadioButtonPython39 := CreateGdbPythonButton('3.9', RowLeft2, RadioButtonPython33, False);
+
+  // Python 3.10
+  RadioButtonPython310 := CreateGdbPythonButton('3.10', RowLeft2, RadioButtonPython34, False);
+
+  // Python 3.11
+  RadioButtonPython311 := CreateGdbPythonButton('3.11', RowLeft2, RadioButtonPython35, False);
 
   Result := GdbPage.ID;
 end;

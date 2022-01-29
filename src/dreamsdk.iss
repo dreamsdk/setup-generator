@@ -1,15 +1,23 @@
 ; =============================================================================
-; DreamSDK Inno Setup Script
+; DreamSDK Setup - Inno Setup Script
 ; =============================================================================
+#include "inc/const.iss"
 
-; Installer versions#define MyAppVersion "R3-dev"
+; Installer mode
+#define InstallerMode RELEASE
+
+; Installer versions#define AppVersion "R3"
 #define PackageVersion "3.0.4.2201"
 #define ProductVersion "3.0.4.2201"
 ; Copyright
 #define MyAppCopyright "© Copyleft 2018-2022"
 
 ; Source directories
+#if InstallerMode == RELEASE
 #define SourceDirectoryBase "..\.sources"
+#else
+#define SourceDirectoryBase "..\.sources-dev"
+#endif
 
 #define SourceDirectoryMinGW SourceDirectoryBase + "\mingw-base"
 #define SourceDirectoryMSYS SourceDirectoryBase + "\msys-base"
@@ -51,6 +59,12 @@
 #define MyAppPublisher "The DreamSDK Team"
 #define MyAppURL "https://www.dreamsdk.org/"
 
+#if InstallerMode == DEBUG
+#define MyAppVersion AppVersion + "-dev"
+#else
+#define MyAppVersion AppVersion
+#endif
+
 #define TestConnectionURL "http://www.dreamcast.fr/"
 
 #define MyAppNameHelp MyAppName + " Help"
@@ -72,6 +86,7 @@
 #define AppAddonsDirectory AppMainDirectory + "\addons"
 #define AppToolsDirectory AppMainDirectory + "\tools"
 #define AppPackagesDirectory AppMainDirectory + "\packages"
+#define AppShortcutsDirectory AppSupportDirectory + "\shortcuts"
 
 #define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
 
@@ -129,13 +144,15 @@ AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
+#if InstallerMode == RELEASE
 ; Release mode
-;Compression=lzma2/ultra64
-
+Compression=lzma2/ultra64
+#else
 ; Debug mode
 Compression=none
 DiskSpanning=True
 DiskSliceSize=736000000
+#endif
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
@@ -145,35 +162,41 @@ Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
+[Types]
+Name: "fullwithoutide"; Description: "{cm:TypeFullInstallationWithoutIDE}"
+Name: "full"; Description: "{cm:TypeFullInstallation}"
+Name: "compact"; Description: "{cm:TypeCompactInstallation}"
+Name: "custom"; Description: "{cm:TypeCustomInstallation}"; Flags: iscustom
+
 [Components]
 ; Main
-Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom; Flags: fixed
-Name: "main\base"; Description: "{cm:ComponentBase}"; Types: full compact custom; Flags: fixed
-Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
-Name: "main\kos"; Description: "{cm:ComponentKOS}"; ExtraDiskSpaceRequired: 209715200; Types: full compact custom; Flags: fixed
+Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom fullwithoutide; Flags: fixed
+Name: "main\base"; Description: "{cm:ComponentBase}"; Types: full compact custom fullwithoutide; Flags: fixed
+Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Types: full compact custom fullwithoutide; Flags: fixed
+Name: "main\kos"; Description: "{cm:ComponentKOS}"; Types: full compact custom fullwithoutide; Flags: fixed
 
 ; IDE
 Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
 Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
 
 ; Addons
-Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full
-Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; Types: full
-Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; Types: full
-Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; Types: full
-Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; Types: full
-Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; Types: full
+Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full fullwithoutide
+Name: "addons\elevate"; Description: "{cm:ComponentAdditionalTools_elevate}"; Types: full fullwithoutide
+Name: "addons\pvr2png"; Description: "{cm:ComponentAdditionalTools_pvr2png}"; Types: full fullwithoutide
+Name: "addons\txfutils"; Description: "{cm:ComponentAdditionalTools_txfutils}"; Types: full fullwithoutide
+Name: "addons\txfutils\txflib"; Description: "{cm:ComponentAdditionalTools_txfutils_txflib}"; Types: full fullwithoutide
+Name: "addons\vmutool"; Description: "{cm:ComponentAdditionalTools_vmutool}"; Types: full fullwithoutide
 
 ; Tools
-Name: "tools"; Description: "{cm:ComponentUtilities}"; Types: full
-Name: "tools\checker"; Description: "{cm:ComponentUtilities_checker}"; Types: full
-Name: "tools\bdreams"; Description: "{cm:ComponentUtilities_bdreams}"; Types: full
-Name: "tools\ipwriter"; Description: "{cm:ComponentUtilities_ipwriter}"; Types: full
-Name: "tools\ipwriter\iplogos"; Description: "{cm:ComponentUtilities_ipwriter_iplogos}"; Types: full
-Name: "tools\mrwriter"; Description: "{cm:ComponentUtilities_mrwriter}"; Types: full
-Name: "tools\buildsbi"; Description: "{cm:ComponentUtilities_buildsbi}"; Types: full
-Name: "tools\sbinducr"; Description: "{cm:ComponentUtilities_sbinducr}"; Types: full
-Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: full
+Name: "tools"; Description: "{cm:ComponentUtilities}"; Types: full fullwithoutide
+Name: "tools\checker"; Description: "{cm:ComponentUtilities_checker}"; Types: full fullwithoutide
+Name: "tools\bdreams"; Description: "{cm:ComponentUtilities_bdreams}"; Types: full fullwithoutide
+Name: "tools\ipwriter"; Description: "{cm:ComponentUtilities_ipwriter}"; Types: full fullwithoutide
+Name: "tools\ipwriter\iplogos"; Description: "{cm:ComponentUtilities_ipwriter_iplogos}"; Types: full fullwithoutide
+Name: "tools\mrwriter"; Description: "{cm:ComponentUtilities_mrwriter}"; Types: full fullwithoutide
+Name: "tools\buildsbi"; Description: "{cm:ComponentUtilities_buildsbi}"; Types: full fullwithoutide
+Name: "tools\sbinducr"; Description: "{cm:ComponentUtilities_sbinducr}"; Types: full fullwithoutide
+Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: full fullwithoutide
 
 [Files]
 ; Install helpers
@@ -201,12 +224,15 @@ Source: "{#SourceDirectoryToolchainExperimental}\*"; DestDir: "{#AppToolchainBas
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
 Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27
+Source: "{#SourceDirectoryGdbPython33}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython33
 Source: "{#SourceDirectoryGdbPython34}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython34
 Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython35
 Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
 Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
 Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
 Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
+Source: "{#SourceDirectoryGdbPython310}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython310
+Source: "{#SourceDirectoryGdbPython311}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython311
 
 ; DreamSDK
 Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
@@ -241,66 +267,134 @@ Source: "{#SourceDirectoryTools}\vmutool\*"; DestDir: "{#AppToolsDirectory}\vmut
 ; Main shortcuts
 Name: "{group}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{group}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
-Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; IconIndex: 0; Comment: "{cm:UninstallPackage}"
+
+; Installation directory main shortcuts
+Name: "{app}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
+Name: "{app}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
+Name: "{app}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
+
+; Additional shortcuts (based on tasks)
+Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
+Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
+
+;
+; Post-Windows 8 shortcuts
+;
 
 ; Documentation
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:KallistiOfficialDocumentation}"; Filename: "http://gamedev.allusion.net/docs/kos-2.0.0/"
-Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:SegaDreamcastWikiDocumentation}"; Filename: "https://dreamcast.wiki"
+Name: "{group}\{cm:DocumentationGroupDirectory}"; Filename: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}"; Flags: preventpinning excludefromshowinnewinstall; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}\{cm:KallistiOfficialDocumentation}"; Filename: "http://gamedev.allusion.net/docs/kos-2.0.0/"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}\{cm:SegaDreamcastWikiDocumentation}"; Filename: "https://dreamcast.wiki"; MinVersion: 0,6.2
 
 ; Useful Links
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkCodeBlocks}"; Filename: "http://www.codeblocks.org"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAppGitHub}"; Filename: "https://github.com/dreamsdk"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filename: "http://mc.pp.se/dc"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"
-Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"
+Name: "{group}\{cm:UsefulLinksGroupDirectory}"; Filename: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}"; Flags: preventpinning excludefromshowinnewinstall; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkCodeBlocks}"; Filename: "http://www.codeblocks.org"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAppGitHub}"; Filename: "https://github.com/dreamsdk"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filename: "http://mc.pp.se/dc"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"; MinVersion: 0,6.2
+
+; Tools
+Name: "{group}\{cm:ToolsGroupDirectory}"; Filename: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}"; Flags: preventpinning excludefromshowinnewinstall; MinVersion: 0,6.2
+
+; Tools: 1ST_READ.BIN Checker
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkChecker}"; Filename: "{#AppToolsDirectory}\checker\checker.exe"; WorkingDir: "{#AppToolsDirectory}\checker"; Comment: "{cm:ComponentUtilities_checker}"; MinVersion: 0,6.2; Components: tools\checker
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkCheckerReadme}"; Filename: "{#AppToolsDirectory}\checker\readme.txt"; WorkingDir: "{#AppToolsDirectory}\checker"; MinVersion: 0,6.2; Components: tools\checker
+
+; Tool: BootDreams
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkBootDreams}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.exe"; WorkingDir: "{#AppToolsDirectory}\bdreams"; Comment: "{cm:ComponentUtilities_bdreams}"; MinVersion: 0,6.2; Components: tools\bdreams
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkBootDreamsHelp}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.chm"; WorkingDir: "{#AppToolsDirectory}\bdreams"; MinVersion: 0,6.2; Components: tools\bdreams
+
+; Tool: IP.BIN Writer
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkIpWriter}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.exe"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; Comment: "{cm:ComponentUtilities_ipwriter}"; MinVersion: 0,6.2; Components: tools\ipwriter
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkIpWriterHelp}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.chm"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; MinVersion: 0,6.2; Components: tools\ipwriter
+
+; Tool: MR Writer
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkMRWriter}"; Filename: "{#AppToolsDirectory}\mrwriter\mrwriter.exe"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; Comment: "{cm:ComponentUtilities_mrwriter}"; MinVersion: 0,6.2; Components: tools\mrwriter
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkMRWriterReadme}"; Filename: "{#AppToolsDirectory}\mrwriter\readme.txt"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; MinVersion: 0,6.2; Components: tools\mrwriter
+
+; Tool: SBI Builder
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkSbiBuilder}"; Filename: "{#AppToolsDirectory}\buildsbi\buildsbi.exe"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Comment: "{cm:ComponentUtilities_buildsbi}"; MinVersion: 0,6.2; Components: tools\buildsbi
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderChanges}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\changes.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; MinVersion: 0,6.2; Components: tools\buildsbi
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderReadme}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; MinVersion: 0,6.2; Components: tools\buildsbi
+
+; Tool: Selfboot Inducer
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkSelfbootInducer}"; Filename: "{#AppToolsDirectory}\sbinducr\sbinducr.exe"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Comment: "{cm:ComponentUtilities_sbinducr}"; MinVersion: 0,6.2; Components: tools\sbinducr
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerReadme}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; MinVersion: 0,6.2; Components: tools\sbinducr
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerChanges}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\whatsnew.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; MinVersion: 0,6.2; Components: tools\sbinducr
+
+; Tool: VMU Tool PC
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:LinkVmuTool}"; Filename: "{#AppToolsDirectory}\vmutool\vmutool.exe"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Comment: "{cm:ComponentUtilities_vmutool}"; MinVersion: 0,6.2; Components: tools\vmutool
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolHelp}"; Filename: "{#AppToolsDirectory}\vmutool\help\vmutool.chm"; WorkingDir: "{#AppToolsDirectory}\vmutool"; MinVersion: 0,6.2; Components: tools\vmutool
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolReadme}"; Filename: "{#AppToolsDirectory}\vmutool\help\readme.rtf"; WorkingDir: "{#AppToolsDirectory}\vmutool"; MinVersion: 0,6.2; Components: tools\vmutool
+
+;
+; Pre-Windows 8 shortcuts below
+;
+
+; Documentation
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:GettingStarted}"; Filename: "{#AppGettingStartedFile}"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:LicenseInformation}"; Filename: "{#AppSupportDirectory}\license.rtf"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:ProgramHelp}"; Filename: "{#AppHelpFile}"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:KallistiOfficialDocumentation}"; Filename: "http://gamedev.allusion.net/docs/kos-2.0.0/"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:DocumentationGroupDirectory}\{cm:SegaDreamcastWikiDocumentation}"; Filename: "https://dreamcast.wiki"; OnlyBelowVersion: 0,6.2
+
+; Useful Links
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAwesomeDreamcast}"; Filename: "https://github.com/dreamcastdevs/awesome-dreamcast"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkCodeBlocks}"; Filename: "http://www.codeblocks.org"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulation}"; Filename: "https://dcemulation.org"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDCEmulationProgrammingDiscussion}"; Filename: "https://dcemulation.org/phpBB/viewforum.php?f=29"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkAppGitHub}"; Filename: "https://github.com/dreamsdk"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filename: "http://mc.pp.se/dc"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"; OnlyBelowVersion: 0,6.2
 
 ;
 ; Tools
 ;
 
 ; Tools: 1ST_READ.BIN Checker
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkChecker}"; Filename: "{#AppToolsDirectory}\checker\checker.exe"; WorkingDir: "{#AppToolsDirectory}\checker"; Comment: "{cm:ComponentUtilities_checker}"; Components: tools\checker
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkCheckerReadme}"; Filename: "{#AppToolsDirectory}\checker\readme.txt"; WorkingDir: "{#AppToolsDirectory}\checker"; Components: tools\checker
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkChecker}"; Filename: "{#AppToolsDirectory}\checker\checker.exe"; WorkingDir: "{#AppToolsDirectory}\checker"; Comment: "{cm:ComponentUtilities_checker}"; OnlyBelowVersion: 0,6.2; Components: tools\checker
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkCheckerReadme}"; Filename: "{#AppToolsDirectory}\checker\readme.txt"; WorkingDir: "{#AppToolsDirectory}\checker"; OnlyBelowVersion: 0,6.2; Components: tools\checker
 
-; Tools: BootDreams
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkBootDreams}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.exe"; WorkingDir: "{#AppToolsDirectory}\bdreams"; Comment: "{cm:ComponentUtilities_bdreams}"; Components: tools\bdreams
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkBootDreamsHelp}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.chm"; WorkingDir: "{#AppToolsDirectory}\bdreams"; Components: tools\bdreams
+; Tool: BootDreams
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkBootDreams}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.exe"; WorkingDir: "{#AppToolsDirectory}\bdreams"; Comment: "{cm:ComponentUtilities_bdreams}"; OnlyBelowVersion: 0,6.2; Components: tools\bdreams
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkBootDreamsHelp}"; Filename: "{#AppToolsDirectory}\bdreams\BootDreams.chm"; WorkingDir: "{#AppToolsDirectory}\bdreams"; OnlyBelowVersion: 0,6.2; Components: tools\bdreams
 
-; Tools: IP.BIN Writer
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkIpWriter}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.exe"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; Comment: "{cm:ComponentUtilities_ipwriter}"; Components: tools\ipwriter
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkIpWriterHelp}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.chm"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; Components: tools\ipwriter
+; Tool: IP.BIN Writer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkIpWriter}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.exe"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; Comment: "{cm:ComponentUtilities_ipwriter}"; OnlyBelowVersion: 0,6.2; Components: tools\ipwriter
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkIpWriterHelp}"; Filename: "{#AppToolsDirectory}\ipwriter\ipwriter.chm"; WorkingDir: "{#AppToolsDirectory}\ipwriter"; OnlyBelowVersion: 0,6.2; Components: tools\ipwriter
 
-; Tools: MR Writer
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkMRWriter}"; Filename: "{#AppToolsDirectory}\mrwriter\mrwriter.exe"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; Comment: "{cm:ComponentUtilities_mrwriter}"; Components: tools\mrwriter
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkMRWriterReadme}"; Filename: "{#AppToolsDirectory}\mrwriter\readme.txt"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; Components: tools\mrwriter
+; Tool: MR Writer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkMRWriter}"; Filename: "{#AppToolsDirectory}\mrwriter\mrwriter.exe"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; Comment: "{cm:ComponentUtilities_mrwriter}"; OnlyBelowVersion: 0,6.2; Components: tools\mrwriter
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkMRWriterReadme}"; Filename: "{#AppToolsDirectory}\mrwriter\readme.txt"; WorkingDir: "{#AppToolsDirectory}\mrwriter"; OnlyBelowVersion: 0,6.2; Components: tools\mrwriter
 
-; Tools: SBI Builder
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSbiBuilder}"; Filename: "{#AppToolsDirectory}\buildsbi\buildsbi.exe"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Comment: "{cm:ComponentUtilities_buildsbi}"; Components: tools\buildsbi
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderChanges}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\changes.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Components: tools\buildsbi
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderReadme}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Components: tools\buildsbi
+; Tool: SBI Builder
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSbiBuilder}"; Filename: "{#AppToolsDirectory}\buildsbi\buildsbi.exe"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; Comment: "{cm:ComponentUtilities_buildsbi}"; OnlyBelowVersion: 0,6.2; Components: tools\buildsbi
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderChanges}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\changes.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; OnlyBelowVersion: 0,6.2; Components: tools\buildsbi
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSbiBuilderReadme}"; Filename: "{#AppToolsDirectory}\buildsbi\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\buildsbi"; OnlyBelowVersion: 0,6.2; Components: tools\buildsbi
 
-; Tools: Selfboot Inducer
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSelfbootInducer}"; Filename: "{#AppToolsDirectory}\sbinducr\sbinducr.exe"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Comment: "{cm:ComponentUtilities_sbinducr}"; Components: tools\sbinducr
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerReadme}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Components: tools\sbinducr
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerChanges}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\whatsnew.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Components: tools\sbinducr
+; Tool: Selfboot Inducer
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkSelfbootInducer}"; Filename: "{#AppToolsDirectory}\sbinducr\sbinducr.exe"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; Comment: "{cm:ComponentUtilities_sbinducr}"; OnlyBelowVersion: 0,6.2; Components: tools\sbinducr
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerReadme}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\readme.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; OnlyBelowVersion: 0,6.2; Components: tools\sbinducr
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkSelfbootInducerChanges}"; Filename: "{#AppToolsDirectory}\sbinducr\docs\whatsnew.txt"; WorkingDir: "{#AppToolsDirectory}\sbinducr"; OnlyBelowVersion: 0,6.2; Components: tools\sbinducr
 
-; Tools: VMU Tool PC
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkVmuTool}"; Filename: "{#AppToolsDirectory}\vmutool\vmutool.exe"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Comment: "{cm:ComponentUtilities_vmutool}"; Components: tools\vmutool
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolHelp}"; Filename: "{#AppToolsDirectory}\vmutool\help\vmutool.chm"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Components: tools\vmutool
-Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolReadme}"; Filename: "{#AppToolsDirectory}\vmutool\help\readme.rtf"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Components: tools\vmutool
-
-; Additional shortcuts
-Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
-Name: "{commonappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: quicklaunchicon
+; Tool: VMU Tool PC
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:LinkVmuTool}"; Filename: "{#AppToolsDirectory}\vmutool\vmutool.exe"; WorkingDir: "{#AppToolsDirectory}\vmutool"; Comment: "{cm:ComponentUtilities_vmutool}"; OnlyBelowVersion: 0,6.2; Components: tools\vmutool
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolHelp}"; Filename: "{#AppToolsDirectory}\vmutool\help\vmutool.chm"; WorkingDir: "{#AppToolsDirectory}\vmutool"; OnlyBelowVersion: 0,6.2; Components: tools\vmutool
+Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{cm:LinkVmuToolReadme}"; Filename: "{#AppToolsDirectory}\vmutool\help\readme.rtf"; WorkingDir: "{#AppToolsDirectory}\vmutool"; OnlyBelowVersion: 0,6.2; Components: tools\vmutool
 
 [Run]
 Filename: "{#AppGettingStartedFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent shellexec; Description: "{cm:LaunchGettingStarted}"
@@ -386,6 +480,12 @@ PreviousVersionUninstallUnableToGetCommand=Failed to uninstall {#MyAppName} %s. 
 ; Destination Directory
 InstallationDirectoryContainSpaces=Sorry, target installation directory cannot contain spaces. Choose a different one.
 
+; Components: Types
+TypeFullInstallationWithoutIDE=Full installation without IDE integration
+TypeFullInstallation=Full installation
+TypeCompactInstallation=Compact installation
+TypeCustomInstallation=Custom installation
+
 ; Components: List
 ComponentMain=Base program files (required)
 ComponentBase=MinGW/MSYS and Win32 toolchain (required)
@@ -413,7 +513,7 @@ ComponentUtilities_vmutool=VMU Tool PC – Visual Memory data manager (GUI)
 ToolchainsTitlePage=Toolchains Configuration
 ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
-LabelToolchainsDescription=Toolchains are the set of tools used to produce Sega Dreamcast programs. Please choose below your preferred version. If you are unsure, please choose Stable.
+LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
 ToolchainsStable=Stable (recommanded)
 LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 4.7.4 with Newlib 2.0.0. It's the most well tested combinaison and the current toolchains officially supported.
 ToolchainsExperimental=Experimental
@@ -424,15 +524,18 @@ ToolchainsExperimentalConfirmation=Experimental toolchains may be unstable. Are 
 GdbTitlePage=GNU Debugger Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbIntroduction=Customize your GNU Debugger for SuperH installation.
-LabelGdbDescription=You may enable Python extensions for your GDB for SuperH. Only Python 32-bits is supported. If the Python options below are disabled then please install a 32-bits Python runtime on your computer and run Setup again.
-GdbPythonNone=Don't enable Python for GDB
+LabelGdbDescription=You may enable now Python extensions for GDB, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
+GdbPythonNone=Don't enable Python extensions for GNU Debugger (GDB)
 GdbPython27=Python 2.7
+GdbPython33=Python 3.3
 GdbPython34=Python 3.4
 GdbPython35=Python 3.5
 GdbPython36=Python 3.6
 GdbPython37=Python 3.7
 GdbPython38=Python 3.8
 GdbPython39=Python 3.9
+GdbPython310=Python 3.10
+GdbPython311=Python 3.11
 
 ; Ruby
 RubyTitlePage=Ruby Configuration
@@ -485,13 +588,18 @@ LaunchGettingStarted=Open the Getting Started guide
 Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
 [UninstallDelete]
-Type: dirifempty; Name: "{app}\support\ide\codeblocks"
-Type: dirifempty; Name: "{app}\support\ide"
-Type: dirifempty; Name: "{app}\support"
+Type: dirifempty; Name: "{#AppSupportDirectory}\ide\codeblocks"
+Type: dirifempty; Name: "{#AppSupportDirectory}\ide"
+Type: dirifempty; Name: "{#AppSupportDirectory}"
 
 [InstallDelete]
-Type: filesandordirs; Name: "{app}\msys\1.0\opt\toolchains\dc\*"
-Type: filesandordirs; Name: "{app}\msys\1.0\opt\mruby\*"
+Type: filesandordirs; Name: "{#AppToolchainBase}\*"
+Type: filesandordirs; Name: "{#SourceDirectoryEmbeddedRuby}\mruby\*"
+
+[Dirs]
+Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
 
 [Code]
 const
