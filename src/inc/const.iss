@@ -1,2 +1,5 @@
 #define RELEASE 1
 #define DEBUG 0
+
+#define COMPRESSION_ENABLED 1
+#define COMPRESSION_DISABLED 0

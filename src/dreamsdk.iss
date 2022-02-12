@@ -4,7 +4,9 @@
 #include "inc/const.iss"
 
 ; Installer mode
-#define InstallerMode RELEASE
+#define InstallerMode DEBUG
+#define SourceMode RELEASE
+#define CompressionMode COMPRESSION_ENABLED
 
 ; Installer versions#define AppVersion "R3"
 #define PackageVersion "3.0.4.2201"
@@ -13,7 +15,7 @@
 #define MyAppCopyright "© Copyleft 2018-2022"
 
 ; Source directories
-#if InstallerMode == RELEASE
+#if SourceMode == RELEASE
 #define SourceDirectoryBase "..\.sources"
 #else
 #define SourceDirectoryBase "..\.sources-dev"
@@ -144,7 +146,7 @@ AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
-#if InstallerMode == RELEASE
+#if CompressionMode == COMPRESSION_ENABLED
 ; Release mode
 Compression=lzma2/ultra64
 #else
