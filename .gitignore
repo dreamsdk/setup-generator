@@ -4,3 +4,4 @@ rsrc/helpers/temp/*.exe
 .sources
 .sources-dev
 .helpers
+config.iss

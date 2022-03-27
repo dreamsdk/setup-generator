@@ -2,17 +2,7 @@
 ; DreamSDK Setup - Inno Setup Script
 ; =============================================================================
 #include "inc/const.iss"
-
-; Installer mode
-#define InstallerMode DEBUG
-#define SourceMode RELEASE
-#define CompressionMode COMPRESSION_ENABLED
-
-; Installer versions#define AppVersion "R3"
-#define PackageVersion "3.0.4.2201"
-#define ProductVersion "3.0.4.2201"
-; Copyright
-#define MyAppCopyright "© Copyleft 2018-2022"
+#include "config.iss"
 
 ; Source directories
 #if SourceMode == RELEASE
