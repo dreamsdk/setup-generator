@@ -13,4 +13,4 @@
 #define ProductVersion "3.0.4.2201"
 
 ; Copyright
-#define MyAppCopyright "Â© Copyleft 2018-2022"
+#define MyAppCopyright "© Copyleft 2018-2022"
