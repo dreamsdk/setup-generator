@@ -1,6 +1,7 @@
-; =============================================================================
+; ==============================================================================
 ; DreamSDK Setup - Inno Setup Script
-; =============================================================================
+; ==============================================================================
+
 #include "inc/const.iss"
 #include "config.iss"
 
@@ -80,7 +81,7 @@
 #define AppPackagesDirectory AppMainDirectory + "\packages"
 #define AppShortcutsDirectory AppSupportDirectory + "\shortcuts"
 
-#define OutputBaseFileName MyAppName + '-' + MyAppVersion + '-' + "Setup"
+#define OutputBaseFileName "setup"
 
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 
@@ -136,14 +137,17 @@ AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
 AllowUNCPath=False
 
+; Enable Disk Spanning
+DiskSpanning=True
+SlicesPerDisk=1
+DiskSliceSize=134217728
+
 #if CompressionMode == COMPRESSION_ENABLED
 ; Release mode
 Compression=lzma2/ultra64
 #else
 ; Debug mode
 Compression=none
-DiskSpanning=True
-DiskSliceSize=736000000
 #endif
 
 [Languages]
