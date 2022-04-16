@@ -150,6 +150,12 @@ Compression=lzma2/ultra64
 Compression=none
 #endif
 
+#if DigitalSignatureMode == SIGNATURE_ENABLED
+; Digital Signature
+SignTool=SignTool $f
+SignedUninstaller=yes
+#endif
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
 

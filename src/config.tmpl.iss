@@ -1,11 +1,12 @@
-; ==============================================================================
+; =============================================================================
 ; DreamSDK Setup - Inno Setup Script
-; ==============================================================================
+; =============================================================================
 
 ; Installer mode
 #define InstallerMode DEBUG
 #define SourceMode RELEASE
 #define CompressionMode COMPRESSION_DISABLED
+#define DigitalSignatureMode SIGNATURE_DISABLED
 
 ; Installer versions
 #define AppVersion "R3"
