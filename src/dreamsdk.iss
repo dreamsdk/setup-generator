@@ -596,7 +596,7 @@ Type: dirifempty; Name: "{#AppSupportDirectory}"
 
 [InstallDelete]
 Type: filesandordirs; Name: "{#AppToolchainBase}\*"
-Type: filesandordirs; Name: "{#SourceDirectoryEmbeddedRuby}\mruby\*"
+Type: filesandordirs; Name: "{#AppOptBase}\mruby\*"
 
 [Dirs]
 Name: "{#AppShortcutsDirectory}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
