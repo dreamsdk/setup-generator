@@ -10,8 +10,8 @@
 
 ; Installer versions
 #define AppVersion "R3"
-#define PackageVersion "3.0.4.2201"
-#define ProductVersion "3.0.4.2201"
+#define PackageVersion "3.0.4.2206"
+#define ProductVersion "3.0.4.2206"
 
 ; Copyright
 #define MyAppCopyright "© Copyleft 2018-2022"
