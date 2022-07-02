@@ -44,4 +44,5 @@ begin
   VersionFileName := ExpandConstant('{#AppMainDirectory}\' + 'VERSION');
   PatchFile(VersionFileName, '(RELEASE)', '{#MyAppVersion}');  
   PatchFile(VersionFileName, '(DATE)', '{#BuildDateTime}');
+  PatchFile(VersionFileName, '(BUILD_NUMBER)', '{#FullVersionNumber}');
 end;

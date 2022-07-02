@@ -1,6 +1,6 @@
-; =============================================================================
+; ==============================================================================
 ; DreamSDK Setup - Inno Setup Script
-; =============================================================================
+; ==============================================================================
 
 ; Installer mode
 #define InstallerMode DEBUG
@@ -8,10 +8,7 @@
 #define CompressionMode COMPRESSION_DISABLED
 #define DigitalSignatureMode SIGNATURE_DISABLED
 
-; Installer versions
-#define AppVersion "R3"
-#define PackageVersion "3.0.4.2206"
-#define ProductVersion "3.0.4.2206"
-
-; Copyright
-#define MyAppCopyright "© Copyleft 2018-2022"
+; Installer version
+#define VersionNumberMajor "3"
+#define VersionNumberMinor "0"
+#define VersionNumberBuild "4"

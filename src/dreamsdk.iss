@@ -45,12 +45,29 @@
 #define SourcePackagesBinary SourceDirectoryBase + "\binary-packages"
 #define SourcePackagesSource SourceDirectoryBase + "\source-packages"
 
-; Don't modify anything beyond this point
+; You don't have to modify anything beyond this point
 
 #define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
 #define MyAppName "DreamSDK"
 #define MyAppPublisher "The DreamSDK Team"
 #define MyAppURL "https://www.dreamsdk.org/"
+
+; Used by the installer for checking if Internet is available
+; This should be HTTP only
+#define TestConnectionURL "http://dreamsdk.org/.update/version.txt"
+
+; Copyright
+#define CurrentYear GetDateTimeString('yyyy', '', '')
+#define MyAppCopyright "© Copyleft 2018-" + CurrentYear
+
+; Version
+#define VersionNumberRevision GetDateTimeString('yymm', '', '')
+
+#define AppVersion "R" + VersionNumberMajor
+#define FullVersionNumber VersionNumberMajor + "." + VersionNumberMinor + "." + VersionNumberBuild + "." + VersionNumberRevision
+
+#define PackageVersion FullVersionNumber
+#define ProductVersion FullVersionNumber
 
 #if InstallerMode == DEBUG
 #define MyAppVersion AppVersion + "-dev"
@@ -58,8 +75,7 @@
 #define MyAppVersion AppVersion
 #endif
 
-#define TestConnectionURL "http://www.dreamcast.fr/"
-
+; Application names
 #define MyAppNameHelp MyAppName + " Help"
 #define AppMainName "Shell"
 #define AppManagerName "Manager" 
@@ -67,6 +83,7 @@
 #define FullAppMainName MyAppName + " " + AppMainName
 #define FullAppManagerName MyAppName + " " + AppManagerName
 
+; Paths
 #define AppMsysBase "{app}\msys\1.0"
 #define AppOptBase AppMsysBase + "\opt"
 #define AppToolchainBase AppOptBase + "\toolchains\dc"
