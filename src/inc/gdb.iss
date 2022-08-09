@@ -25,27 +25,38 @@ end;
 
 function TestPythonVersion(Version: String): Boolean;
 var
-  PythonFileName, PythonBitness, PythonFilePath, VersionWithoutDot: String;
-
+  i: Integer;
+  Buffer,
+  PythonFileName,
+  PythonBitness,
+  PythonFilePath,
+  VersionWithoutDot: String;
+  PythonFilePaths: TArrayOfString;
+  
 begin
   Result := False;
+  Log(Format('TestPythonVersion: %s', [Version]));
 
   VersionWithoutDot := Version;
   StringChangeEx(VersionWithoutDot, '.', '', True);
   PythonFileName := Format('python%s.dll', [VersionWithoutDot]);    
-  PythonFilePath := RunSimpleCommandOnPython('whereis.bat', PythonFileName);
   
-  if FileExists(PythonFilePath) then
+  Buffer := RunSimpleCommandOnPython('whereis.exe', PythonFileName);
+  Explode(PythonFilePaths, Buffer, sLineBreak);  
+  
+  for i := 0 to Length(PythonFilePaths) - 1 do
   begin
-    Log(Format('Python %s is installed: %s', [Version, PythonFilePath]));
-    PythonBitness := RunSimpleCommandOnPython('pecheck.exe', PythonFilePath);
-    Result := PythonBitness = '32-bits'; // 32-bits only
-    Log(Format('Python %s bitness is %s', [Version, PythonBitness]));
-  end
-  else
-    Log(Format('Python %s is not installed', [Version]));
-
-//  Result := StartsWith(Version, PythonVersion) and Result;
+    PythonFilePath := PythonFilePaths[i];
+    if FileExists(PythonFilePath) then
+    begin
+      Log(Format('Python %s is installed: %s', [Version, PythonFilePath]));
+      PythonBitness := RunSimpleCommandOnPython('pecheck.exe', PythonFilePath);
+      Result := Result or (PythonBitness = '32-bits'); // 32-bits only
+      Log(Format('Python %s bitness is %s', [Version, PythonBitness]));
+    end
+    else
+      Log(Format('Python %s is not installed', [Version]));
+  end;
 end;
 
 function IsGdbPythonNone: Boolean;
@@ -139,7 +150,7 @@ begin
     CustomMessage('GdbTitlePage'), 
     CustomMessage('GdbSubtitlePage'));
   
-  ExtractTemporaryFile('whereis.bat');
+  ExtractTemporaryFile('whereis.exe');
   ExtractTemporaryFile('pecheck.exe');
  
   RowLeft1 := 0;

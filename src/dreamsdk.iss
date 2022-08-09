@@ -222,7 +222,6 @@ Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: fu
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{#AppSupportDirectory}"; Flags: ignoreversion noencryption nocompression
 
 ; Temporary files used for the installation
-Source: "..\rsrc\helpers\temp\*"; Flags: dontcopy noencryption nocompression
 Source: "..\.helpers\*"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
