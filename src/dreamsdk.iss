@@ -684,7 +684,7 @@ begin
   
   // This test should be the latest!
   // Check if an old version is installed
-  Result := Result and HandlePreviousVersion('{#MyAppID}', '{#MyAppVersion}');
+  Result := Result and HandlePreviousVersion('{#MyAppID}', '{#PackageVersion}');
 end;
 
 procedure FinalizeSetup;

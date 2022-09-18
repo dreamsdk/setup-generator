@@ -57,27 +57,29 @@ end;
  
 // Compares two version numbers, returns -1 if vA is newer, 0 if both are identical, 1 if vB is newer
 function CompareVersion(vA, vB: String): Integer;
-var tmp: TArrayOfString;
-    verA,verB: Array of Integer;
-    i,len: Integer;
+var
+  tmp: TArrayOfString;
+  verA, verB: Array of Integer;
+  i, len: Integer;
+
 begin
     vA := SanitizeVersion(vA);
     vB := SanitizeVersion(vB);
    
-    StringChange(vA,'-','.');
-    StringChange(vB,'-','.');
+    StringChange(vA, '-', '.');
+    StringChange(vB, '-', '.');
 
     Log(Format('Comparing Version %s with %s', [vA, vB]));
  
-    Explode(tmp,vA,'.');
-    SetArrayLength(verA,GetArrayLength(tmp));
+    Explode(tmp, vA, '.');
+    SetArrayLength(verA, GetArrayLength(tmp));
     for i := 0 to GetArrayLength(tmp) - 1 do
-        verA[i] := StrToIntDef(tmp[i],0);
+        verA[i] := StrToIntDef(tmp[i], 0);
         
-    Explode(tmp,vB,'.');
-    SetArrayLength(verB,GetArrayLength(tmp));
+    Explode(tmp, vB, '.');
+    SetArrayLength(verB, GetArrayLength(tmp));
     for i := 0 to GetArrayLength(tmp) - 1 do
-        verB[i] := StrToIntDef(tmp[i],0);
+        verB[i] := StrToIntDef(tmp[i], 0);
  
     len := GetArrayLength(verA);
     if GetArrayLength(verB) < len then
@@ -88,22 +90,23 @@ begin
         begin
             Result := 1;
             exit;
-        end else
+        end 
+        else
         if verA[i] > verB[i] then
         begin
             Result := -1;
-            exit
+            Exit;
         end;
  
     if GetArrayLength(verA) < GetArrayLength(verB) then
     begin
         Result := 1;
-        exit;
-    end else
-    if GetArrayLength(verA) > GetArrayLength(verB) then
+        Exit;
+    end 
+    else if GetArrayLength(verA) > GetArrayLength(verB) then
     begin
         Result := -1;
-        exit;
+        Exit;
     end;
  
     Result := 0; 
