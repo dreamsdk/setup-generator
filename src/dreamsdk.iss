@@ -123,7 +123,7 @@
 [Setup]
 AppId={{#MyAppID}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
+AppVersion={#PackageVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}#help
@@ -142,7 +142,7 @@ WizardSmallImageFile=..\rsrc\dreamsdk-48.bmp
 WizardImageFile=..\rsrc\banner\banner.bmp
 SetupIconFile=..\rsrc\package\setup.ico
 AppCopyright={#MyAppCopyright}
-UninstallDisplayName={#MyAppName}
+UninstallDisplayName={#MyAppName} {#MyAppVersion}
 VersionInfoVersion={#PackageVersion}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoCopyright={#MyAppCopyright}
