@@ -105,11 +105,12 @@
 #define IdeCodeBlocksName "Code::Blocks"
 #define IdeCodeBlocksSupportedVersions "17.12 or 20.03"
 
-#define PSVinceLibraryFileName "psvince.dll"
-#define PSVinceLibrary AppSupportDirectory + "\" + PSVinceLibraryFileName
+#define IdeComponentsListName "ide"
 
 ; Includes
+#include "inc/psvince.iss"
 #include "inc/utils.iss"
+#include "inc/components.iss"
 #include "inc/preq.iss"
 #include "inc/ui.iss"
 #include "inc/environ.iss"
@@ -195,8 +196,8 @@ Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Types: full co
 Name: "main\kos"; Description: "{cm:ComponentKOS}"; Types: full compact custom fullwithoutide; Flags: fixed
 
 ; IDE
-Name: "ide"; Description: "{cm:ComponentIDE}"; Types: full
-Name: "ide\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
+Name: "{#IdeComponentsListName}"; Description: "{cm:ComponentIDE}"; Types: full
+Name: "{#IdeComponentsListName}\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
 
 ; Addons
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full fullwithoutide
@@ -291,6 +292,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; 
 Name: "{app}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{app}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{app}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
+Name: "{app}\usr"; Filename: "{#AppMsysBase}"; WorkingDir: "{#AppMsysBase}"
 
 ; Additional shortcuts (based on tasks)
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
@@ -621,6 +623,12 @@ Name: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
 
 [Code]
 const
+  // This should match the [Types] section of this file.
+  TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION_WITHOUT_IDE = 0;
+  TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION = 1;
+  TYPES_COMBO_ITEMINDEX_COMPACT_INSTALLATION = 2;
+  TYPES_COMBO_ITEMINDEX_CUSTOM_INSTALLATION = 3;
+
   CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
 
 var
@@ -633,20 +641,39 @@ var
   RubyPageID,
   ToolchainsPageID: Integer;
 
-function IsModuleLoaded(modulename: AnsiString): Boolean;
-external 'IsModuleLoaded@files:{#PSVinceLibraryFileName} stdcall';
+  ComponentsListDisabledItemsCount,
+  ComponentsListItemsCountWithoutIde: Integer;  
 
-function IsModuleLoadedU(modulename: String):  Boolean;
-external 'IsModuleLoaded@{#PSVinceLibrary} stdcall uninstallonly';
+procedure ComponentsListCheckChanges;
+var
+  SelectedComponentsCount,
+  ComponentsCount: Integer;  
 
-procedure InitializeWizard;
 begin
-  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
-  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
-  RubyPageID := CreateRubyPage;
-  GdbPageID := CreateGdbPage;
-  ToolchainsPageID := CreateToolchainsPage;
-  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  SelectedComponentsCount := GetSelectedComponentsCount;
+  ComponentsCount := GetComponentsListCount;
+
+  Log(Format('Components List Status: %d selected of %d', [SelectedComponentsCount, ComponentsCount]));
+  
+  if (SelectedComponentsCount = ComponentsCount) then
+    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION
+  else if (SelectedComponentsCount = ComponentsListDisabledItemsCount) then
+    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_COMPACT_INSTALLATION
+  else if not IsComponentSelected('{#IdeComponentsListName}') and (SelectedComponentsCount = ComponentsListItemsCountWithoutIde) then
+    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION_WITHOUT_IDE
+  else
+    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_CUSTOM_INSTALLATION;
+end;
+
+procedure ComponentsListClickCheck(Sender: TObject);
+begin
+  ComponentsListCheckChanges;
+end;
+
+procedure HandleComponentsListTypesCombo;
+begin
+  // Thanks to: https://stackoverflow.com/a/36989894/3726096
+  WizardForm.ComponentsList.OnClickCheck := @ComponentsListClickCheck;
 end;
 
 function IsProcessRunning(const ProcessName: String): Boolean;
@@ -684,7 +711,8 @@ begin
   
   // This test should be the latest!
   // Check if an old version is installed
-  Result := Result and HandlePreviousVersion('{#MyAppID}', '{#PackageVersion}');
+  Result := Result
+    and HandlePreviousVersion('{#MyAppID}', '{#PackageVersion}');
 end;
 
 procedure FinalizeSetup;
@@ -838,6 +866,25 @@ begin
   end;
 end;
 
+procedure CurPageChanged(CurPageID: Integer);
+var
+  i: Integer;
+
+begin
+  if CurPageID = wpSelectComponents then
+  begin
+    // Retrieve components name from the ComponentsList
+    InitializeComponentsListNames;
+
+    // Get all disabled items from the ComponentsList
+    ComponentsListDisabledItemsCount := GetComponentsListDisabledItemsCount;
+
+    // Get the IDE items from the ComponentsList
+    ComponentsListItemsCountWithoutIde := 
+      GetComponentsListCount - GetComponentRootLevelItemsCount('{#IdeComponentsListName}');
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and IsTaskSelected('envpath') then
@@ -850,4 +897,15 @@ begin
     UninstallCodeBlocksIntegration;
   if (CurUninstallStep = usPostUninstall) then
     EnvRemovePath(ExpandConstant('{#AppMainDirectory}'));
+end;
+
+procedure InitializeWizard;
+begin
+  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
+  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
+  RubyPageID := CreateRubyPage;
+  GdbPageID := CreateGdbPage;
+  ToolchainsPageID := CreateToolchainsPage;
+  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  HandleComponentsListTypesCombo;
 end;

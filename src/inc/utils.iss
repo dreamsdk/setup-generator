@@ -1,6 +1,7 @@
 [Code]
 
 const
+  sEmptyStr = '';
   sLineBreak = #13#10;
   MAX_RAND_SEED = $FFFFFFFF;  
     
