@@ -867,9 +867,6 @@ begin
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
-var
-  i: Integer;
-
 begin
   if CurPageID = wpSelectComponents then
   begin
