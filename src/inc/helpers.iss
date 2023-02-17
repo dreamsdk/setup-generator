@@ -46,3 +46,8 @@ begin
   PatchFile(VersionFileName, '(DATE)', '{#BuildDateTime}');
   PatchFile(VersionFileName, '(BUILD_NUMBER)', '{#FullVersionNumber}');
 end;
+
+procedure CreateJunctions;
+begin
+  CreateJunction('{#AppMsysBase}', '{app}\usr');
+end;

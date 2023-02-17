@@ -88,6 +88,7 @@
 #define AppOptBase AppMsysBase + "\opt"
 #define AppToolchainBase AppOptBase + "\toolchains\dc"
 #define AppMainDirectory AppOptBase + "\dreamsdk"
+#define AppHelpersDirectory AppMainDirectory + "\helpers"
 #define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
 #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
 #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
@@ -292,7 +293,6 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; 
 Name: "{app}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"
 Name: "{app}\{#FullAppManagerName}"; Filename: "{#AppManagerExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteManagerApplication}"
 Name: "{app}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{#AppSupportDirectory}\uninst.ico"; Comment: "{cm:UninstallPackage}"
-Name: "{app}\usr"; Filename: "{#AppMsysBase}"; WorkingDir: "{#AppMsysBase}"
 
 ; Additional shortcuts (based on tasks)
 Name: "{commondesktop}\{#FullAppMainName}"; Filename: "{#AppMainExeName}"; WorkingDir: "{#AppMainDirectory}"; Comment: "{cm:ExecuteMainApplication}"; Tasks: desktopicon
@@ -720,6 +720,7 @@ begin
   SetPackageVersion;
   PatchMountPoint;
   SetupApplication;
+  CreateJunctions;
 end;
 
 function InitializeUninstall: Boolean;
