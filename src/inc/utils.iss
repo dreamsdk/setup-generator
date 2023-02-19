@@ -247,7 +247,7 @@ begin
   
   if DirExists(SourceDirectoryPath) then
   begin
-    Executable := ExpandConstant('{#AppHelpersDirectory}\makelink.exe');
+    Executable := ExpandConstant('{#AppHelpersDirectory}\mkdirln.exe');
     if FileExists(Executable) then
     begin
       CommandLine := Format('"%s" "%s"', [SourceDirectoryPath, TargetDirectoryPath]);
