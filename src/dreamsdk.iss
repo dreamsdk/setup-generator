@@ -20,8 +20,8 @@
 #define SourceDirectoryAppSystemObjects SourceDirectoryBase + "\system-objects"
 #define SourceDirectoryAppSystemObjectsConfiguration SourceDirectoryBase + "\system-objects-configuration"
 ; Toolchains
+#define SourceDirectoryToolchainLegacy SourceDirectoryBase + "\toolchain-legacy"
 #define SourceDirectoryToolchainStable SourceDirectoryBase + "\toolchain-stable"
-#define SourceDirectoryToolchainExperimental SourceDirectoryBase + "\toolchain-experimental"
 
 ; GDB
 #define SourceDirectoryGdb SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-no-python"
@@ -239,7 +239,7 @@ Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{#AppMsysBase}"; Flags: ignorevers
 
 ; Toolchains
 Source: "{#SourceDirectoryToolchainStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
-Source: "{#SourceDirectoryToolchainExperimental}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsExperimental
+Source: "{#SourceDirectoryToolchainLegacy}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsLegacy
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -534,11 +534,10 @@ ToolchainsTitlePage=Toolchains Configuration
 ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
 LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
-ToolchainsStable=Stable (recommanded)
-LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 4.7.4 with Newlib 2.0.0. It's the most well tested combinaison and the current toolchains officially supported.
-ToolchainsExperimental=Experimental
-LabelToolchainsDescriptionExperimental=Experimental toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.4.0 for AICA. It's newer but not well tested. Use this version at your own risk.
-ToolchainsExperimentalConfirmation=Experimental toolchains may be unstable. Are you sure to continue?
+ToolchainsStable=Stable
+LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.4.0 for AICA. It's the current toolchains officially supported.
+ToolchainsLegacy=Legacy
+LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC 4.7.4 with Newlib 2.0.0. This was the previous, officially supported toolchains for the past decade.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
@@ -752,18 +751,6 @@ begin
     begin
       MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
       Exit;
-    end;
-  end;
-
-  // Toolchains Page
-  if (CurPageID = ToolchainsPageID) then
-  begin
-    if IsToolchainsExperimental then
-    begin
-      // Sure to use experimental toolchain?
-      Result := ConfirmExperimentalToolchainsUsage;
-      if not Result then
-        Exit;
     end;
   end;
 

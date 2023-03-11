@@ -1,11 +1,11 @@
 [code]
 var
   RadioButtonToolchainsStable,
-  RadioButtonToolchainsExperimental: TNewRadioButton;
+  RadioButtonToolchainsLegacy: TNewRadioButton;
 
-function IsToolchainsExperimental: Boolean;
+function IsToolchainsLegacy: Boolean;
 begin
-  Result := RadioButtonToolchainsExperimental.Checked;
+  Result := RadioButtonToolchainsLegacy.Checked;
 end;
 
 function IsToolchainsStable: Boolean;
@@ -13,18 +13,12 @@ begin
   Result := RadioButtonToolchainsStable.Checked;
 end;
 
-function ConfirmExperimentalToolchainsUsage: Boolean;
-begin
-  Result := (MsgBox(CustomMessage('ToolchainsExperimentalConfirmation'),
-    mbConfirmation, MB_YESNO) = IDYES);
-end;
-
 function CreateToolchainsPage: Integer;
 var
   ToolchainsPage: TWizardPage;
   LabelToolchainsIntroduction, 
   LabelToolchainsDescription,
-  LabelToolchainsDescriptionExperimental,
+  LabelToolchainsDescriptionLegacy,
   LabelToolchainsDescriptionStable: TLabel;
   BtnImage: TBitmapImage;
 
@@ -70,22 +64,22 @@ begin
   LabelToolchainsDescriptionStable.Width := ToolchainsPage.SurfaceWidth;
   SetMultiLinesLabel(LabelToolchainsDescriptionStable, 3);  
 
-  // Experimental Toolchains
-  RadioButtonToolchainsExperimental := TNewRadioButton.Create(ToolchainsPage);
-  RadioButtonToolchainsExperimental.Parent := ToolchainsPage.Surface;
-  RadioButtonToolchainsExperimental.Caption := CustomMessage('ToolchainsExperimental');  
-  RadioButtonToolchainsExperimental.Top := LabelToolchainsDescriptionStable.Top 
+  // Legacy Toolchains
+  RadioButtonToolchainsLegacy := TNewRadioButton.Create(ToolchainsPage);
+  RadioButtonToolchainsLegacy.Parent := ToolchainsPage.Surface;
+  RadioButtonToolchainsLegacy.Caption := CustomMessage('ToolchainsLegacy');  
+  RadioButtonToolchainsLegacy.Top := LabelToolchainsDescriptionStable.Top 
     + LabelToolchainsDescriptionStable.Height + ScaleY(8);
-  RadioButtonToolchainsExperimental.Width := ToolchainsPage.SurfaceWidth;
-  RadioButtonToolchainsExperimental.Font.Style := [fsBold];
+  RadioButtonToolchainsLegacy.Width := ToolchainsPage.SurfaceWidth;
+  RadioButtonToolchainsLegacy.Font.Style := [fsBold];
 
-  LabelToolchainsDescriptionExperimental := TLabel.Create(ToolchainsPage);
-  LabelToolchainsDescriptionExperimental.Parent := ToolchainsPage.Surface;
-  LabelToolchainsDescriptionExperimental.Caption := CustomMessage('LabelToolchainsDescriptionExperimental');    
-  LabelToolchainsDescriptionExperimental.Top := RadioButtonToolchainsExperimental.Top 
-    + RadioButtonToolchainsExperimental.Height + ScaleY(4);
-  LabelToolchainsDescriptionExperimental.Width := ToolchainsPage.SurfaceWidth;
-  SetMultiLinesLabel(LabelToolchainsDescriptionExperimental, 3);  
+  LabelToolchainsDescriptionLegacy := TLabel.Create(ToolchainsPage);
+  LabelToolchainsDescriptionLegacy.Parent := ToolchainsPage.Surface;
+  LabelToolchainsDescriptionLegacy.Caption := CustomMessage('LabelToolchainsDescriptionLegacy');    
+  LabelToolchainsDescriptionLegacy.Top := RadioButtonToolchainsLegacy.Top 
+    + RadioButtonToolchainsLegacy.Height + ScaleY(4);
+  LabelToolchainsDescriptionLegacy.Width := ToolchainsPage.SurfaceWidth;
+  SetMultiLinesLabel(LabelToolchainsDescriptionLegacy, 3);  
 
   Result := ToolchainsPage.ID;
 end;
