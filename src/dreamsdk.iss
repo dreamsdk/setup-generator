@@ -22,6 +22,7 @@
 ; Toolchains
 #define SourceDirectoryToolchainLegacy SourceDirectoryBase + "\toolchain-legacy"
 #define SourceDirectoryToolchainStable SourceDirectoryBase + "\toolchain-stable"
+#define SourceDirectoryToolchainTesting SourceDirectoryBase + "\toolchain-testing"
 
 ; GDB
 #define SourceDirectoryGdb SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-no-python"
@@ -35,6 +36,7 @@
 #define SourceDirectoryGdbPython39 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.9"
 #define SourceDirectoryGdbPython310 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.10"
 #define SourceDirectoryGdbPython311 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.11"
+#define SourceDirectoryGdbPython312 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-3.12"
 
 ; Embedded libraries
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
@@ -150,7 +152,11 @@ VersionInfoCompany={#MyAppPublisher}
 VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductTextVersion={#MyAppVersion}
+#if InstallerMode == RELEASE
 VersionInfoDescription={#MyAppName} Setup
+#else
+VersionInfoDescription={#MyAppName} Setup (DEBUG)
+#endif
 VersionInfoProductVersion={#ProductVersion}
 AppComments={#BuildDateTime}
 AppReadmeFile={#AppSupportDirectory}\license.rtf
@@ -240,6 +246,7 @@ Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{#AppMsysBase}"; Flags: ignorevers
 ; Toolchains
 Source: "{#SourceDirectoryToolchainStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
 Source: "{#SourceDirectoryToolchainLegacy}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsLegacy
+Source: "{#SourceDirectoryToolchainTesting}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsTesting
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -253,6 +260,7 @@ Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags
 Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
 Source: "{#SourceDirectoryGdbPython310}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython310
 Source: "{#SourceDirectoryGdbPython311}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython311
+Source: "{#SourceDirectoryGdbPython312}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython312
 
 ; DreamSDK
 Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
@@ -538,6 +546,9 @@ ToolchainsStable=Stable
 LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.4.0 for AICA. It's the current toolchains officially supported.
 ToolchainsLegacy=Legacy
 LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC 4.7.4 with Newlib 2.0.0. This was the previous, officially supported toolchains for the past decade.
+ToolchainsTesting=Testing (experimental)
+LabelToolchainsDescriptionTesting=Testing toolchains are based on GCC 12.2.0 with Newlib 4.3.0 for SuperH and GCC 8.4.0 for AICA. It's newer but not well tested. Use this version at your own risk.
+ToolchainsTestingConfirmation=Testing toolchains may be unstable. Are you sure to continue?
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
@@ -555,6 +566,7 @@ GdbPython38=Python 3.8
 GdbPython39=Python 3.9
 GdbPython310=Python 3.10
 GdbPython311=Python 3.11
+GdbPython312=Python 3.12
 
 ; Ruby
 RubyTitlePage=Ruby Configuration
@@ -707,11 +719,15 @@ begin
     Result := False;
     Exit;
   end;
-  
+
+#if InstallerMode == RELEASE
   // This test should be the latest!
   // Check if an old version is installed
   Result := Result
     and HandlePreviousVersion('{#MyAppID}', '{#PackageVersion}');
+#else
+  Result := True;
+#endif
 end;
 
 procedure FinalizeSetup;
@@ -751,6 +767,18 @@ begin
     begin
       MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
       Exit;
+    end;
+  end;
+
+  // Toolchains Page
+  if (CurPageID = ToolchainsPageID) then
+  begin
+    if IsToolchainsTesting then
+    begin
+      // Sure to use testing toolchain?
+      Result := ConfirmTestingToolchainsUsage;
+      if not Result then
+        Exit;
     end;
   end;
 

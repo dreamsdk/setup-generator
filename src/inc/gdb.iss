@@ -11,7 +11,8 @@ var
   RadioButtonPython38,
   RadioButtonPython39,
   RadioButtonPython310,
-  RadioButtonPython311: TNewRadioButton;
+  RadioButtonPython311,
+  RadioButtonPython312: TNewRadioButton;
 
 function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
 begin
@@ -114,6 +115,11 @@ begin
   Result := RadioButtonPython311.Checked;
 end;
 
+function IsGdbPython312: Boolean;
+begin
+  Result := RadioButtonPython312.Checked;
+end;
+
 function CreateGdbPythonButton(Version: String; ButtonLeft: Integer;
   var FromButton: TNewRadioButton; FirstRow: Boolean): TNewRadioButton;
 var
@@ -134,8 +140,7 @@ begin
   Result.Caption := CustomMessage(ButtonLabel);  
   Result.Top := FromButton.Top + FromButton.Height + ScaleY(ScaleValue);
   Result.Left := ButtonLeft;
-  Result.Width := GdbPage.SurfaceWidth;
-  Result.Enabled := TestPythonVersion(Version);  
+  Result.Enabled := TestPythonVersion(Version);
 end;
 
 function CreateGdbPage: Integer;
@@ -143,7 +148,9 @@ var
   LabelGdbIntroduction, 
   LabelGdbDescription: TLabel;
   BtnImage: TBitmapImage;
-  RowLeft1, RowLeft2: Integer;
+  RowLeft1,
+  RowLeft2,
+  RowLeft3: Integer;
 
 begin
   GdbPage := CreateCustomPage(wpSelectComponents, 
@@ -154,7 +161,8 @@ begin
   ExtractTemporaryFile('pecheck.exe');
  
   RowLeft1 := 0;
-  RowLeft2 := GdbPage.SurfaceWidth div 2;
+  RowLeft2 := GdbPage.SurfaceWidth div 3;
+  RowLeft3 := RowLeft2 * 2; 
 
   BtnImage := SetPageIcon('gdb', GdbPage);
 
@@ -201,25 +209,30 @@ begin
   // Python 3.5
   RadioButtonPython35 := CreateGdbPythonButton('3.5', RowLeft1, RadioButtonPython34, False);
 
-  // Python 3.6
-  RadioButtonPython36 := CreateGdbPythonButton('3.6', RowLeft1, RadioButtonPython35, False);
-
   // Row 2
 
+  // Python 3.6
+  RadioButtonPython36 := CreateGdbPythonButton('3.6', RowLeft2, RadioButtonNone, True);
+
   // Python 3.7
-  RadioButtonPython37 := CreateGdbPythonButton('3.7', RowLeft2, RadioButtonNone, True);
+  RadioButtonPython37 := CreateGdbPythonButton('3.7', RowLeft2, RadioButtonPython27, False);
 
   // Python 3.8
-  RadioButtonPython38 := CreateGdbPythonButton('3.8', RowLeft2, RadioButtonPython27, False);
+  RadioButtonPython38 := CreateGdbPythonButton('3.8', RowLeft2, RadioButtonPython33, False);
 
   // Python 3.9
-  RadioButtonPython39 := CreateGdbPythonButton('3.9', RowLeft2, RadioButtonPython33, False);
+  RadioButtonPython39 := CreateGdbPythonButton('3.9', RowLeft2, RadioButtonPython34, False);
+
+  // Row 3
 
   // Python 3.10
-  RadioButtonPython310 := CreateGdbPythonButton('3.10', RowLeft2, RadioButtonPython34, False);
+  RadioButtonPython310 := CreateGdbPythonButton('3.10', RowLeft3, RadioButtonNone, True);
 
   // Python 3.11
-  RadioButtonPython311 := CreateGdbPythonButton('3.11', RowLeft2, RadioButtonPython35, False);
+  RadioButtonPython311 := CreateGdbPythonButton('3.11', RowLeft3, RadioButtonPython27, False);
+
+  // Python 3.12
+  RadioButtonPython312 := CreateGdbPythonButton('3.12', RowLeft3, RadioButtonPython33, False);
 
   Result := GdbPage.ID;
 end;
