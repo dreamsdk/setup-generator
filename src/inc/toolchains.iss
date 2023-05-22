@@ -111,5 +111,14 @@ begin
   LabelToolchainsDescriptionTesting.Width := ToolchainsPage.SurfaceWidth;
   SetMultiLinesLabel(LabelToolchainsDescriptionTesting, 2);
 
+  // Testing is only for Vista and greater...
+  if not IsWindowsVistaOrGreater then
+  begin
+    RadioButtonToolchainsTesting.Enabled := False;
+    LabelToolchainsDescriptionTesting.Enabled := False;
+    RadioButtonToolchainsTesting.Caption := 
+      RadioButtonToolchainsTesting.Caption + CustomMessage('ToolchainsTestingDisabled'); 
+  end;
+
   Result := ToolchainsPage.ID;
 end;

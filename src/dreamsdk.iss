@@ -122,6 +122,7 @@
 #include "inc/kos.iss"
 #include "inc/ruby.iss"
 #include "inc/gdb.iss"#include "inc/helpers.iss"
+#include "inc/winver.iss"
 #include "inc/toolchains.iss"
 
 [Setup]
@@ -547,8 +548,9 @@ LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with N
 ToolchainsLegacy=Legacy
 LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC 4.7.4 with Newlib 2.0.0. This was the previous, officially supported toolchains for the past decade.
 ToolchainsTesting=Testing (experimental)
+ToolchainsTestingDisabled= (unsupported on your OS)
 LabelToolchainsDescriptionTesting=Testing toolchains are based on GCC 12.2.0 with Newlib 4.3.0 for SuperH and GCC 8.4.0 for AICA. It's newer but not well tested. Use this version at your own risk.
-ToolchainsTestingConfirmation=Testing toolchains may be unstable. Are you sure to continue?
+ToolchainsTestingConfirmation=Testing toolchains may be unstable. You can change that later in {#FullAppManagerName}. Are you sure to continue?
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
