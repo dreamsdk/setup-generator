@@ -56,3 +56,11 @@ procedure RemoveJunctions;
 begin
   RemoveJunction('{app}\usr');
 end;
+
+procedure AddGitSafeDirectories;
+begin
+  AddGitSafeDirectory('kos');
+  AddGitSafeDirectory('kos-ports');
+  AddGitSafeDirectory('dcload\dcload-serial');
+  AddGitSafeDirectory('dcload\dcload-ip');
+end;

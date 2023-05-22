@@ -738,6 +738,7 @@ begin
   PatchMountPoint;
   SetupApplication;
   CreateJunctions;
+  AddGitSafeDirectories;
 end;
 
 function InitializeUninstall: Boolean;
