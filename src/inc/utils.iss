@@ -250,7 +250,39 @@ begin
     Executable := ExpandConstant('{#AppHelpersDirectory}\mkdirln.exe');
     if FileExists(Executable) then
     begin
-      CommandLine := Format('"%s" "%s"', [SourceDirectoryPath, TargetDirectoryPath]);
+      CommandLine := Format('create "%s" "%s"', [TargetDirectoryPath, SourceDirectoryPath]);
+      Log(Format('  Executable: "%s", CommandLine: [%s]', [Executable, CommandLine]));
+      
+      Result := Exec(Executable, CommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      Log(Format('  Result: %d', [Result]));
+    end
+    else
+      Result := True;
+  end;
+end;
+
+// Remove/delete a directory junction (equivalent to symbolic link)
+function RemoveJunction(TargetDirectoryPath: String): Boolean;
+var
+  Executable,
+  CommandLine: String;
+  ResultCode: Integer;
+
+begin
+  Result := False;
+  
+  TargetDirectoryPath := ExpandConstant(TargetDirectoryPath);
+    
+  Log(Format('CreateJunction [TargetDirectoryPath: "%s"]', [
+    TargetDirectoryPath
+  ]));
+  
+  if DirExists(TargetDirectoryPath) then
+  begin
+    Executable := ExpandConstant('{#AppHelpersDirectory}\mkdirln.exe');
+    if FileExists(Executable) then
+    begin
+      CommandLine := Format('remove "%s"', [TargetDirectoryPath]);
       Log(Format('  Executable: "%s", CommandLine: [%s]', [Executable, CommandLine]));
       
       Result := Exec(Executable, CommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);

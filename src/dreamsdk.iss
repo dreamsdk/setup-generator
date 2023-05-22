@@ -426,7 +426,7 @@ Name: "{group}\{cm:ToolsGroupDirectory}\{cm:ToolsDocumentationGroupDirectory}\{c
 
 [Run]
 Filename: "{#AppGettingStartedFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent shellexec; Description: "{cm:LaunchGettingStarted}"
-Filename: "{#AppManagerExeName}"; Parameters: "--home-dir ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
+Filename: "{#AppManagerExeName}"; Parameters: "--home-dir ""{app}"""; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
 Filename: "{#AppHelpFile}"; WorkingDir: "{#AppMainDirectory}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:LaunchProgram,{#StringChange(MyAppNameHelp, '&', '&&')}}"
 
 [CustomMessages]
@@ -543,7 +543,7 @@ ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
 LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
 ToolchainsStable=Stable
-LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.4.0 for AICA. It's the current toolchains officially supported.
+LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.5.0 for AICA. It's the current toolchains officially supported.
 ToolchainsLegacy=Legacy
 LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC 4.7.4 with Newlib 2.0.0. This was the previous, officially supported toolchains for the past decade.
 ToolchainsTesting=Testing (experimental)
@@ -907,7 +907,10 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if (CurUninstallStep = usUninstall) then
+  begin
+	RemoveJunctions;
     UninstallCodeBlocksIntegration;
+  end;	
   if (CurUninstallStep = usPostUninstall) then
     EnvRemovePath(ExpandConstant('{#AppMainDirectory}'));
 end;

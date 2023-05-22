@@ -51,3 +51,8 @@ procedure CreateJunctions;
 begin
   CreateJunction('{#AppMsysBase}', '{app}\usr');
 end;
+
+procedure RemoveJunctions;
+begin
+  RemoveJunction('{app}\usr');
+end;
