@@ -134,7 +134,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}#help
 AppSupportURL={#MyAppURL}help/
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={sd}\{#MyAppName}
+DefaultDirName={sd}\{#MyAppName}                                       
 DefaultGroupName={#MyAppName}
 OutputDir=..\bin
 OutputBaseFilename={#OutputBaseFileName}
@@ -186,7 +186,8 @@ SignedUninstaller=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\text\license.rtf"; InfoBeforeFile: "..\rsrc\text\before.rtf"; InfoAfterFile: "..\rsrc\text\after.rtf"
 
 [Tasks]
-Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}" 
+Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}"
+Name: "windowsterminal"; Description: "{cm:IntegrateWithWindowsTerminal}" 
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
@@ -612,6 +613,7 @@ CodeBlocksInitializeConfirmation=This will create the required files to enable {
 
 ; Additional tasks
 AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment variable
+IntegrateWithWindowsTerminal=Add {#MyAppName} to Windows Terminal
 
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
