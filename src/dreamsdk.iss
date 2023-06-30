@@ -110,6 +110,8 @@
 
 #define IdeComponentsListName "ide"
 
+#define WindowsTerminalName "Windows Terminal"
+
 ; Includes
 #include "inc/psvince.iss"
 #include "inc/utils.iss"
@@ -124,6 +126,7 @@
 #include "inc/gdb.iss"#include "inc/helpers.iss"
 #include "inc/winver.iss"
 #include "inc/toolchains.iss"
+#include "inc/wt.iss"
 
 [Setup]
 AppId={{#MyAppID}
@@ -187,7 +190,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\tex
 
 [Tasks]
 Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}"
-Name: "windowsterminal"; Description: "{cm:IntegrateWithWindowsTerminal}" 
+Name: "wtconfig"; Description: "{cm:IntegrateWithWindowsTerminal}" 
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
@@ -611,9 +614,13 @@ CodeBlocksIntegrationRemoveFailed=Error when restoring {#IdeCodeBlocksName}!%n%n
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
 CodeBlocksInitializeConfirmation=This will create the required files to enable {#IdeCodeBlocksName} integration for all the users on this computer. Continue?
 
+; Windows Terminal
+WindowsTerminalIntegrationInstallationFailed=Error when installing {#WindowsTerminalName}!%n%n%s
+WindowsTerminalIntegrationUninstallationFailed=Error when uninstalling {#WindowsTerminalName}!%n%n%s
+
 ; Additional tasks
 AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment variable
-IntegrateWithWindowsTerminal=Add {#MyAppName} to Windows Terminal
+IntegrateWithWindowsTerminal=Add {#MyAppName} to {#WindowsTerminalName}
 
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
@@ -905,16 +912,22 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if (CurStep = ssPostInstall) and IsTaskSelected('envpath') then
-    EnvAddPath(ExpandConstant('{#AppMainDirectory}'));
+  if (CurStep = ssPostInstall) then
+  begin
+    if IsTaskSelected('envpath') then
+      EnvAddPath(ExpandConstant('{#AppMainDirectory}'));
+    if IsTaskSelected('wtconfig') then
+      InstallWindowsTerminalIntegration;
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if (CurUninstallStep = usUninstall) then
   begin
-	RemoveJunctions;
+    RemoveJunctions;
     UninstallCodeBlocksIntegration;
+    UninstallWindowsTerminalIntegration;
   end;	
   if (CurUninstallStep = usPostUninstall) then
     EnvRemovePath(ExpandConstant('{#AppMainDirectory}'));
