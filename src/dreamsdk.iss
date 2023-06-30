@@ -548,12 +548,12 @@ ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
 LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
 ToolchainsStable=Stable
-LabelToolchainsDescriptionStable=Stable toolchains are based on GCC 9.3.0 with Newlib 3.3.0 for SuperH and GCC 8.5.0 for AICA. It's the current toolchains officially supported.
+LabelToolchainsDescriptionStable=Stable toolchains are based on GCC {#ToolchainsStableVersionSuperH} with Newlib {#ToolchainsStableVersionNewlib} for SuperH and GCC {#ToolchainsStableVersionAICA} for AICA. It's the current toolchains officially supported.
 ToolchainsLegacy=Legacy
-LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC 4.7.4 with Newlib 2.0.0. This was the previous, officially supported toolchains for the past decade.
+LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC {#ToolchainsLegacyVersion} with Newlib {#ToolchainsLegacyVersionNewlib}. This was the previous, officially supported toolchains for the past decade.
 ToolchainsTesting=Testing (experimental)
 ToolchainsTestingDisabled= (unsupported on your OS)
-LabelToolchainsDescriptionTesting=Testing toolchains are based on GCC 12.2.0 with Newlib 4.3.0 for SuperH and GCC 8.4.0 for AICA. It's newer but not well tested. Use this version at your own risk.
+LabelToolchainsDescriptionTesting=Testing toolchains are based on GCC {#ToolchainsTestingVersionSuperH} with Newlib {#ToolchainsTestingVersionNewlib} for SuperH and GCC {#ToolchainsTestingVersionAICA} for AICA. It's newer but not well tested. Use this version at your own risk.
 ToolchainsTestingConfirmation=Testing toolchains may be unstable. You can change that later in {#FullAppManagerName}. Are you sure to continue?
 
 ; GNU Debugger for Super H

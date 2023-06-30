@@ -47,3 +47,20 @@
 ; This should be incremented when distributing the package. Currently, 3 
 ; packages has been officially released: DreamSDK R1 (1), DreamSDK R2 (2 and 3).
 #define VersionNumberBuild "4"
+
+; Toolchains version (displayed on-screen, just for information)
+; This should match what you put in "prepare.ini" from "prepare" utility.
+
+; Stable
+#define ToolchainsStableVersionSuperH "9.3.0"
+#define ToolchainsStableVersionNewlib "3.3.0"
+#define ToolchainsStableVersionAICA "8.5.0"
+
+; Legacy
+#define ToolchainsLegacyVersion "4.7.4"
+#define ToolchainsLegacyVersionNewlib "2.0.0"
+
+; Testing
+#define ToolchainsTestingVersionSuperH "13.1.0"
+#define ToolchainsTestingVersionNewlib "4.3.0"
+#define ToolchainsTestingVersionAICA "8.5.0"
