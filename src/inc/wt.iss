@@ -1,8 +1,9 @@
 [Code]
 type
-  TWindowsTerminalIntegrationOperation = (wtiInstall, wtiUninstall);
+  TWindowsTerminalIntegrationOperation = (wtiInstall, wtiUninstall, wtiStatus);
 
-const    
+const
+  WT_HELPER_FILE = 'wtcheck.exe';    
   WT_CONFIG_FILE = '{app}\msys\1.0\opt\dreamsdk\helpers\wtconfig.exe';
 
 function RunWindowsTerminalConfigTool(
@@ -14,7 +15,9 @@ var
 begin
   UtilitySwitch := 'uninstall';
   if Operation = wtiInstall then
-    UtilitySwitch := 'install';
+    UtilitySwitch := 'install'
+  else if Operation = wtiStatus then
+    UtilitySwitch := 'status';
 
   Buffer := RunCommand(
     Format('"%s" %s', [
@@ -24,7 +27,7 @@ begin
     False
   );
             
-  Result := IsInString('done successfully', Buffer);
+  Result := not IsInString('Error: ', Buffer);
 end;
 
 procedure InstallWindowsTerminalIntegration;
@@ -47,4 +50,17 @@ begin
   IsSuccess := RunWindowsTerminalConfigTool(wtiUninstall, Buffer);
   if not IsSuccess then
     MsgBox(Format(CustomMessage('WindowsTerminalIntegrationUninstallationFailed'), [Buffer]), mbCriticalError, MB_OK); 
+end;
+
+function IsWindowsTerminalInstalled: Boolean;
+var
+  WindowsTerminalHelperFileName: String;
+  Buffer: String;
+
+begin
+  WindowsTerminalHelperFileName := ExpandConstant( '{tmp}\' + WT_HELPER_FILE );
+  if not FileExists( WindowsTerminalHelperFileName ) then
+    ExtractTemporaryFile( WT_HELPER_FILE );
+  Buffer := RunCommand( WindowsTerminalHelperFileName, True );
+  Result := not IsInString('Error: ', Buffer); 
 end;

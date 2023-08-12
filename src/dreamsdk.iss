@@ -190,7 +190,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\rsrc\tex
 
 [Tasks]
 Name: "envpath"; Description: "{cm:AddToPathEnvironmentVariable}"
-Name: "wtconfig"; Description: "{cm:IntegrateWithWindowsTerminal}" 
+Name: "wtconfig"; Description: "{cm:IntegrateWithWindowsTerminal}"; Check: IsWindowsTerminalInstalled 
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
