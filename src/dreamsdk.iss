@@ -21,8 +21,8 @@
 #define SourceDirectoryAppSystemObjectsConfiguration SourceDirectoryBase + "\system-objects-configuration"
 ; Toolchains
 #define SourceDirectoryToolchainLegacy SourceDirectoryBase + "\toolchain-legacy"
+#define SourceDirectoryToolchainOldStable SourceDirectoryBase + "\toolchain-oldstable"
 #define SourceDirectoryToolchainStable SourceDirectoryBase + "\toolchain-stable"
-#define SourceDirectoryToolchainTesting SourceDirectoryBase + "\toolchain-testing"
 
 ; GDB
 #define SourceDirectoryGdb SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-no-python"
@@ -250,8 +250,8 @@ Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{#AppMsysBase}"; Flags: ignorevers
 
 ; Toolchains
 Source: "{#SourceDirectoryToolchainStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
+Source: "{#SourceDirectoryToolchainOldStable}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsOldStable
 Source: "{#SourceDirectoryToolchainLegacy}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsLegacy
-Source: "{#SourceDirectoryToolchainTesting}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsTesting
 
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
@@ -548,13 +548,13 @@ ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
 LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
 ToolchainsStable=Stable
+ToolchainsStableDisabled= (unsupported on your OS)
 LabelToolchainsDescriptionStable=Stable toolchains are based on GCC {#ToolchainsStableVersionSuperH} with Newlib {#ToolchainsStableVersionNewlib} for SuperH and GCC {#ToolchainsStableVersionAICA} for AICA. It's the current toolchains officially supported.
 ToolchainsLegacy=Legacy
+ToolchainsLegacyConfirmation=Legacy toolchains are pretty old, are you sure to continue? You can change that later in {#FullAppManagerName}.
 LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC {#ToolchainsLegacyVersion} with Newlib {#ToolchainsLegacyVersionNewlib}. This was the previous, officially supported toolchains for the past decade.
-ToolchainsTesting=Testing (experimental)
-ToolchainsTestingDisabled= (unsupported on your OS)
-LabelToolchainsDescriptionTesting=Testing toolchains are based on GCC {#ToolchainsTestingVersionSuperH} with Newlib {#ToolchainsTestingVersionNewlib} for SuperH and GCC {#ToolchainsTestingVersionAICA} for AICA. It's newer but not well tested. Use this version at your own risk.
-ToolchainsTestingConfirmation=Testing toolchains may be unstable. You can change that later in {#FullAppManagerName}. Are you sure to continue?
+ToolchainsOldStable=Old Stable
+LabelToolchainsDescriptionOldStable=Old stable toolchains are based on GCC {#ToolchainsOldStableVersionSuperH} with Newlib {#ToolchainsOldStableVersionNewlib} for SuperH and GCC {#ToolchainsOldStableVersionAICA} for AICA. It's the previous stable toolchains.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger Configuration
@@ -785,10 +785,10 @@ begin
   // Toolchains Page
   if (CurPageID = ToolchainsPageID) then
   begin
-    if IsToolchainsTesting then
+    if IsToolchainsLegacy then
     begin
-      // Sure to use testing toolchain?
-      Result := ConfirmTestingToolchainsUsage;
+      // Sure to use legacy toolchain?
+      Result := ConfirmLegacyToolchainsUsage;
       if not Result then
         Exit;
     end;

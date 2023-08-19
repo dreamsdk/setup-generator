@@ -52,15 +52,16 @@
 ; This should match what you put in "prepare.ini" from "prepare" utility.
 
 ; Stable
-#define ToolchainsStableVersionSuperH "9.3.0"
-#define ToolchainsStableVersionNewlib "3.3.0"
+#define ToolchainsStableVersionSuperH "13.2.0"
+#define ToolchainsStableVersionNewlib "4.3.0.20230120"
 #define ToolchainsStableVersionAICA "8.5.0"
+
+; Old Stable
+#define ToolchainsOldStableVersionSuperH "9.5.0"
+#define ToolchainsOldStableVersionNewlib "4.3.0.20230120"
+#define ToolchainsOldStableVersionAICA "8.5.0"
 
 ; Legacy
 #define ToolchainsLegacyVersion "4.7.4"
 #define ToolchainsLegacyVersionNewlib "2.0.0"
 
-; Testing
-#define ToolchainsTestingVersionSuperH "13.1.0"
-#define ToolchainsTestingVersionNewlib "4.3.0"
-#define ToolchainsTestingVersionAICA "8.5.0"

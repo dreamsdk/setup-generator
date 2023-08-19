@@ -2,7 +2,7 @@
 var
   RadioButtonToolchainsStable,
   RadioButtonToolchainsLegacy,
-  RadioButtonToolchainsTesting: TNewRadioButton;
+  RadioButtonToolchainsOldStable: TNewRadioButton;
 
 function IsToolchainsLegacy: Boolean;
 begin
@@ -14,14 +14,14 @@ begin
   Result := RadioButtonToolchainsStable.Checked;
 end;
 
-function IsToolchainsTesting: Boolean;
+function IsToolchainsOldStable: Boolean;
 begin
-  Result := RadioButtonToolchainsTesting.Checked;
+  Result := RadioButtonToolchainsOldStable.Checked;
 end;
 
-function ConfirmTestingToolchainsUsage: Boolean;
+function ConfirmLegacyToolchainsUsage: Boolean;
 begin
-  Result := (MsgBox(CustomMessage('ToolchainsTestingConfirmation'),
+  Result := (MsgBox(CustomMessage('ToolchainsLegacyConfirmation'),
     mbConfirmation, MB_YESNO) = IDYES);
 end;
 
@@ -32,7 +32,7 @@ var
   LabelToolchainsDescription,
   LabelToolchainsDescriptionLegacy,
   LabelToolchainsDescriptionStable,
-  LabelToolchainsDescriptionTesting: TLabel;
+  LabelToolchainsDescriptionOldStable: TLabel;
   BtnImage: TBitmapImage;
 
 begin
@@ -77,12 +77,29 @@ begin
   LabelToolchainsDescriptionStable.Width := ToolchainsPage.SurfaceWidth;
   SetMultiLinesLabel(LabelToolchainsDescriptionStable, 2);  
 
+  // OldStable Toolchains
+  RadioButtonToolchainsOldStable := TNewRadioButton.Create(ToolchainsPage);
+  RadioButtonToolchainsOldStable.Parent := ToolchainsPage.Surface;
+  RadioButtonToolchainsOldStable.Caption := CustomMessage('ToolchainsOldStable');  
+  RadioButtonToolchainsOldStable.Top := LabelToolchainsDescriptionStable.Top 
+    + LabelToolchainsDescriptionStable.Height + ScaleY(8);
+  RadioButtonToolchainsOldStable.Width := ToolchainsPage.SurfaceWidth;
+  RadioButtonToolchainsOldStable.Font.Style := [fsBold];
+
+  LabelToolchainsDescriptionOldStable := TLabel.Create(ToolchainsPage);
+  LabelToolchainsDescriptionOldStable.Parent := ToolchainsPage.Surface;
+  LabelToolchainsDescriptionOldStable.Caption := CustomMessage('LabelToolchainsDescriptionOldStable');    
+  LabelToolchainsDescriptionOldStable.Top := RadioButtonToolchainsOldStable.Top 
+    + RadioButtonToolchainsOldStable.Height + ScaleY(2);
+  LabelToolchainsDescriptionOldStable.Width := ToolchainsPage.SurfaceWidth;
+  SetMultiLinesLabel(LabelToolchainsDescriptionOldStable, 2);
+
   // Legacy Toolchains
   RadioButtonToolchainsLegacy := TNewRadioButton.Create(ToolchainsPage);
   RadioButtonToolchainsLegacy.Parent := ToolchainsPage.Surface;
   RadioButtonToolchainsLegacy.Caption := CustomMessage('ToolchainsLegacy');  
-  RadioButtonToolchainsLegacy.Top := LabelToolchainsDescriptionStable.Top 
-    + LabelToolchainsDescriptionStable.Height + ScaleY(8);
+  RadioButtonToolchainsLegacy.Top := LabelToolchainsDescriptionOldStable.Top 
+    + LabelToolchainsDescriptionOldStable.Height + ScaleY(8);
   RadioButtonToolchainsLegacy.Width := ToolchainsPage.SurfaceWidth;
   RadioButtonToolchainsLegacy.Font.Style := [fsBold];
 
@@ -94,30 +111,13 @@ begin
   LabelToolchainsDescriptionLegacy.Width := ToolchainsPage.SurfaceWidth;
   SetMultiLinesLabel(LabelToolchainsDescriptionLegacy, 2);  
 
-  // Testing Toolchains
-  RadioButtonToolchainsTesting := TNewRadioButton.Create(ToolchainsPage);
-  RadioButtonToolchainsTesting.Parent := ToolchainsPage.Surface;
-  RadioButtonToolchainsTesting.Caption := CustomMessage('ToolchainsTesting');  
-  RadioButtonToolchainsTesting.Top := LabelToolchainsDescriptionLegacy.Top 
-    + LabelToolchainsDescriptionLegacy.Height + ScaleY(8);
-  RadioButtonToolchainsTesting.Width := ToolchainsPage.SurfaceWidth;
-  RadioButtonToolchainsTesting.Font.Style := [fsBold];
-
-  LabelToolchainsDescriptionTesting := TLabel.Create(ToolchainsPage);
-  LabelToolchainsDescriptionTesting.Parent := ToolchainsPage.Surface;
-  LabelToolchainsDescriptionTesting.Caption := CustomMessage('LabelToolchainsDescriptionTesting');    
-  LabelToolchainsDescriptionTesting.Top := RadioButtonToolchainsTesting.Top 
-    + RadioButtonToolchainsTesting.Height + ScaleY(2);
-  LabelToolchainsDescriptionTesting.Width := ToolchainsPage.SurfaceWidth;
-  SetMultiLinesLabel(LabelToolchainsDescriptionTesting, 2);
-
-  // Testing is only for Vista and greater...
+  // Stable is only for Vista and greater...
   if not IsWindowsVistaOrGreater then
   begin
-    RadioButtonToolchainsTesting.Enabled := False;
-    LabelToolchainsDescriptionTesting.Enabled := False;
-    RadioButtonToolchainsTesting.Caption := 
-      RadioButtonToolchainsTesting.Caption + CustomMessage('ToolchainsTestingDisabled'); 
+    RadioButtonToolchainsStable.Enabled := False;
+    LabelToolchainsDescriptionStable.Enabled := False;
+    RadioButtonToolchainsStable.Caption := 
+      RadioButtonToolchainsStable.Caption + CustomMessage('ToolchainsStableDisabled'); 
   end;
 
   Result := ToolchainsPage.ID;
