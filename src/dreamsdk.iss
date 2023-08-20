@@ -89,6 +89,7 @@
 #define AppMsysBase "{app}\msys\1.0"
 #define AppOptBase AppMsysBase + "\opt"
 #define AppToolchainBase AppOptBase + "\toolchains\dc"
+#define AppToolchainSuperHDirectory AppToolchainBase + "\sh-elf"
 #define AppMainDirectory AppOptBase + "\dreamsdk"
 #define AppHelpersDirectory AppMainDirectory + "\helpers"
 #define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
@@ -254,18 +255,18 @@ Source: "{#SourceDirectoryToolchainOldStable}\*"; DestDir: "{#AppToolchainBase}"
 Source: "{#SourceDirectoryToolchainLegacy}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsLegacy
 
 ; GDB
-Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
-Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27
-Source: "{#SourceDirectoryGdbPython33}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython33
-Source: "{#SourceDirectoryGdbPython34}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython34
-Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython35
-Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
-Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
-Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
-Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
-Source: "{#SourceDirectoryGdbPython310}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython310
-Source: "{#SourceDirectoryGdbPython311}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython311
-Source: "{#SourceDirectoryGdbPython312}\*"; DestDir: "{#AppToolchainBase}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython312
+Source: "{#SourceDirectoryGdb}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
+Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27
+Source: "{#SourceDirectoryGdbPython33}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython33
+Source: "{#SourceDirectoryGdbPython34}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython34
+Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython35
+Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
+Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
+Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
+Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
+Source: "{#SourceDirectoryGdbPython310}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython310
+Source: "{#SourceDirectoryGdbPython311}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython311
+Source: "{#SourceDirectoryGdbPython312}\*"; DestDir: "{#AppToolchainSuperHDirectory}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython312
 
 ; DreamSDK
 Source: "{#SourceDirectoryAppSystemObjects}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
