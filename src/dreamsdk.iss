@@ -655,8 +655,6 @@ const
   CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
 
 var
-  IsUninstallMode: Boolean;
-
   BrowseForFolderExFakePageID,
   IntegratedDevelopmentEnvironmentSettingsPageID, 
   GdbPageID,
@@ -723,7 +721,7 @@ end;
 function InitializeSetup: Boolean;
 begin
   Result := True;
-  IsUninstallMode := False;
+  SetUninstallMode(False);
 
   // Check modules running
   if IsModulesRunning then
@@ -754,7 +752,7 @@ end;
 function InitializeUninstall: Boolean;
 begin
   Result := True;
-  IsUninstallMode := True;
+  SetUninstallMode(True);
 
   // Check modules running
   if IsModulesRunning then

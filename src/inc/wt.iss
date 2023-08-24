@@ -30,6 +30,24 @@ begin
   Result := not IsInString('Error: ', Buffer);
 end;
 
+function IsWindowsTerminalInstalled: Boolean;
+var
+  WindowsTerminalHelperFileName: String;
+  Buffer: String;
+
+begin
+  if IsUninstallMode then
+    Result := RunWindowsTerminalConfigTool(wtiStatus, Buffer)
+  else
+  begin
+    WindowsTerminalHelperFileName := ExpandConstant('{tmp}\' + WT_HELPER_FILE);
+    if not FileExists(WindowsTerminalHelperFileName) then
+      ExtractTemporaryFile(WT_HELPER_FILE);
+    Buffer := RunCommand(WindowsTerminalHelperFileName, True);
+    Result := not IsInString('Error: ', Buffer); 
+  end;
+end;
+
 procedure InstallWindowsTerminalIntegration;
 var
   Buffer: String;
@@ -46,21 +64,11 @@ var
   Buffer: String;
   IsSuccess: Boolean;
 
-begin
-  IsSuccess := RunWindowsTerminalConfigTool(wtiUninstall, Buffer);
-  if not IsSuccess then
-    MsgBox(Format(CustomMessage('WindowsTerminalIntegrationUninstallationFailed'), [Buffer]), mbCriticalError, MB_OK); 
-end;
-
-function IsWindowsTerminalInstalled: Boolean;
-var
-  WindowsTerminalHelperFileName: String;
-  Buffer: String;
-
-begin
-  WindowsTerminalHelperFileName := ExpandConstant( '{tmp}\' + WT_HELPER_FILE );
-  if not FileExists( WindowsTerminalHelperFileName ) then
-    ExtractTemporaryFile( WT_HELPER_FILE );
-  Buffer := RunCommand( WindowsTerminalHelperFileName, True );
-  Result := not IsInString('Error: ', Buffer); 
+begin  
+  if IsWindowsTerminalInstalled then
+  begin
+    IsSuccess := RunWindowsTerminalConfigTool(wtiUninstall, Buffer);
+    if not IsSuccess then
+      MsgBox(Format(CustomMessage('WindowsTerminalIntegrationUninstallationFailed'), [Buffer]), mbCriticalError, MB_OK); 
+  end;
 end;
