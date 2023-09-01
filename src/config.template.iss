@@ -23,6 +23,12 @@
 ; while, so do this only if you are happy with your changes.
 #define CompressionMode COMPRESSION_ENABLED
 
+; Previous version uninstallation mode [UNINSTALL_REQUIRED|UNINSTALL_IGNORED]
+; Set this to UNINSTALL_IGNORED if you want to avoid the automatic
+; uninstallation of a previous DreamSDK version. This feature is only working
+; when InstallerMode is in DEBUG mode.
+#define DebugUninstallHandlingMode UNINSTALL_REQUIRED
+
 ; Digital signature mode [SIGNATURE_ENABLED|SIGNATURE_DISABLED]
 ; This parameter is used for code signing the installer your are generating.
 ; You will need the SignTool utility from Microsoft.

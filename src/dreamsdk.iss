@@ -730,13 +730,15 @@ begin
     Exit;
   end;
 
-#if InstallerMode == RELEASE
+#if InstallerMode == DEBUG && DebugUninstallHandlingMode == UNINSTALL_IGNORED
+  // Ignore uninstallation of a previous version; if requested
+  // Of course, only if installer is in DEBUG mode
+  Result := True;
+#else
   // This test should be the latest!
   // Check if an old version is installed
   Result := Result
     and HandlePreviousVersion('{#MyAppID}', '{#PackageVersion}');
-#else
-  Result := True;
 #endif
 end;
 
