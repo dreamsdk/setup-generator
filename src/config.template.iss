@@ -65,3 +65,5 @@
 #define ToolchainsLegacyVersion "4.7.4"
 #define ToolchainsLegacyVersionNewlib "2.0.0"
 
+; GNU Debugger (GDB)
+#define GdbVersion "10.2"

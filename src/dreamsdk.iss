@@ -558,10 +558,10 @@ ToolchainsOldStable=Old Stable
 LabelToolchainsDescriptionOldStable=Old stable toolchains are based on GCC {#ToolchainsOldStableVersionSuperH} with Newlib {#ToolchainsOldStableVersionNewlib} for SuperH and GCC {#ToolchainsOldStableVersionAICA} for AICA. It's the previous stable toolchains.
 
 ; GNU Debugger for Super H
-GdbTitlePage=GNU Debugger Configuration
+GdbTitlePage=GNU Debugger (GDB) Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
-LabelGdbIntroduction=Customize your GNU Debugger for SuperH installation.
-LabelGdbDescription=You may enable now Python extensions for GDB, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
+LabelGdbIntroduction=Customize your GNU Debugger (GDB) {#GdbVersion} for SuperH installation.
+LabelGdbDescription=You may enable now Python extensions for GDB {#GdbVersion}, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
 GdbPythonNone=Don't enable Python extensions for GNU Debugger (GDB)
 GdbPython27=Python 2.7
 GdbPython33=Python 3.3
