@@ -117,7 +117,8 @@ begin
     RadioButtonToolchainsStable.Enabled := False;
     LabelToolchainsDescriptionStable.Enabled := False;
     RadioButtonToolchainsStable.Caption := 
-      RadioButtonToolchainsStable.Caption + CustomMessage('ToolchainsStableDisabled'); 
+      RadioButtonToolchainsStable.Caption + CustomMessage('ToolchainsStableDisabled');
+    RadioButtonToolchainsOldStable.Checked := True; 
   end;
 
   Result := ToolchainsPage.ID;
