@@ -337,6 +337,7 @@ Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDre
 Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"; MinVersion: 0,6.2
 Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"; MinVersion: 0,6.2
 Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"; MinVersion: 0,6.2
+Name: "{#AppShortcutsDirectory}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDreamcastWiki}"; Filename: "https://dreamcast.wiki"; MinVersion: 0,6.2
 
 ; Tools
 Name: "{group}\{cm:ToolsGroupDirectory}"; Filename: "{#AppShortcutsDirectory}\{cm:ToolsGroupDirectory}"; Flags: preventpinning excludefromshowinnewinstall; MinVersion: 0,6.2
@@ -394,6 +395,7 @@ Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkMarcusDreamcast}"; Filenam
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSegaDreamcastGitHub}"; Filename: "https://github.com/sega-dreamcast"; OnlyBelowVersion: 0,6.2
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSimulantDiscordChannel}"; Filename: "https://discord.gg/TRx94EV"; OnlyBelowVersion: 0,6.2
 Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkSiZiOUS}"; Filename: "http://www.sizious.com"; OnlyBelowVersion: 0,6.2
+Name: "{group}\{cm:UsefulLinksGroupDirectory}\{cm:LinkDreamcastWiki}"; Filename: "https://dreamcast.wiki"; OnlyBelowVersion: 0,6.2
 
 ;
 ; Tools
@@ -460,6 +462,7 @@ LinkMarcusDreamcast=Marcus Comstedt (zeldin) - Dreamcast Programming
 LinkSegaDreamcastGitHub=Sega Dreamcast GitHub
 LinkSimulantDiscordChannel=Simulant Engine - Discord Channel
 LinkSiZiOUS=SiZiOUS Serial Koder
+LinkDreamcastWiki=Dreamcast Wiki
 
 ; Tools
 ToolsGroupDirectory=Tools
