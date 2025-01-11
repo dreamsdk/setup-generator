@@ -1,15 +1,25 @@
 [Code]
 
+function GetMsysInstallationPath(Dummy: String): String;
+begin
+  Result := ExpandConstant('{app}');
+  if IsFoundationMinGW then
+    Result := ExpandConstant('{app}\msys\1.0\');
+end;
+
 procedure PatchMountPoint;
 var
   InstallPath, fstabFileName: String;
 
 begin
-  InstallPath := ExpandConstant('{app}');
-  StringChangeEx(InstallPath, '\', '/', True);
-  fstabFileName := ExpandConstant('{app}\msys\1.0\etc\fstab');
-  PatchFile(fstabFileName, '{app}', InstallPath);
-  PatchFile(fstabFileName + '.sample', '{app}', InstallPath); 
+  if IsFoundationMinGW then
+  begin
+    InstallPath := ExpandConstant('{app}');
+    StringChangeEx(InstallPath, '\', '/', True);
+    fstabFileName := ExpandConstant('{app}\msys\1.0\etc\fstab');
+    PatchFile(fstabFileName, '{app}', InstallPath);
+    PatchFile(fstabFileName + '.sample', '{app}', InstallPath); 
+  end;
 end;
 
 procedure SetupApplication;
@@ -20,7 +30,7 @@ var
   RubySwitch: String;
 
 begin
-  ManagerFileName := ExpandConstant('{#AppManagerExeName}');
+  ManagerFileName := ExpandConstant('{app}\{#AppManagerExeName}');
   
   RubySwitch := '';
   if IsRubyEnabled then
@@ -41,7 +51,7 @@ var
   VersionFileName: String;
 
 begin
-  VersionFileName := ExpandConstant('{#AppMainDirectory}\' + 'VERSION');
+  VersionFileName := ExpandConstant('{app}\{#AppMainDirectory}\' + 'VERSION');
   PatchFile(VersionFileName, '(RELEASE)', '{#MyAppVersion}');  
   PatchFile(VersionFileName, '(DATE)', '{#BuildDateTime}');
   PatchFile(VersionFileName, '(BUILD_NUMBER)', '{#FullVersionNumber}');
@@ -49,12 +59,14 @@ end;
 
 procedure CreateJunctions;
 begin
-  CreateJunction('{#AppMsysBase}', '{app}\usr');
+  if IsFoundationMinGW then
+    CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr');
 end;
 
 procedure RemoveJunctions;
 begin
-  RemoveJunction('{app}\usr');
+//  if IsFoundationMinGW then
+    RemoveJunction('{app}\usr');
 end;
 
 procedure AddGitSafeDirectories;
