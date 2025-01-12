@@ -1,7 +1,6 @@
 ﻿[Code]
 // Thanks to Jernej Simončič, Lex Li and XhmikosR.
 // https://blog.lextudio.com/inno-setup-script-sample-for-version-comparison-advanced-version-c398d0ef18ad
-// https://github.com/XhmikosR/psvince
 
 const
   VERSION_IDENTICAL = 0;

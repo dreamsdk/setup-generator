@@ -9,7 +9,8 @@ var
 begin
   Result := False;
   
-  Directory := ExpandConstant('{code:GetMsysInstallationPath}\{#AppToolchainBase}\') + Directory;
+  Directory := ExpandConstant(
+    Format('{code:GetApplicationToolchainBasePath}\%s', [Directory]));
   StringChangeEx(Directory, '\', '/', True);  
        
   Log(Format('AddGitSafeDirectory [Directory: "%s"]', [

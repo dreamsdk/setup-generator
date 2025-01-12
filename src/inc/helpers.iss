@@ -1,12 +1,5 @@
 [Code]
 
-function GetMsysInstallationPath(Dummy: String): String;
-begin
-  Result := ExpandConstant('{app}');
-  if IsFoundationMinGW then
-    Result := ExpandConstant('{app}\msys\1.0\');
-end;
-
 procedure PatchMountPoint;
 var
   InstallPath, fstabFileName: String;
@@ -30,7 +23,7 @@ var
   RubySwitch: String;
 
 begin
-  ManagerFileName := ExpandConstant('{app}\{#AppManagerExeName}');
+  ManagerFileName := ExpandConstant('{code:GetApplicationComponentManagerFilePath}');
   
   RubySwitch := '';
   if IsRubyEnabled then
@@ -51,7 +44,7 @@ var
   VersionFileName: String;
 
 begin
-  VersionFileName := ExpandConstant('{app}\{#AppMainDirectory}\' + 'VERSION');
+  VersionFileName := ExpandConstant('{code:GetApplicationMainPath}\VERSION');
   PatchFile(VersionFileName, '(RELEASE)', '{#MyAppVersion}');  
   PatchFile(VersionFileName, '(DATE)', '{#BuildDateTime}');
   PatchFile(VersionFileName, '(BUILD_NUMBER)', '{#FullVersionNumber}');
@@ -59,13 +52,15 @@ end;
 
 procedure CreateJunctions;
 begin
+  Log('CreateJunctions');
   if IsFoundationMinGW then
     CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr');
 end;
 
 procedure RemoveJunctions;
 begin
-//  if IsFoundationMinGW then
+  Log('RemoveJunctions');
+  if IsFoundationMinGW then
     RemoveJunction('{app}\usr');
 end;
 
@@ -76,3 +71,39 @@ begin
   AddGitSafeDirectory('dcload\dcload-serial');
   AddGitSafeDirectory('dcload\dcload-ip');
 end;
+
+procedure LoadFoundationFromFile;
+var
+  Buffer: AnsiString;
+  FoundationIndex: Integer;
+
+begin
+  Log('LoadFoundationFromFile');
+  LoadStringFromFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer);
+  FoundationIndex := StrToIntDef(Buffer, -1);
+  case FoundationIndex of
+    1: SetFoundation(efkMinGWMSYS);
+    2: SetFoundation(efkMinGW64MSYS2);
+  end;
+end;
+
+procedure SaveFoundationToFile;
+var
+  Buffer: String;
+  
+begin
+  Log('SaveFoundationToFile');
+  Buffer := IntToStr(Ord(Foundation));
+  SaveStringToFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer, False);
+end;
+
+procedure RemoveFoundationFile;
+var
+  FileName: String;
+
+begin
+  FileName := ExpandConstant('{code:GetFoundationFilePath}');
+  if FileExists(FileName) then
+    DeleteFile(FileName);
+end;
+

@@ -53,14 +53,6 @@ begin
   WizardForm.ComponentsList.OnClickCheck := @ComponentsListClickCheck;
 end;
 
-function IsProcessRunning(const ProcessName: String): Boolean;
-begin
-  if IsUninstallMode then
-    Result := IsModuleLoadedU(ProcessName)
-  else
-    Result := IsModuleLoaded(ProcessName);
-end;
-
 function IsModulesRunning: Boolean;
 begin
   Result := False;
@@ -100,27 +92,12 @@ end;
 
 procedure FinalizeSetup;
 begin
+  SaveFoundationToFile;
   SetPackageVersion;
   PatchMountPoint;
   SetupApplication;
   CreateJunctions;
   AddGitSafeDirectories;
-end;
-
-function InitializeUninstall: Boolean;
-begin
-  Result := True;
-  SetUninstallMode(True);
-
-  // Check modules running
-  if IsModulesRunning then
-  begin
-    Result := False;
-    Exit;
-  end;
-
-  // Unload the DLL, otherwise the dll is not deleted
-  UnloadDLL(ExpandConstant('{#PSVinceLibrary}'));
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -221,12 +198,7 @@ begin
       Result := ConfirmFoundationMinGW;
       if not Result then
         Exit;      
-    end;
-        
-    Log(Format('Foundation: IsFoundationMinGW64=%d, IsFoundationMinGW=%d', [
-      IsFoundationMinGW64,
-      IsFoundationMinGW
-    ]));
+    end;       
   end;
 
   // Code::Blocks Page
@@ -295,35 +267,90 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if (CurStep = ssPostInstall) then
-  begin
-    if IsTaskSelected('envpath') then
-      EnvAddPath(ExpandConstant('{app}\{#AppMainDirectory}'));
-    if IsTaskSelected('wtconfig') then
-      InstallWindowsTerminalIntegration;
-  end;
-end;
+  case CurStep of
+    ssInstall:
+      begin
+#if InstallerMode == DEBUG
+        LogCalculatedTargets;
+#endif
+      end;
 
-procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-begin
-  if (CurUninstallStep = usUninstall) then
-  begin
-    RemoveJunctions;
-    UninstallCodeBlocksIntegration;
-    UninstallWindowsTerminalIntegration;
-  end;	
-  if (CurUninstallStep = usPostUninstall) then
-    EnvRemovePath(ExpandConstant('{app}\{#AppMainDirectory}'));
+    ssPostInstall:
+      begin
+        if IsTaskSelected('envpath') then
+          EnvAddPath(ExpandConstant('{code:GetApplicationMainPath}'));
+        if IsTaskSelected('wtconfig') then
+          InstallWindowsTerminalIntegration;
+      end;
+
+  end;
 end;
 
 procedure InitializeWizard;
 begin
+  // Initialize the foundation on MinGW/MSYS, the legacy foundation
+  // This is critical as this choice can be altered on Windows 10+ but not on
+  // older Windows.
+  SetFoundation(efkMinGWMSYS);
+
+  // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
+
+  // Creates pages in the specified order
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
   RubyPageID := CreateRubyPage;
   GdbPageID := CreateGdbPage;
   ToolchainsPageID := CreateToolchainsPage;
   FoundationPageID := CreateFoundationPage;
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+
+  // Initialize the components list dropdown
   HandleComponentsListTypesCombo;
+end;
+
+//=============================================================================
+// UNINSTALL
+//=============================================================================
+
+function InitializeUninstall: Boolean;
+begin
+  Result := True;
+  SetUninstallMode(True);
+
+  // Check modules running
+  if IsModulesRunning then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  // Unload the DLL, otherwise the dll is not deleted
+  PSVinceUnload;
+
+  // As we are on Uninstall, we can't change the foundation base, but we must
+  // retrieve it as this has an impact on the uninstallation
+  LoadFoundationFromFile;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  case CurUninstallStep of
+    
+    usUninstall:
+      begin
+#if InstallerMode == DEBUG
+        LogCalculatedTargets;
+#endif
+        RemoveJunctions;
+        UninstallCodeBlocksIntegration;
+        UninstallWindowsTerminalIntegration;
+      end;
+    
+    usPostUninstall:
+      begin
+        EnvRemovePath(ExpandConstant('{code:GetApplicationMainPath}'));
+        RemoveFoundationFile;
+      end;
+
+  end;  
 end;

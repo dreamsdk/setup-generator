@@ -2,7 +2,7 @@
 
 function GetMakeDirectoryLinkFileName: String;
 begin
-  Result := ExpandConstant('{code:GetMsysInstallationPath}\{#AppHelpersDirectory}\mkdirln.exe');
+  Result := ExpandConstant('{code:GetApplicationHelpersPath}\mkdirln.exe');
 end;
 
 // Create a directory junction (equivalent to symbolic link)

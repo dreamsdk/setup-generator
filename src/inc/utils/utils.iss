@@ -1,12 +1,9 @@
 [Code]
 
 const
-  sEmptyStr = '';
+  sEmptyStr = '';  
   sLineBreak = #13#10;
   MAX_RAND_SEED = $FFFFFFFF;  
-
-var
-  UninstallMode: Boolean;
       
 // Thanks Michel (Phidels.com)
 function Left(SubStr, S: String): String;
@@ -182,14 +179,4 @@ begin
   until Length(curString) = 0;
 
   Result:= tmpArray;
-end;
-
-procedure SetUninstallMode(Mode: Boolean);
-begin
-  UninstallMode := Mode;
-end;
-
-function IsUninstallMode: Boolean;
-begin
-  Result := UninstallMode;
 end;
