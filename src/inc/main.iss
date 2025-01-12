@@ -273,6 +273,7 @@ begin
 #if InstallerMode == DEBUG
         LogCalculatedTargets;
 #endif
+        RenamePreviousDirectoriesBeforeInstallation;
       end;
 
     ssPostInstall:
@@ -341,6 +342,7 @@ begin
 #if InstallerMode == DEBUG
         LogCalculatedTargets;
 #endif
+        RemoveFoundationFile;
         RemoveJunctions;
         UninstallCodeBlocksIntegration;
         UninstallWindowsTerminalIntegration;
@@ -349,7 +351,6 @@ begin
     usPostUninstall:
       begin
         EnvRemovePath(ExpandConstant('{code:GetApplicationMainPath}'));
-        RemoveFoundationFile;
       end;
 
   end;  

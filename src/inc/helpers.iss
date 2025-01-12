@@ -107,3 +107,11 @@ begin
     DeleteFile(FileName);
 end;
 
+procedure RenamePreviousDirectoriesBeforeInstallation;
+begin
+  Log('RenamePreviousDirectoriesBeforeInstallation');
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
+end;
+
+

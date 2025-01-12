@@ -77,6 +77,7 @@
 #include "inc/helpers/inet.iss"
 #include "inc/helpers/preq.iss"
 #include "inc/helpers/psvince.iss"
+#include "inc/helpers/renbckp.iss"
 #include "inc/helpers/wt.iss"
 
 #include "inc/pages/foundation.iss"
@@ -207,10 +208,6 @@ Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environm
 Type: dirifempty; Name: "{code:GetApplicationSupportPath}\ide\codeblocks"
 Type: dirifempty; Name: "{code:GetApplicationSupportPath}\ide"
 Type: dirifempty; Name: "{code:GetApplicationSupportPath}"
-
-[InstallDelete]
-//Type: filesandordirs; Name: "{code:GetMsysInstallationPath}\{#AppToolchainBase}\*"
-//Type: filesandordirs; Name: "{code:GetMsysInstallationPath}\{#AppOptBase}\mruby\*"
 
 [Dirs]
 Name: "{code:GetApplicationShortcutsPath}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
