@@ -4,9 +4,9 @@ type
 
 const  
   CB_HELPER_FILE = '{tmp}\cbhelper.exe';
-  CB_PATCH_FILE = '{app}\msys\1.0\opt\dreamsdk\packages\ide\codeblocks\codeblocks-patcher.exe';
+  CB_PATCH_FILE = '{code:GetApplicationPackagesPath}\ide\codeblocks\codeblocks-patcher.exe';
    
-  CB_BACKUP_DIR = '{app}\support\ide\codeblocks';
+  CB_BACKUP_DIR = '{code:GetApplicationSupportPath}\ide\codeblocks';
         
 var
   IntegratedDevelopmentEnvironmentPage: TWizardPage;

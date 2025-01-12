@@ -4,7 +4,7 @@ type
 
 const
   WT_HELPER_FILE = 'wtcheck.exe';    
-  WT_CONFIG_FILE = '{app}\msys\1.0\opt\dreamsdk\helpers\wtconfig.exe';
+  WT_CONFIG_FILE = '{code:GetApplicationHelpersPath}\wtconfig.exe';
 
 function RunWindowsTerminalConfigTool(
   const Operation: TWindowsTerminalIntegrationOperation;
