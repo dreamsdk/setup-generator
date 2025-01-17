@@ -80,11 +80,12 @@ var
 begin
   Log('LoadFoundationFromFile');
   LoadStringFromFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer);
-  FoundationIndex := StrToIntDef(Buffer, -1);
-  case FoundationIndex of
-    1: SetFoundation(efkMinGWMSYS);
-    2: SetFoundation(efkMinGW64MSYS2);
-  end;
+  FoundationIndex := StrToIntDef(Buffer, -1);  
+  Log(Format('  FoundationIndex: %d', [FoundationIndex]));
+  if (FoundationIndex = 2) then
+    SetFoundation(efkMinGW64MSYS2)
+  else
+    SetFoundation(efkMinGWMSYS);  
 end;
 
 procedure SaveFoundationToFile;
@@ -114,4 +115,29 @@ begin
   RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
 end;
 
+function VersionSanitizer(const VersionNumber: String): String;
+begin
+  Result := VersionNumber;  
+  StringChangeEx(Result, 'R', '', True);
+  StringChangeEx(Result, '-dev', '', True);
+  Log(Format('VersionSanitizer: Old=%s, New=%s', [VersionNumber, Result]));
+end;
 
+procedure VersionBeforeUninstall;
+begin
+  Log('VersionBeforeUninstall called');
+  
+  LoadFoundationFromFile;
+
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
+end;
+
+procedure GlobalInitialization;
+begin
+  Log('GlobalInitialization called');
+
+  SetWizardDirValueInitialized(False);
+  VersionSetDynamicFunctionSanitize(@VersionSanitizer);
+  SetDoBeforeUninstall(@VersionBeforeUninstall);
+end;

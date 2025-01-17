@@ -24,16 +24,24 @@
 // PATHS
 //=============================================================================
 
-function GetMsysInstallationPath(Dummy: String): String;
+function GetApplicationRootPath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{app}');
+  if (not UninstallMode) and (not IsWizardDirValueInitialized) then
+    Result := GetRegistryValue('{#MyAppID}', 'Inno Setup: App Path')
+  else
+    Result := ExpandConstant('{app}');
+end;
+
+function GetMsysInstallationPath(Dummy: String): String;
+begin  
+  Result := ExpandConstant('{code:GetApplicationRootPath}');
   if IsFoundationMinGW then
-    Result := ExpandConstant('{app}\msys\1.0\');
+    Result := ExpandConstant('{code:GetApplicationRootPath}\msys\1.0\');
 end;
 
 function GetApplicationSupportPath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{app}\{#AppSupportDirectoryName}');
+  Result := ExpandConstant('{code:GetApplicationRootPath}\{#AppSupportDirectoryName}');
 end;
 
 function GetApplicationShortcutsPath(Dummy: String): String;
@@ -124,7 +132,8 @@ var
 begin
   Dummy := sEmptyStr;
 
-  Log('--- Calculated Target Directory Paths ---');
+  Log('--- Calculated Target Directory Paths ---');  
+  Log(Format('GetApplicationRootPath: "%s"', [GetApplicationRootPath(Dummy)]));
   Log(Format('GetApplicationSupportPath: "%s"', [GetApplicationSupportPath(Dummy)]));
   Log(Format('GetApplicationShortcutsPath: "%s"', [GetApplicationShortcutsPath(Dummy)]));
   Log(Format('GetApplicationOptBasePath: "%s"', [GetApplicationOptBasePath(Dummy)]));

@@ -10,6 +10,7 @@ var
 
 begin
   Result := True;
+  Log(Format('RenameFileOrDirectoryAsBackup: "%s"', [TargetFileOrDirectory]));
   if FileExists(TargetFileOrDirectory) or DirExists(TargetFileOrDirectory) then
   begin
     RenameBackupHelperFileName := ExpandConstant('{tmp}\' + RENBCKP_HELPER_FILE);

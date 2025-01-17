@@ -70,6 +70,7 @@ function InitializeSetup: Boolean;
 begin
   Result := True;
   SetUninstallMode(False);
+  GlobalInitialization;
 
   // Check modules running
   if IsModulesRunning then
@@ -114,6 +115,7 @@ begin
       MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
       Exit;
     end;
+    SetWizardDirValueInitialized(True);
   end;
 
   // Toolchains Page
@@ -289,11 +291,6 @@ end;
 
 procedure InitializeWizard;
 begin
-  // Initialize the foundation on MinGW/MSYS, the legacy foundation
-  // This is critical as this choice can be altered on Windows 10+ but not on
-  // older Windows.
-  SetFoundation(efkMinGWMSYS);
-
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
 
@@ -317,6 +314,7 @@ function InitializeUninstall: Boolean;
 begin
   Result := True;
   SetUninstallMode(True);
+  GlobalInitialization;
 
   // Check modules running
   if IsModulesRunning then

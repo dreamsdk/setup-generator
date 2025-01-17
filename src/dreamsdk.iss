@@ -65,6 +65,7 @@
 #include "inc/utils/components.iss"
 #include "inc/utils/ui.iss"
 #include "inc/utils/environ.iss"
+#include "inc/utils/registry.iss"
 #include "inc/utils/version.iss"
 
 #include "inc/global.iss"
@@ -78,6 +79,7 @@
 #include "inc/helpers/preq.iss"
 #include "inc/helpers/psvince.iss"
 #include "inc/helpers/renbckp.iss"
+#include "inc/helpers/version.iss"
 #include "inc/helpers/wt.iss"
 
 #include "inc/pages/foundation.iss"

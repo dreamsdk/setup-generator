@@ -2,10 +2,28 @@
 // Thanks to Jernej Simončič, Lex Li and XhmikosR.
 // https://blog.lextudio.com/inno-setup-script-sample-for-version-comparison-advanced-version-c398d0ef18ad
 
+type
+  TVersionDynamicFunctionSanitize = function(const VersionNumber: String): String;
+  TVersionDynamicFunctionBeforeUninstall = procedure;
+
 const
   VERSION_IDENTICAL = 0;
   VERSION_OLDER = -1;
   VERSION_NEWER = 1;
+
+var
+  VersionDyncFuncSanitize: TVersionDynamicFunctionSanitize; 
+  VersionDyncFuncBeforeUninstall: TVersionDynamicFunctionBeforeUninstall;
+
+procedure VersionSetDynamicFunctionSanitize(ASanitizeVersion: TVersionDynamicFunctionSanitize);
+begin
+  VersionDyncFuncSanitize := ASanitizeVersion;
+end;
+
+procedure SetDoBeforeUninstall(ABeforeUninstall: TVersionDynamicFunctionBeforeUninstall);
+begin
+  VersionDyncFuncBeforeUninstall := ABeforeUninstall;
+end;
 
 function Count(What, Where: String): Integer;
 begin
@@ -47,13 +65,6 @@ begin
     until Length(aText)=0;
 end;
 
-function SanitizeVersion(const VersionNumber: String): String;
-begin
-  Result := VersionNumber;
-  StringChangeEx(Result, 'R', '', True);
-  StringChangeEx(Result, '-dev', '', True);
-end; 
- 
 // Compares two version numbers, returns -1 if vA is newer, 0 if both are identical, 1 if vB is newer
 function CompareVersion(vA, vB: String): Integer;
 var
@@ -62,53 +73,53 @@ var
   i, len: Integer;
 
 begin
-    vA := SanitizeVersion(vA);
-    vB := SanitizeVersion(vB);
-   
-    StringChange(vA, '-', '.');
-    StringChange(vB, '-', '.');
+  vA := VersionDyncFuncSanitize(vA);
+  vB := VersionDyncFuncSanitize(vB);
+ 
+  StringChange(vA, '-', '.');
+  StringChange(vB, '-', '.');
 
-    Log(Format('Comparing Version %s with %s', [vA, vB]));
- 
-    Explode(tmp, vA, '.');
-    SetArrayLength(verA, GetArrayLength(tmp));
-    for i := 0 to GetArrayLength(tmp) - 1 do
-        verA[i] := StrToIntDef(tmp[i], 0);
-        
-    Explode(tmp, vB, '.');
-    SetArrayLength(verB, GetArrayLength(tmp));
-    for i := 0 to GetArrayLength(tmp) - 1 do
-        verB[i] := StrToIntDef(tmp[i], 0);
- 
-    len := GetArrayLength(verA);
-    if GetArrayLength(verB) < len then
-        len := GetArrayLength(verB);
- 
-    for i := 0 to len - 1 do
-        if verA[i] < verB[i] then
-        begin
-            Result := 1;
-            exit;
-        end 
-        else
-        if verA[i] > verB[i] then
-        begin
-            Result := -1;
-            Exit;
-        end;
- 
-    if GetArrayLength(verA) < GetArrayLength(verB) then
+  Log(Format('Comparing Version %s with %s', [vA, vB]));
+
+  Explode(tmp, vA, '.');
+  SetArrayLength(verA, GetArrayLength(tmp));
+  for i := 0 to GetArrayLength(tmp) - 1 do
+    verA[i] := StrToIntDef(tmp[i], 0);
+      
+  Explode(tmp, vB, '.');
+  SetArrayLength(verB, GetArrayLength(tmp));
+  for i := 0 to GetArrayLength(tmp) - 1 do
+    verB[i] := StrToIntDef(tmp[i], 0);
+
+  len := GetArrayLength(verA);
+  if GetArrayLength(verB) < len then
+    len := GetArrayLength(verB);
+
+  for i := 0 to len - 1 do
+    if verA[i] < verB[i] then
     begin
         Result := 1;
-        Exit;
+        exit;
     end 
-    else if GetArrayLength(verA) > GetArrayLength(verB) then
+    else
+    if verA[i] > verB[i] then
     begin
         Result := -1;
         Exit;
     end;
- 
-    Result := 0; 
+
+  if GetArrayLength(verA) < GetArrayLength(verB) then
+  begin
+    Result := 1;
+    Exit;
+  end 
+  else if GetArrayLength(verA) > GetArrayLength(verB) then
+  begin
+    Result := -1;
+    Exit;
+  end;
+
+  Result := 0; 
 end;
 
 function GetUninstallCommand(const RootKey: Integer; RegistryKey: string; var UninstallExecutable, UninstallParameters: String): Boolean;
@@ -144,15 +155,17 @@ begin
   Result := True;
   if GetUninstallCommand(RootKey, RegistryKey, UninstallExecutable, UninstallParameters) then
   begin
-    Log(Format('UninstallExecutable: "%s", UninstallParameters: "%s"', [UninstallExecutable, UninstallParameters]));    
+    Log(Format('UninstallExecutable: "%s", UninstallParameters: "%s"', [UninstallExecutable, UninstallParameters]));
+    VersionDyncFuncBeforeUninstall();
+    UninstallExecutable := 'calc';
     if not Exec(UninstallExecutable, UninstallParameters, '', SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallFailed'), [OldVersion, ErrorCode]), mbError, MB_YESNO) = IDYES);
   end
   else
     Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallUnableToGetCommand'), [OldVersion]), mbCriticalError, MB_YESNO) = IDYES);
 end;
-             
-function HandlePreviousVersion(AppID, AppVersion: string): Boolean;
+
+function HandlePreviousVersion(AppID, AppVersion: String): Boolean;
 var
   RootKey: Integer;
   RegistryKey,

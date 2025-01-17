@@ -8,7 +8,8 @@ type
 
 var
   Foundation: TEnvironmentFoundationKind;
-  UninstallMode: Boolean;
+  UninstallMode,
+  WizardDirValueInitialized: Boolean;
 
 function IsUninstallMode: Boolean;
 begin
@@ -18,6 +19,16 @@ end;
 procedure SetUninstallMode(SelectedMode: Boolean);
 begin
   UninstallMode := SelectedMode;
+end;
+
+function IsWizardDirValueInitialized: Boolean;
+begin
+  Result := WizardDirValueInitialized;
+end;
+
+procedure SetWizardDirValueInitialized(ValueInitialized: Boolean);
+begin
+  WizardDirValueInitialized := ValueInitialized;
 end;
 
 function IsFoundationPossibleMinGW64: Boolean;
