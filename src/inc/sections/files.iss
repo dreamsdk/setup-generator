@@ -69,3 +69,8 @@ Source: "{#SourceDirectoryTools}\mrwriter\*"; DestDir: "{code:GetApplicationTool
 Source: "{#SourceDirectoryTools}\buildsbi\*"; DestDir: "{code:GetApplicationToolsPath}\buildsbi"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\buildsbi
 Source: "{#SourceDirectoryTools}\sbinducr\*"; DestDir: "{code:GetApplicationToolsPath}\sbinducr"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\sbinducr
 Source: "{#SourceDirectoryTools}\vmutool\*"; DestDir: "{code:GetApplicationToolsPath}\vmutool"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\vmutool
+
+[Dirs]
+Name: "{code:GetApplicationShortcutsPath}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
+Name: "{code:GetApplicationShortcutsPath}\{cm:UsefulLinksGroupDirectory}"; MinVersion: 0,6.2
+Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
