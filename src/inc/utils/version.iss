@@ -157,7 +157,6 @@ begin
   begin
     Log(Format('UninstallExecutable: "%s", UninstallParameters: "%s"', [UninstallExecutable, UninstallParameters]));
     VersionDyncFuncBeforeUninstall();
-    UninstallExecutable := 'calc';
     if not Exec(UninstallExecutable, UninstallParameters, '', SW_HIDE, ewWaitUntilTerminated, ErrorCode) then
       Result := (MsgBox(Format(CustomMessage('PreviousVersionUninstallFailed'), [OldVersion, ErrorCode]), mbError, MB_YESNO) = IDYES);
   end

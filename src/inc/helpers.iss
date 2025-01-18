@@ -2,7 +2,8 @@
 
 procedure PatchMountPoint;
 var
-  InstallPath, fstabFileName: String;
+  InstallPath,
+  fstabFileName: String;
 
 begin
   if IsFoundationMinGW then

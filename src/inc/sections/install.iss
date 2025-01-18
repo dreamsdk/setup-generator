@@ -1,5 +1,5 @@
 [Registry]
-Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
+Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "{#MyAppEnvironmentVariable}"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
 [Dirs]
 Name: "{code:GetApplicationShortcutsPath}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2

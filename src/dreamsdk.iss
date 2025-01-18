@@ -37,6 +37,13 @@
 #define MyAppVersion AppVersion
 #endif
 
+; Environment variable
+#if InstallerMode == RELEASE
+#define MyAppEnvironmentVariable "DREAMSDK_HOME"
+#else
+#define MyAppEnvironmentVariable "DREAMSDK_HOME_DEBUG"
+#endif
+
 ; Application names
 #define MyAppNameHelp MyAppName + " Help"
 #define AppMainName "Shell"
@@ -154,6 +161,10 @@ Compression=none
 SignTool=SignTool $f
 SignedUninstaller=yes
 #endif
+
+// ============================================================================
+// SECTIONS
+// ============================================================================
 
 #include "inc/sections/labels.iss"
 
