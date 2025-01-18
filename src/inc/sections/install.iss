@@ -1,5 +1,12 @@
-[Files]
+[Registry]
+Root: "HKLM"; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: "DREAMSDK_HOME"; ValueData: "{app}"; Flags: preservestringtype uninsdeletevalue
 
+[Dirs]
+Name: "{code:GetApplicationShortcutsPath}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
+Name: "{code:GetApplicationShortcutsPath}\{cm:UsefulLinksGroupDirectory}"; MinVersion: 0,6.2
+Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
+
+[Files]
 ; Install helpers
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 
@@ -70,7 +77,3 @@ Source: "{#SourceDirectoryTools}\buildsbi\*"; DestDir: "{code:GetApplicationTool
 Source: "{#SourceDirectoryTools}\sbinducr\*"; DestDir: "{code:GetApplicationToolsPath}\sbinducr"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\sbinducr
 Source: "{#SourceDirectoryTools}\vmutool\*"; DestDir: "{code:GetApplicationToolsPath}\vmutool"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\vmutool
 
-[Dirs]
-Name: "{code:GetApplicationShortcutsPath}\{cm:DocumentationGroupDirectory}"; MinVersion: 0,6.2
-Name: "{code:GetApplicationShortcutsPath}\{cm:UsefulLinksGroupDirectory}"; MinVersion: 0,6.2
-Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
