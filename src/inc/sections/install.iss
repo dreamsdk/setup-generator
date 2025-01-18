@@ -25,7 +25,7 @@ Source: "{#SourceDirectoryAppSystemObjectsMSYS}\*"; DestDir: "{app}"; Flags: ign
 Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Check: IsFoundationMinGW
 
 ; MinGW-w64/MSYS2 Base
-Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Check: IsFoundationMinGW64; Excludes: "clang32\*,clang64\*,clangarm64\*,mingw32\*,ucrt64\*,autorebase.bat,clang32.exe,clang32.ico,clang32.ini,clang64.exe,clang64.ico,clang64.ini,clangarm64.exe,clangarm64.ico,clangarm64.ini,mingw32.exe,mingw32.ico,mingw32.ini,mingw64.exe,mingw64.ico,mingw64.ini,msys2.exe,msys2.ico,msys2.ini,msys2_shell.cmd,test.log,ucrt64.exe,ucrt64.ico,ucrt64.ini"
+Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Check: IsFoundationMinGW64; Excludes: "clang32,clang64,clangarm64,mingw32,ucrt64,autorebase.bat,clang32.exe,clang32.ico,clang32.ini,clang64.exe,clang64.ico,clang64.ini,clangarm64.exe,clangarm64.ico,clangarm64.ini,mingw32.exe,mingw32.ico,mingw32.ini,mingw64.exe,mingw64.ico,mingw64.ini,msys2.exe,msys2.ico,msys2.ini,msys2_shell.cmd,test.log,ucrt64.exe,ucrt64.ico,ucrt64.ini"
 Source: "{#SourceDirectoryAppSystemObjectsMSYS2}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base; Check: IsFoundationMinGW64
 
 ; Common
