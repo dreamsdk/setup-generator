@@ -38,10 +38,10 @@
 #endif
 
 ; Environment variable
-#if InstallerMode == RELEASE
-#define MyAppEnvironmentVariable "DREAMSDK_HOME"
-#else
+#if InstallerMode == DEBUG && EnvironmentHomeVariableMode == DEBUG
 #define MyAppEnvironmentVariable "DREAMSDK_HOME_DEBUG"
+#else
+#define MyAppEnvironmentVariable "DREAMSDK_HOME"
 #endif
 
 ; Application names

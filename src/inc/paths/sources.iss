@@ -19,6 +19,7 @@
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons-cmd"
 #define SourceDirectoryTools SourceDirectoryBase + "\addons-gui"
 #define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
+#define SourceDirectoryAppCommonObjects SourceDirectoryBase + "\dreamsdk-objects"
 #define SourceDirectorySystemUtilities SourceDirectoryBase + "\utilities"
 
 // Toolchains

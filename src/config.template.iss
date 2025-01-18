@@ -16,6 +16,13 @@
 ; to generate the proper ".sources" directory.
 #define SourceMode RELEASE
 
+; Environment home variable mode [DEBUG|RELEASE]
+; If set to DEBUG, the system environment variable will be set to 
+; "DREAMSDK_HOME_DEBUG". If set to RELEASE, the variable will be named
+; "DREAMSDK_HOME". This feature is only working when InstallerMode is in 
+; DEBUG mode.
+#define EnvironmentHomeVariableMode RELEASE
+
 ; Compression mode [COMPRESSION_ENABLED|COMPRESSION_DISABLED]
 ; Set this to COMPRESSION_DISABLED if you just want to test the setup generation
 ; with real files (i.e., using the ".sources" directory). Then set this flag to
