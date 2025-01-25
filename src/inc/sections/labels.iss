@@ -86,8 +86,11 @@ TypeCompactInstallation=Compact installation
 TypeCustomInstallation=Custom installation
 
 ; Components: List
+ComponentKeywordRequired= (required)
 ComponentMain=Base program files (required)
-ComponentBase=MinGW/MSYS and Win32 toolchain (required)
+ComponentBase=Foundation and Win32 toolchain (required)
+ComponentBase32=MinGW/MSYS
+ComponentBase64=MinGW-w64/MSYS2
 ComponentToolchains=Super-H and AICA toolchains (required)
 ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
 ComponentIDE=Support for Integrated Development Environment (IDE)
@@ -124,14 +127,6 @@ ToolchainsTitlePage=Toolchains Configuration
 ToolchainsSubtitlePage=Which toolchains version do you want to use?
 LabelToolchainsIntroduction=Customize your toolchains installation.
 LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
-ToolchainsStable=Stable
-ToolchainsStableDisabled= (unsupported on your OS)
-LabelToolchainsDescriptionStable=Stable toolchains are based on GCC {#ToolchainsStableVersionSuperH} with Newlib {#ToolchainsStableVersionNewlib} for SuperH and GCC {#ToolchainsStableVersionAICA} for AICA. It's the current toolchains officially supported.
-ToolchainsLegacy=Legacy
-ToolchainsLegacyConfirmation=Legacy toolchains are pretty old, are you sure to continue? You can change that later in {#FullAppManagerName}.
-LabelToolchainsDescriptionLegacy=Legacy toolchains are based on GCC {#ToolchainsLegacyVersion} with Newlib {#ToolchainsLegacyVersionNewlib}. This was the previous, officially supported toolchains for the past decade.
-ToolchainsOldStable=Old Stable
-LabelToolchainsDescriptionOldStable=Old stable toolchains are based on GCC {#ToolchainsOldStableVersionSuperH} with Newlib {#ToolchainsOldStableVersionNewlib} for SuperH and GCC {#ToolchainsOldStableVersionAICA} for AICA. It's the previous stable toolchains.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger (GDB) Configuration

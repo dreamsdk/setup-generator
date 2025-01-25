@@ -180,3 +180,22 @@ begin
 
   Result:= tmpArray;
 end;
+
+function FormatSize(Size: Int64): String;
+var
+  GB, MB, KB, B: Int64;
+
+begin
+  GB := Size div (1024 * 1024 * 1024);
+  MB := (Size mod (1024 * 1024 * 1024)) div (1024 * 1024);
+  KB := ((Size mod (1024 * 1024 * 1024)) mod (1024 * 1024)) div 1024;
+  B := ((Size mod (1024 * 1024 * 1024)) mod (1024 * 1024)) mod 1024;
+  if GB > 0 then
+    Result := Format('%d GB', [GB])
+  else if MB > 0 then
+    Result := Format('%d MB', [MB])
+  else if KB > 0 then
+    Result := Format('%d KB', [KB])
+  else
+    Result := Format('%d B', [B]);
+end;

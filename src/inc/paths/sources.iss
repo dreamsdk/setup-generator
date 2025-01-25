@@ -13,6 +13,7 @@
 
 // Foundation: MinGW64
 #define SourceDirectoryMinGW64 SourceDirectoryBase + "\mingw64-base"
+#define SourceDirectoryMSYS2 SourceDirectoryBase + "\msys2-base"
 #define SourceDirectoryAppSystemObjectsMSYS2 SourceDirectoryBase + "\msys2-system-objects"
 
 // Foundation: Common

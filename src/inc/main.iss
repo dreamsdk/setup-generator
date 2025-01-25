@@ -294,12 +294,15 @@ begin
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
 
-  // Creates pages in the specified order
-  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
+  // Creates pages before Select Components
+  // Creates pages in the specified order  
   RubyPageID := CreateRubyPage;
+  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
   GdbPageID := CreateGdbPage;
-  ToolchainsPageID := CreateToolchainsPage;
+  ToolchainsPageID := CreateToolchainsPage;    
   FoundationPageID := CreateFoundationPage;
+
+  // Create page after Select Components
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
 
   // Initialize the components list dropdown

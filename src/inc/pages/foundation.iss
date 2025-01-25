@@ -2,6 +2,11 @@
 var
   RadioButtonFoundationMinGW64,
   RadioButtonFoundationMinGW: TNewRadioButton;
+  ComponentsListFoundationItemIndexMinGW,
+  ComponentsListFoundationItemIndexMinGW64: Integer;
+  CaptionKeywordRequired,
+  ComponentsListFoundationCaptionMinGW,
+  ComponentsListFoundationCaptionMinGW64: String;
 
 function ConfirmFoundationMinGW: Boolean;
 begin
@@ -9,16 +14,71 @@ begin
     mbError, MB_YESNO) = IDYES);
 end;
 
+procedure UpdateFoundation;
+var
+  CaptionMinGW,
+  CaptionMinGW64: String;
+
+begin  
+  with WizardForm.ComponentsList do
+  begin
+    // Tick the correct foundation in the ComponentsList
+    Checked[ComponentsListFoundationItemIndexMinGW] := not IsFoundationMinGW64;
+    Checked[ComponentsListFoundationItemIndexMinGW64] := IsFoundationMinGW64;
+
+    // Update the caption in the ComponentsList for the selected foundation
+    CaptionMinGW := ComponentsListFoundationCaptionMinGW + CaptionKeywordRequired;
+    CaptionMinGW64 := ComponentsListFoundationCaptionMinGW64;
+    if IsFoundationMinGW64 then
+    begin
+      CaptionMinGW := ComponentsListFoundationCaptionMinGW;
+      CaptionMinGW64 := ComponentsListFoundationCaptionMinGW64 + CaptionKeywordRequired;
+    end;
+    ItemCaption[ComponentsListFoundationItemIndexMinGW] := CaptionMinGW;
+    ItemCaption[ComponentsListFoundationItemIndexMinGW64] := CaptionMinGW64;
+    
+    // Force text refresh
+    Invalidate;  
+  end;
+
+  // Force recalculation of disk space usage
+  WizardForm.TypesCombo.OnChange(WizardForm.TypesCombo);
+end;
+
 procedure RadioButtonFoundationMinGW64Click(Sender: TObject);
 begin
   SetFoundation(efkMinGW64MSYS2);
+  UpdateFoundation;
   Log('Selected Foundation: MinGW64/MSYS2');
 end;
 
 procedure RadioButtonFoundationMinGWClick(Sender: TObject);
 begin
   SetFoundation(efkMinGWMSYS);
+  UpdateFoundation;
   Log('Selected Foundation: MinGW/MSYS');
+end;
+
+procedure InitializeFoundationLogic;
+begin
+  CaptionKeywordRequired := ExpandConstant('{cm:ComponentKeywordRequired}');
+  ComponentsListFoundationCaptionMinGW := ExpandConstant('{cm:ComponentBase32}');
+  ComponentsListFoundationCaptionMinGW64 := ExpandConstant('{cm:ComponentBase64}');
+                                                              
+  // This should matches in "inc/sections/components.iss"
+
+  ComponentsListFoundationItemIndexMinGW := WizardForm.ComponentsList.Items.IndexOf(
+    ExpandConstant('{cm:ComponentBase32}')
+  );
+  ComponentsListFoundationItemIndexMinGW64 := WizardForm.ComponentsList.Items.IndexOf(
+    ExpandConstant('{cm:ComponentBase64}')
+  );
+
+  Log(Format('InitializeFoundationLogic: '
+    + 'ComponentsListFoundationItemIndexMinGW=%d, ComponentsListFoundationItemIndexMinGW64=%d', [
+    ComponentsListFoundationItemIndexMinGW,
+    ComponentsListFoundationItemIndexMinGW64
+  ]));
 end;
 
 function CreateFoundationPage: Integer;
@@ -31,9 +91,13 @@ var
   BtnImage: TBitmapImage;
 
 begin
-  FoundationPage := CreateCustomPage(wpSelectComponents,
+  InitializeFoundationLogic;
+
+  FoundationPage := CreateCustomPage(
+    wpSelectDir,
     CustomMessage('FoundationTitlePage'), 
-    CustomMessage('FoundationSubtitlePage'));
+    CustomMessage('FoundationSubtitlePage')
+  );
 
   BtnImage := SetPageIcon('Foundation', FoundationPage);
 
@@ -90,7 +154,8 @@ begin
   LabelFoundationDescriptionMinGW.Caption := CustomMessage('LabelFoundationDescriptionMinGW');    
   LabelFoundationDescriptionMinGW.Top := RadioButtonFoundationMinGW.Top + RadioButtonFoundationMinGW.Height + ScaleY(4);
   LabelFoundationDescriptionMinGW.Width := FoundationPage.SurfaceWidth;
-  SetMultiLinesLabel(LabelFoundationDescriptionMinGW, 3);  
+  SetMultiLinesLabel(LabelFoundationDescriptionMinGW, 3);
 
+  // Return Page ID
   Result := FoundationPage.ID;
 end;

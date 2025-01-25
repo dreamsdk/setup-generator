@@ -36,9 +36,11 @@ var
   BtnImage: TBitmapImage;
 
 begin
-  ToolchainsPage := CreateCustomPage(wpSelectComponents,
+  ToolchainsPage := CreateCustomPage(
+    wpSelectDir,
     CustomMessage('ToolchainsTitlePage'), 
-    CustomMessage('ToolchainsSubtitlePage'));
+    CustomMessage('ToolchainsSubtitlePage')
+  );
 
   BtnImage := SetPageIcon('toolchains', ToolchainsPage);
 

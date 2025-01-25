@@ -6,14 +6,17 @@ Name: "custom"; Description: "{cm:TypeCustomInstallation}"; Flags: iscustom
 
 [Components]
 ; Main
-Name: "main"; Description: "{cm:ComponentMain}"; Types: full compact custom fullwithoutide; Flags: fixed
-Name: "main\base"; Description: "{cm:ComponentBase}"; Types: full compact custom fullwithoutide; Flags: fixed
-Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Types: full compact custom fullwithoutide; Flags: fixed
-Name: "main\kos"; Description: "{cm:ComponentKOS}"; Types: full compact custom fullwithoutide; Flags: fixed
+Name: "main"; Description: "{cm:ComponentMain}"; Flags: fixed
+Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
+Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
+Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
+Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
+#include "../../toolchains.iss"
+Name: "main\kos"; Description: "{cm:ComponentKOS}"; Flags: fixed
 
 ; IDE
 Name: "{#IdeComponentsListName}"; Description: "{cm:ComponentIDE}"; Types: full
-Name: "{#IdeComponentsListName}\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; ExtraDiskSpaceRequired: 52428800; Types: full
+Name: "{#IdeComponentsListName}\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; Types: full
 
 ; Addons
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full fullwithoutide
