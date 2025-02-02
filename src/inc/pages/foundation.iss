@@ -4,9 +4,6 @@ var
   RadioButtonFoundationMinGW: TNewRadioButton;
   ComponentsListFoundationItemIndexMinGW,
   ComponentsListFoundationItemIndexMinGW64: Integer;
-  CaptionKeywordRequired,
-  ComponentsListFoundationCaptionMinGW,
-  ComponentsListFoundationCaptionMinGW64: String;
 
 function ConfirmFoundationMinGW: Boolean;
 begin
@@ -15,28 +12,13 @@ begin
 end;
 
 procedure UpdateFoundation;
-var
-  CaptionMinGW,
-  CaptionMinGW64: String;
-
 begin  
   with WizardForm.ComponentsList do
   begin
     // Tick the correct foundation in the ComponentsList
     Checked[ComponentsListFoundationItemIndexMinGW] := not IsFoundationMinGW64;
     Checked[ComponentsListFoundationItemIndexMinGW64] := IsFoundationMinGW64;
-
-    // Update the caption in the ComponentsList for the selected foundation
-    CaptionMinGW := ComponentsListFoundationCaptionMinGW + CaptionKeywordRequired;
-    CaptionMinGW64 := ComponentsListFoundationCaptionMinGW64;
-    if IsFoundationMinGW64 then
-    begin
-      CaptionMinGW := ComponentsListFoundationCaptionMinGW;
-      CaptionMinGW64 := ComponentsListFoundationCaptionMinGW64 + CaptionKeywordRequired;
-    end;
-    ItemCaption[ComponentsListFoundationItemIndexMinGW] := CaptionMinGW;
-    ItemCaption[ComponentsListFoundationItemIndexMinGW64] := CaptionMinGW64;
-    
+        
     // Force text refresh
     Invalidate;  
   end;
@@ -60,11 +42,7 @@ begin
 end;
 
 procedure InitializeFoundationLogic;
-begin
-  CaptionKeywordRequired := ExpandConstant('{cm:ComponentKeywordRequired}');
-  ComponentsListFoundationCaptionMinGW := ExpandConstant('{cm:ComponentBase32}');
-  ComponentsListFoundationCaptionMinGW64 := ExpandConstant('{cm:ComponentBase64}');
-                                                              
+begin                                                            
   // This should matches in "inc/sections/components.iss"
 
   ComponentsListFoundationItemIndexMinGW := WizardForm.ComponentsList.Items.IndexOf(

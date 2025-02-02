@@ -38,11 +38,6 @@ Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{code:GetApplicationMainPat
 Source: "{#SourcePackagesBinary}\*"; DestDir: "{code:GetApplicationPackagesPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 Source: "{#SourcePackagesSource}\*"; DestDir: "{code:GetApplicationPackagesPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
-; Toolchains
-Source: "{#SourceDirectoryToolchainStable}\*"; DestDir: "{code:GetApplicationToolchainBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsStable
-Source: "{#SourceDirectoryToolchainOldStable}\*"; DestDir: "{code:GetApplicationToolchainBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsOldStable
-Source: "{#SourceDirectoryToolchainLegacy}\*"; DestDir: "{code:GetApplicationToolchainBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsToolchainsLegacy
-
 ; GDB
 Source: "{#SourceDirectoryGdb}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
 Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27

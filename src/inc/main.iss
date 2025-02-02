@@ -121,10 +121,16 @@ begin
   // Toolchains Page
   if (CurPageID = ToolchainsPageID) then
   begin
-    if IsToolchainsLegacy then
+    if IsModernWindowsForToolchain and (not IsSelectedToolchainForModernWindowsOnly) then
     begin
-      // Sure to use legacy toolchain?
       Result := ConfirmLegacyToolchainsUsage;
+      if not Result then
+        Exit;
+    end;
+
+    if (not IsModernWindowsForToolchain) and IsSelectedToolchainForModernWindowsOnly then
+    begin
+      Result := ConfirmModernToolchainsUsage;
       if not Result then
         Exit;
     end;
@@ -253,17 +259,29 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
-  if CurPageID = wpSelectComponents then
-  begin
-    // Retrieve components name from the ComponentsList
-    InitializeComponentsListNames;
+  case CurPageID of
 
-    // Get all disabled items from the ComponentsList
-    ComponentsListDisabledItemsCount := GetComponentsListDisabledItemsCount;
+    ToolchainsPageID:
+      begin        
+        ToolchainsPageInitialize();
+      end;
+    
+    wpSelectComponents:
+      begin
+        // Retrieve components name from the ComponentsList
+        InitializeComponentsListNames;
 
-    // Get the IDE items from the ComponentsList
-    ComponentsListItemsCountWithoutIde := 
-      GetComponentsListCount - GetComponentRootLevelItemsCount('{#IdeComponentsListName}');
+        // Get all disabled items from the ComponentsList
+        ComponentsListDisabledItemsCount := GetComponentsListDisabledItemsCount;
+
+        // Get the IDE items from the ComponentsList
+        ComponentsListItemsCountWithoutIde := 
+          GetComponentsListCount - GetComponentRootLevelItemsCount('{#IdeComponentsListName}');
+
+        // Update radio buttons in the Components List
+        UpdateFoundation();
+        UpdateToolchainSelection();
+      end;
   end;
 end;
 
@@ -291,6 +309,9 @@ end;
 
 procedure InitializeWizard;
 begin
+  // Parse generated configuration
+  InitializeRecordArray;
+
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
 

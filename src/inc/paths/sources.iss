@@ -23,11 +23,6 @@
 #define SourceDirectoryAppCommonObjects SourceDirectoryBase + "\dreamsdk-objects"
 #define SourceDirectorySystemUtilities SourceDirectoryBase + "\utilities"
 
-// Toolchains
-#define SourceDirectoryToolchainLegacy SourceDirectoryBase + "\toolchain-legacy"
-#define SourceDirectoryToolchainOldStable SourceDirectoryBase + "\toolchain-oldstable"
-#define SourceDirectoryToolchainStable SourceDirectoryBase + "\toolchain-stable"
-
 // GDB
 #define SourceDirectoryGdb SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-no-python"
 #define SourceDirectoryGdbPython27 SourceDirectoryBase + "\sh-elf-gdb\sh-elf-gdb-python-2.7"

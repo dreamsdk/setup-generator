@@ -5,15 +5,6 @@ Name: "compact"; Description: "{cm:TypeCompactInstallation}"
 Name: "custom"; Description: "{cm:TypeCustomInstallation}"; Flags: iscustom
 
 [Components]
-; Main
-Name: "main"; Description: "{cm:ComponentMain}"; Flags: fixed
-Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
-Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
-Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
-Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
-#include "../../toolchains.iss"
-Name: "main\kos"; Description: "{cm:ComponentKOS}"; Flags: fixed
-
 ; IDE
 Name: "{#IdeComponentsListName}"; Description: "{cm:ComponentIDE}"; Types: full
 Name: "{#IdeComponentsListName}\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; Types: full
@@ -36,3 +27,12 @@ Name: "tools\mrwriter"; Description: "{cm:ComponentUtilities_mrwriter}"; Types: 
 Name: "tools\buildsbi"; Description: "{cm:ComponentUtilities_buildsbi}"; Types: full fullwithoutide
 Name: "tools\sbinducr"; Description: "{cm:ComponentUtilities_sbinducr}"; Types: full fullwithoutide
 Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: full fullwithoutide
+
+; Main
+Name: "main"; Description: "{cm:ComponentMain}"; Flags: fixed
+Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
+Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
+Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
+Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
+#include "../../toolchains.iss"
+Name: "main\kos"; Description: "{cm:ComponentKOS}"; Flags: fixed

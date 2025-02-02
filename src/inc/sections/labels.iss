@@ -123,10 +123,16 @@ LabelFoundationDescriptionMinGW64=The modern option
 FoundationUseMinGWConfirmation=Are you sure to continue?
 
 ; Toolchains
-ToolchainsTitlePage=Toolchains Configuration
-ToolchainsSubtitlePage=Which toolchains version do you want to use?
-LabelToolchainsIntroduction=Customize your toolchains installation.
-LabelToolchainsDescription=Toolchains are used for producing Sega Dreamcast programs. You may choose your prefered version now. You can change this later in {#FullAppManagerName}.
+ToolchainsTitlePage=Toolchain Configuration
+ToolchainsSubtitlePage=Which toolchain profile do you want to use?
+LabelToolchainsIntroduction=Customize your toolchain installation.
+LabelToolchainsDescription=Toolchains are used to build Sega Dreamcast programs. Please choose your prefered toolchain profile now. You may change this later in {#FullAppManagerName}.
+LabelToolchainsSelection=Toolchain Profile:
+ToolchainsNotSupportedForOldWindows=(unsupported on your OS)
+ToolchainsLegacyConfirmation=This toolchain is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
+ToolchainsUnsupportedModernConfirmation=This toolchain is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
+ToolchainsNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
+ToolchainsAllWindows=Compatible on all Windows starting from Windows XP.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger (GDB) Configuration
