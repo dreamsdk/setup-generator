@@ -87,12 +87,15 @@ TypeCustomInstallation=Custom installation
 
 ; Components: List
 ComponentKeywordRequired= (required)
-ComponentMain=Base program files (required)
-ComponentBase=Foundation and Win32 toolchain (required)
+ComponentMain=Base program files
+ComponentBase=Foundation and Win32 toolchain
 ComponentBase32=MinGW/MSYS
 ComponentBase64=MinGW-w64/MSYS2
-ComponentToolchains=Super-H and AICA toolchains (required)
-ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool (required)
+ComponentToolchains=Toolchain profile for SuperH
+ComponentGdb=GNU Debugger (GDB) for SuperH
+ComponentGdb32=GNU Debugger (GDB) for SuperH - MinGW/MSYS
+ComponentGdb64=GNU Debugger (GDB) for SuperH - MinGW-w64/MSYS2
+ComponentKOS=KallistiOS, KallistiOS Ports and Dreamcast Tool
 ComponentIDE=Support for Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksName}
 ComponentAdditionalTools=Additional command line tools
@@ -139,18 +142,12 @@ GdbTitlePage=GNU Debugger (GDB) Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbIntroduction=Customize your GNU Debugger (GDB) {#GdbVersion} for SuperH installation.
 LabelGdbDescription=You may enable now Python extensions for GDB {#GdbVersion}, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
-GdbPythonNone=Don't enable Python extensions for GNU Debugger (GDB)
-GdbPython27=Python 2.7
-GdbPython33=Python 3.3
-GdbPython34=Python 3.4
-GdbPython35=Python 3.5
-GdbPython36=Python 3.6
-GdbPython37=Python 3.7
-GdbPython38=Python 3.8
-GdbPython39=Python 3.9
-GdbPython310=Python 3.10
-GdbPython311=Python 3.11
-GdbPython312=Python 3.12
+LabelGdbSelection=GNU Debugger (GDB) Profile:
+GdbNotSupportedForOldWindows=(unsupported on your OS)
+GdbLegacyConfirmation=This GDB is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
+GdbUnsupportedModernConfirmation=This GDB is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
+GdbNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
+GdbAllWindows=Compatible on all Windows starting from Windows XP.
 
 ; Ruby
 RubyTitlePage=Ruby Configuration

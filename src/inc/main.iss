@@ -263,14 +263,16 @@ begin
 
     ToolchainsPageID:
       begin        
-        ToolchainsPageInitialize();
+        ToolchainsPageInitialize(False);        
       end;
+	  
+	GdbPageID:
+	  begin
+	    GdbPageInitialize(False);
+	  end;
     
     wpSelectComponents:
       begin
-        // Retrieve components name from the ComponentsList
-        InitializeComponentsListNames;
-
         // Get all disabled items from the ComponentsList
         ComponentsListDisabledItemsCount := GetComponentsListDisabledItemsCount;
 
@@ -281,6 +283,7 @@ begin
         // Update radio buttons in the Components List
         UpdateFoundation();
         UpdateToolchainSelection();
+        UpdateGdbSelection();
       end;
   end;
 end;
@@ -310,7 +313,11 @@ end;
 procedure InitializeWizard;
 begin
   // Parse generated configuration
-  InitializeRecordArray;
+  InitializeArrayToolchain;
+  InitializeArrayGdb;
+
+  // Retrieve components name from the ComponentsList
+  InitializeComponentsListNames;
 
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
@@ -328,6 +335,10 @@ begin
 
   // Initialize the components list dropdown
   HandleComponentsListTypesCombo;
+
+  // First initialization of pages using generated configuration
+  ToolchainsPageInitialize(True);
+  GdbPageInitialize(True);
 end;
 
 //=============================================================================

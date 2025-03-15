@@ -1,23 +1,6 @@
 // Destination Path [Support]
 #define AppSupportDirectoryName "support"
 
-// Destination Paths [MinGW]
-// #define AppOptBase "opt"
-// #define AppToolchainBase AppOptBase + "\toolchains\dc"
-// #define AppToolchainSuperHDirectory AppToolchainBase + "\sh-elf"
-
-// Destination Paths [AppMainDirectory; Dependency: AppOptBase]
-// #define AppMainDirectory AppOptBase + "\dreamsdk"
-// #define AppHelpersDirectory AppMainDirectory + "\helpers"
-// #define AppAddonsDirectory AppMainDirectory + "\addons"
-// #define AppToolsDirectory AppMainDirectory + "\tools"
-// #define AppPackagesDirectory AppMainDirectory + "\packages"
-
-// #define AppMainExeName AppMainDirectory + "\dreamsdk-shell.exe"
-// #define AppManagerExeName AppMainDirectory + "\dreamsdk-manager.exe"
-// #define AppHelpFile AppMainDirectory + "\dreamsdk.chm"
-// #define AppGettingStartedFile AppMainDirectory + "\getstart.rtf"
-
 [Code]
 
 //=============================================================================

@@ -1,5 +1,4 @@
 [Code]
-
 var
   ComponentsListName: TArrayOfString;
 
@@ -8,6 +7,7 @@ var
 function GetSelectedComponentsCount: Integer;
 var
   S: TStringList;
+
 begin
   S := TStringList.Create;
   try
@@ -41,28 +41,53 @@ end;
 // Thanks to: https://stackoverflow.com/a/29301192/3726096
 procedure InitializeComponentsListNames;
 var
-  i: Integer;
-  CheckBack: array of Boolean;
+  i, j: Integer;
+  CheckBack,
+  EnabledBack: array of Boolean;
+  Buffer: TStringList;
+  UncheckableComponentsList,
+  CurrentComponentsList: TArrayOfString;
+  ComponentName: String;
+  Done: Boolean;
 
 begin
+  Log('InitializeComponentsListNames called');
   // Check if already loaded: if yes, exit
   if GetArrayLength(ComponentsListName) > 0 then
     Exit;
 
   SetArrayLength(CheckBack, GetComponentsListCount);
+  SetArrayLength(EnabledBack, GetComponentsListCount); 
 
   for i := 0 to GetComponentsListCount - 1 do
   begin
     // Saves state in CheckBack
     CheckBack[i] := WizardForm.ComponentsList.Checked[i];
-
-    // Only checks non checked components
-    if (not CheckBack[i]) then
-      WizardForm.ComponentsList.Checked[i] := True;
+    EnabledBack[i] := WizardForm.ComponentsList.ItemEnabled[i];
+                                         
+    // Uncheck the current item: we want to uncheck everything
+    WizardForm.ComponentsList.Checked[i] := False;
+    WizardForm.ComponentsList.ItemEnabled[i] := True;
   end;
 
-  // Saves components names in ComponentsName array
-  ComponentsListName := Split(WizardSelectedComponents(False), ',');
+  Buffer := TStringList.Create;
+  try
+    for i := 0 to GetComponentsListCount - 1 do
+    begin
+      WizardForm.ComponentsList.Checked[i] := True;
+            
+      CurrentComponentsList := Split(WizardSelectedComponents(False), ',');
+      for j := 0 to GetArrayLength(CurrentComponentsList) - 1 do
+      begin
+        ComponentName := CurrentComponentsList[j];
+        if (ComponentName <> '') and (Buffer.IndexOf(ComponentName) = -1) then        
+          Buffer.Add(ComponentName);
+      end;   
+    end;
+    ComponentsListName := Split(Buffer.Text, sLineBreak);
+  finally
+    Buffer.Free;
+  end;
 
   // Unchecks components that was uncheck previouly.
   // If we try to check a checked component it may crash the Inno program (tested)
@@ -70,14 +95,26 @@ begin
   begin
     if (not CheckBack[i]) then
       WizardForm.ComponentsList.Checked[i] := False;
+    if (not EnabledBack[i]) then
+      WizardForm.ComponentsList.ItemEnabled[i] := False;
   end;
 
+#if InstallerMode == DEBUG
   // LOG components name.
   Log('ComponentsList Names:');
   for i := 0 to GetArrayLength(ComponentsListName) - 1 do
   begin
-    Log(Format('  - %s', [ComponentsListName[i]]));
+    WizardForm.ComponentsList.Checked[i]
+    Log(Format('+ Checked="%s", Enabled="%s", Code="%s"; Name="%s"', [
+      BoolToStr(WizardForm.ComponentsList.Checked[i]),
+      BoolToStr(WizardForm.ComponentsList.ItemEnabled[i]),
+      ComponentsListName[i],
+      WizardForm.ComponentsList.ItemCaption[i]
+    ]));  
   end;
+#endif
+
+  Log('InitializeComponentsListNames ended');
 end;
 
 // Returns component name by index

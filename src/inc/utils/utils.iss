@@ -160,6 +160,13 @@ var
   curString : String;
 
 begin
+  SetArrayLength(tmpArray, 0);
+  if (Expression = '') then
+  begin
+    Result := tmpArray; 
+    Exit;
+  end;
+
   i := 0;
   curString := Expression;
 
@@ -198,4 +205,15 @@ begin
     Result := Format('%d KB', [KB])
   else
     Result := Format('%d B', [B]);
+end;
+
+function BoolToStrCustom(B: Boolean; const TrueS: String; const FalseS: String): String;
+begin
+  Result := TrueS;
+  if not B then Result := FalseS;    
+end;
+
+function BoolToStr(B: Boolean): String;
+begin
+  Result := BoolToStrCustom(B, 'True', 'False');
 end;

@@ -9,7 +9,7 @@
 ; =============================================================================
 
 #include "inc/const.iss"
-#include "config.iss"
+#include "cfg/config.iss"
 
 #define MyAppName "DreamSDK"
 

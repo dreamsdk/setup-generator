@@ -34,5 +34,7 @@ Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
 Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
 Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
 Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
-#include "../../toolchains.iss"
+#include "../../cfg/toolchains.iss"
+Name: "main\gdb"; Description: "{cm:ComponentGdb}"; Flags: fixed
+#include "../../cfg/gdb.iss"
 Name: "main\kos"; Description: "{cm:ComponentKOS}"; Flags: fixed

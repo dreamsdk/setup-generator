@@ -1,6 +1,7 @@
 [Code]
 var
   ToolchainsComboBoxSelection: TNewComboBox;
+  ToolchainsComboBoxSelectionStoredItemIndex: Integer;
   ToolchainsLabelSelectionHint: TLabel;
 
 function IsModernWindowsForToolchain(): Boolean;
@@ -44,9 +45,12 @@ begin
     Exit;
 
   // Select the correct toolchain
-  ToolchainProfileIndex := ToolchainsComboBoxSelection.Items.Objects[ToolchainsComboBoxSelection.ItemIndex];    
+  ToolchainProfileIndex := ToolchainsComboBoxSelection.Items
+    .Objects[ToolchainsComboBoxSelection.ItemIndex];
+    
   if SetSelectedToolchain(ToolchainProfileIndex) then
   begin
+    ToolchainsComboBoxSelectionStoredItemIndex := ToolchainsComboBoxSelection.ItemIndex;
     SelectedToolchain := ToolchainPackages[GetSelectedToolchain];
 
     // Display toolchain information
@@ -110,6 +114,8 @@ var
   Name: String;
 
 begin
+  Log('ToolchainsComboBoxSelectionInitialize called');
+
   // Populate the toolchains list
   for i := Low(ToolchainPackages) to High(ToolchainPackages) do
   begin
@@ -126,18 +132,33 @@ begin
   UpdateToolchainSelection();
 end;
 
-procedure ToolchainsPageInitialize();
+procedure ToolchainsPageInitialize(const FirstInitialization: Boolean);
 begin
+  Log(Format('ToolchainsPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
+
+  if FirstInitialization then
+  begin
+    ToolchainsComboBoxSelectionStoredItemIndex := -1;
+  end;
+
   if ToolchainsComboBoxSelection.Enabled then
   begin
     ToolchainsComboBoxSelection.ItemIndex := 0;
-    UpdateToolchainSelection();    
+
+    // Handle re-selection
+    if ToolchainsComboBoxSelectionStoredItemIndex <> -1 then
+    begin
+      Log(Format('+ Re-selection: %d', [ToolchainsComboBoxSelectionStoredItemIndex]));
+      ToolchainsComboBoxSelection.ItemIndex := ToolchainsComboBoxSelectionStoredItemIndex;
+    end;
+    
+    UpdateToolchainSelection();
   end;
 end;
 
 function CreateToolchainsPage(): Integer;
 var
-  ToolchainsPage: TWizardPage;  
+  ToolchainsPage: TWizardPage; 
   Labelntroduction,
   LabelPageExplanation, 
   LabelComboBoxSelection: TLabel;

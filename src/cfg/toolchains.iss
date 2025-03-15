@@ -26,7 +26,7 @@ ToolchainsName_950winxp=9.5.0-winxp
 ToolchainsDesc_950winxp=This legacy toolchain is based on GCC 9.5.0 with Newlib 4.3.0.20230120. This was the previous, officially supported toolchains for the past decade.
 
 [Code]
-procedure InitializeRecordArray();
+procedure InitializeArrayToolchain();
 begin
   SetArrayLength(ToolchainPackages, {#ToolchainsCount});
 

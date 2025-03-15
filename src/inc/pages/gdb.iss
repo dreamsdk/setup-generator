@@ -1,18 +1,18 @@
-[code]
+[Code]
+type
+  TResetGdbContext = record
+    RootComponentsListItemIndex: Integer;
+    GdbPackages: TGdbPackageArray;
+  end;
+  TTResetGdbContextArray = array of TResetGdbContext;
+
 var
-  GdbPage: TWizardPage;
-  RadioButtonNone,
-  RadioButtonPython27,
-  RadioButtonPython33,
-  RadioButtonPython34,
-  RadioButtonPython35,
-  RadioButtonPython36,
-  RadioButtonPython37,
-  RadioButtonPython38,
-  RadioButtonPython39,
-  RadioButtonPython310,
-  RadioButtonPython311,
-  RadioButtonPython312: TNewRadioButton;
+  GdbComboBoxSelection: TNewComboBox;
+  GdbLabelSelectionHint: TLabel;
+  ComponentGdb32ComponentsListItemIndex,
+  ComponentGdb64ComponentsListItemIndex,
+  GdbComboBoxSelectionStoredItemIndex: Integer;
+  IsGdbComboBoxSelection64: Boolean;
 
 function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
 begin
@@ -60,179 +60,369 @@ begin
   end;
 end;
 
-function IsGdbPythonNone: Boolean;
-begin
-  Result := RadioButtonNone.Checked;
-end;
-
-function IsGdbPython27: Boolean;
-begin
-  Result := RadioButtonPython27.Checked;
-end;
-
-function IsGdbPython33: Boolean;
-begin
-  Result := RadioButtonPython33.Checked;
-end;
-
-function IsGdbPython34: Boolean;
-begin
-  Result := RadioButtonPython34.Checked;
-end;
-
-function IsGdbPython35: Boolean;
-begin
-  Result := RadioButtonPython35.Checked;
-end;
-
-function IsGdbPython36: Boolean;
-begin
-  Result := RadioButtonPython36.Checked;
-end;
-
-function IsGdbPython37: Boolean;
-begin
-  Result := RadioButtonPython37.Checked;
-end;
-
-function IsGdbPython38: Boolean;
-begin
-  Result := RadioButtonPython38.Checked;
-end;
-
-function IsGdbPython39: Boolean;
-begin
-  Result := RadioButtonPython39.Checked;
-end;
-
-function IsGdbPython310: Boolean;
-begin
-  Result := RadioButtonPython310.Checked;
-end;
-
-function IsGdbPython311: Boolean;
-begin
-  Result := RadioButtonPython311.Checked;
-end;
-
-function IsGdbPython312: Boolean;
-begin
-  Result := RadioButtonPython312.Checked;
-end;
-
-function CreateGdbPythonButton(Version: String; ButtonLeft: Integer;
-  var FromButton: TNewRadioButton; FirstRow: Boolean): TNewRadioButton;
+function IsSelectedGdbForModernWindowsOnly(): Boolean;
 var
-  ButtonLabel: String;
-  ScaleValue: Integer;
+  SelectedGdb: Integer;
 
 begin
-  ButtonLabel := Version;
-  StringChangeEx(ButtonLabel, '.', '', True);
-  ButtonLabel := 'GdbPython' + ButtonLabel;
+  Result := False;
+  (*SelectedGdb := GetSelectedGdb;
+  if SelectedGdb <> -1 then
+    Result := GdbPackages[SelectedGdb].IsModernWindowsOnly;   *)
+end;
+
+function ConfirmModernGdbUsage(): Boolean;
+begin
+  Result := (MsgBox(CustomMessage('GdbUnsupportedModernConfirmation'),
+    mbError, MB_YESNO) = IDYES);
+end;
+
+function ConfirmLegacyGdbUsage(): Boolean;
+begin
+  Result := (MsgBox(CustomMessage('GdbLegacyConfirmation'),
+    mbConfirmation, MB_YESNO) = IDYES);
+end;
+
+function GetComponentsListItemIndex(const Text: String; StartIndex: Integer): Integer;
+var
+  i: Integer;
+
+begin
+  if StartIndex = 0 then
+    Result := WizardForm.ComponentsList.Items.IndexOf(Text)
+  else 
+    for i := StartIndex to WizardForm.ComponentsList.Items.Count - 1 do
+      if WizardForm.ComponentsList.Items[i] = Text then
+      begin
+        Result := i;
+        Break;
+      end;
+end;
+
+procedure ResetGdbSelection();
+var
+  ContextIndex, i,
+  RootComponentsListItemIndex,
+  ComponentsListItemIndex: Integer;
+  GdbPackages: TGdbPackageArray; 
+  ResetGdbContext: TTResetGdbContextArray;
+#if InstallerMode == DEBUG
+  IsComponentsListItemIndexUpdated: Boolean;
+#endif
+
+begin
+  Log('ResetGdbSelection called');
+
+  SetArrayLength(ResetGdbContext, 2);
+
+  // 32-bit
+  ResetGdbContext[0].RootComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
+  ResetGdbContext[0].GdbPackages := Gdb32Packages;
+
+  // 64-bit
+  ResetGdbContext[1].RootComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
+  ResetGdbContext[1].GdbPackages := Gdb64Packages;
+
+  // Reset all 32-bit and 64-bit checkboxes
+  for ContextIndex := Low(ResetGdbContext) to High(ResetGdbContext) do
+  begin
+    GdbPackages := ResetGdbContext[ContextIndex].GdbPackages;
+    RootComponentsListItemIndex := ResetGdbContext[ContextIndex].RootComponentsListItemIndex;    
+
+#if InstallerMode == DEBUG
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s" [%d of %d]', [
+      RootComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      (ContextIndex + 1),
+      (High(ResetGdbContext) + 1)
+    ]));
+#endif
+
+    with WizardForm.ComponentsList do
+    begin      
+      // Process all GDB packages
+      for i := High(GdbPackages) downto Low(GdbPackages) do
+      begin        
+        // Update ComponentsListItemIndex from GdbPackages[i] if needed 
+        ComponentsListItemIndex := GdbPackages[i].ComponentsListItemIndex;
+#if InstallerMode == DEBUG
+        IsComponentsListItemIndexUpdated := False;
+#endif                 
+        if (ComponentsListItemIndex = -1) then
+        begin
+          ComponentsListItemIndex := GetComponentsListItemIndex(GdbPackages[i].Name, RootComponentsListItemIndex);          
+          GdbPackages[i].ComponentsListItemIndex := ComponentsListItemIndex;
+#if InstallerMode == DEBUG
+          IsComponentsListItemIndexUpdated := True;
+#endif
+        end;
+
+#if InstallerMode == DEBUG
+        Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IsComponentsListItemIndexUpdated="%s"', [
+          ComponentsListItemIndex,
+          WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex],
+          BoolToStrCustom(IsComponentsListItemIndexUpdated, 'Updated', 'Not Updated')
+        ]));
+#endif
+
+        // Uncheck all packages that are linked to the root node
+        ItemEnabled[ComponentsListItemIndex] := True;
+        (*CheckItem(ComponentsListItemIndex, coUncheck);
+        Checked[ComponentsListItemIndex] := False;
+        ItemEnabled[ComponentsListItemIndex] := False;*)
+      end;
+
+      // Uncheck the root node
+      ItemEnabled[RootComponentsListItemIndex] := True;
+      //CheckItem(RootComponentsListItemIndex, coUncheck);
+      Checked[RootComponentsListItemIndex] := False;
+      //ItemEnabled[RootComponentsListItemIndex] := False;
+
+      Invalidate();
+
+#if InstallerMode == DEBUG
+        Log(Format('+ RootComponentsListItemIndex=%d, Name="%s", Status="%s"', [
+          ComponentsListItemIndex,
+          WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+          BoolToStrCustom(WizardForm.ComponentsList.Checked[RootComponentsListItemIndex], 'Checked', 'Unchecked')
+        ]));
+#endif
+    end;    
+  end;
+
+  Log('ResetGdbSelection ended');
+end;
+
+procedure UpdateGdbSelection();
+var
+  GdbProfileIndex,
+  GdbComponentsListItemIndex: Integer;
+  GdbDescription,
+  GdbWindowsText: String;
+  SelectedGdb: TGdbPackage;
+  GdbPackages: TGdbPackageArray;
+   
+begin
+  if GdbComboBoxSelection.ItemIndex = -1 then
+    Exit;
+	
+  GetGdbPackagesList(GdbPackages);
+
+  // Select the correct Gdb
+  GdbProfileIndex := GdbComboBoxSelection.Items.Objects[GdbComboBoxSelection.ItemIndex];    
+  if SetSelectedGdb(GdbProfileIndex) then
+  begin
+    GdbComboBoxSelectionStoredItemIndex := GdbComboBoxSelection.ItemIndex;
+    IsGdbComboBoxSelection64 := IsFoundationMinGW64;
+
+    SelectedGdb := Gdb32Packages[GetSelectedGdb];
+    GdbComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
+    if IsGdbComboBoxSelection64 then
+    begin
+      SelectedGdb := Gdb64Packages[GetSelectedGdb];
+      GdbComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
+    end;
+
+    // Display Gdb information
+    GdbLabelSelectionHint.Caption := SelectedGdb.Description;
+          
+    // Tick the correct Gdb in the ComponentsList then force UI refresh
+    if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then
+    begin
+      with WizardForm.ComponentsList do
+      begin
+        // Uncheck all GDB packages              
+        ResetGdbSelection();
+
+        // Check only the choice the user made
+        if SelectedGdb.ComponentsListItemIndex <> -1 then
+        begin
+          // Check the root GDB node
+          CheckItem(GdbComponentsListItemIndex, coCheck);        
+          Checked[GdbComponentsListItemIndex] := True;
+
+          // Check the specified GDB packaged in that GBD node
+          Log(Format('Checking: %d', [SelectedGdb.ComponentsListItemIndex]));
+          CheckItem(SelectedGdb.ComponentsListItemIndex, coCheck);
+          Checked[SelectedGdb.ComponentsListItemIndex] := True;
+
+          // Refresh UI
+          Invalidate();
+        end;
+      end;
+
+      // Force recalculation of disk space usage
+      WizardForm.TypesCombo.OnChange(WizardForm.TypesCombo);
+    end;      
+  end;  
+end;
+
+procedure GdbComboBoxSelectionAddItem(Text: String; GdbProfileIndex: Integer);
+var
+  GdbItemText: String;
+  NewItemIndex: Integer;
+  GdbPackages: TGdbPackageArray;  
+
+begin
+  GetGdbPackagesList(GdbPackages);
   
-  ScaleValue := 4;
-  if FirstRow then
-    ScaleValue := 8;
-      
-  Result := TNewRadioButton.Create(GdbPage);
-  Result.Parent := GdbPage.Surface;
-  Result.Caption := CustomMessage(ButtonLabel);  
-  Result.Top := FromButton.Top + FromButton.Height + ScaleY(ScaleValue);
-  Result.Left := ButtonLeft;
-  Result.Enabled := TestPythonVersion(Version);
+  GdbItemText := Text;  
+  (*if (not IsModernWindowsForGdb) and GdbPackages[GdbProfileIndex].IsModernWindowsOnly then
+    GdbItemText := Format('%s %s', [Text, ExpandConstant('{cm:GdbNotSupportedForOldWindows}')]);*)
+
+  // Add the Gdb to the ComboBox
+  NewItemIndex := GdbComboBoxSelection.Items.Add(GdbItemText);  
+  GdbComboBoxSelection.Items.Objects[NewItemIndex] := Integer(GdbProfileIndex);
 end;
 
-function CreateGdbPage: Integer;
+(*procedure GdbInitialize();
 var
-  LabelGdbIntroduction, 
-  LabelGdbDescription: TLabel;
+  ComponentsListItemIndex,
+  RootComponentsListItemIndex: Integer;
+
+begin
+    // Save the item position in ComponentsList
+    RootComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
+    if IsFoundationMinGW64 then
+      RootComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
+    ComponentsListItemIndex := GetComponentsListItemIndex(GdbItemText, RootComponentsListItemIndex);    
+    GdbPackages[GdbProfileIndex].ComponentsListItemIndex := ComponentsListItemIndex;
+    
+    Log(Format('GdbComboBoxSelectionAddItem: %s, index=%d, componentListIndex=%d', [
+      Text,
+      GdbProfileIndex,
+      ComponentsListItemIndex
+    ]));  
+end;*)
+
+procedure GdbComboBoxSelectionInitialize();
+var
+  i: Integer;
+  Name: String;
+  GdbPackages: TGdbPackageArray;  
+  
+begin
+  (*if FirstInitialization then
+  begin
+    GdbInitialize();    
+  end;*)
+
+  // Populate the Gdb list
+  GdbComboBoxSelection.Items.Clear;
+  
+  GetGdbPackagesList(GdbPackages);  
+  for i := Low(GdbPackages) to High(GdbPackages) do
+  begin
+    Name := GdbPackages[i].Name;
+    GdbComboBoxSelectionAddItem(Name, i);
+  end;
+  
+  // Enable the list
+  GdbComboBoxSelection.Enabled := (GdbComboBoxSelection.Items.Count > 0);
+end;
+
+procedure GdbComboBoxSelectionChange(Sender: TObject);
+begin
+  UpdateGdbSelection();
+end;
+
+procedure GdbPageInitialize(const FirstInitialization: Boolean);
+begin
+  Log(Format('GdbPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
+
+  if FirstInitialization then
+  begin
+    GdbComboBoxSelectionStoredItemIndex := -1;
+    IsGdbComboBoxSelection64 := False;
+    ComponentGdb32ComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb32}'));
+    ComponentGdb64ComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb64}'));
+  end;
+
+  Log(Format('GdbPageInitialize: gdb32ComponentListIndex=%d, gdb64ComponentListIndex=%d', [
+    ComponentGdb32ComponentsListItemIndex,
+    ComponentGdb64ComponentsListItemIndex
+  ]));
+
+  GdbComboBoxSelectionInitialize();
+  if GdbComboBoxSelection.Enabled then
+  begin
+    GdbComboBoxSelection.ItemIndex := 0;
+
+    // Handle re-selection but only if we are in the same flavour (32 or 64-bit)
+    if (GdbComboBoxSelectionStoredItemIndex <> -1) 
+      and (IsFoundationMinGW64 = IsGdbComboBoxSelection64) then
+    begin
+      Log(Format('+ Re-selection: %d', [GdbComboBoxSelectionStoredItemIndex]));
+      GdbComboBoxSelection.ItemIndex := GdbComboBoxSelectionStoredItemIndex;
+    end;
+
+    UpdateGdbSelection();    
+  end;
+end;
+
+function CreateGdbPage(): Integer;
+var
+  GdbPage: TWizardPage;  
+  Labelntroduction,
+  LabelPageExplanation, 
+  LabelComboBoxSelection: TLabel;
   BtnImage: TBitmapImage;
-  RowLeft1,
-  RowLeft2,
-  RowLeft3: Integer;
 
 begin
-  GdbPage := CreateCustomPage(wpSelectComponents, 
-    CustomMessage('GdbTitlePage'), 
-    CustomMessage('GdbSubtitlePage'));
-  
+  // Extract utility files
   ExtractTemporaryFile('whereis.exe');
   ExtractTemporaryFile('pecheck.exe');
- 
-  RowLeft1 := 0;
-  RowLeft2 := GdbPage.SurfaceWidth div 3;
-  RowLeft3 := RowLeft2 * 2; 
+  
+  GdbPage := CreateCustomPage(
+    wpSelectDir,
+    CustomMessage('GdbTitlePage'), 
+    CustomMessage('GdbSubtitlePage')
+  );
 
   BtnImage := SetPageIcon('gdb', GdbPage);
-
+  
   // Introduction label
-  LabelGdbIntroduction := TLabel.Create(GdbPage);
-  LabelGdbIntroduction.Parent := GdbPage.Surface;  
-  LabelGdbIntroduction.Caption := CustomMessage('LabelGdbIntroduction');  
-  LabelGdbIntroduction.AutoSize := True;
-  LabelGdbIntroduction.WordWrap := True;
-  LabelGdbIntroduction.Top := (BtnImage.Height div 2) - (LabelGdbIntroduction.Height div 2);
-  LabelGdbIntroduction.Left := BtnImage.Height + ScaleX(12);
+  Labelntroduction := TLabel.Create(GdbPage);
+  Labelntroduction.Parent := GdbPage.Surface;  
+  Labelntroduction.Caption := CustomMessage('LabelGdbIntroduction');  
+  Labelntroduction.AutoSize := True;
+  Labelntroduction.WordWrap := True;
+  Labelntroduction.Top := (BtnImage.Height div 2) - (Labelntroduction.Height div 2);
+  Labelntroduction.Left := BtnImage.Height + ScaleX(12);
 
   // Explanation of this page
-  LabelGdbDescription := TLabel.Create(GdbPage);
-  LabelGdbDescription.Parent := GdbPage.Surface;
-  LabelGdbDescription.Caption := CustomMessage('LabelGdbDescription'); 
-  LabelGdbDescription.AutoSize := True;
-  LabelGdbDescription.WordWrap := True;  
-  LabelGdbDescription.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
-  LabelGdbDescription.Width := GdbPage.SurfaceWidth;
-  SetMultiLinesLabel(LabelGdbDescription, 4);
-    
-  // No Python
-  RadioButtonNone := TNewRadioButton.Create(GdbPage);
-  RadioButtonNone.Parent := GdbPage.Surface;
-  RadioButtonNone.Caption := CustomMessage('GdbPythonNone');  
-  RadioButtonNone.Top := LabelGdbDescription.Top 
-    + LabelGdbDescription.Height + ScaleY(4);
-  RadioButtonNone.Width := GdbPage.SurfaceWidth;
-  RadioButtonNone.Font.Style := [fsBold];
-  RadioButtonNone.Checked := True;
+  LabelPageExplanation := TLabel.Create(GdbPage);
+  LabelPageExplanation.Parent := GdbPage.Surface;
+  LabelPageExplanation.Caption := CustomMessage('LabelGdbDescription');  
+  LabelPageExplanation.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
+  LabelPageExplanation.Width := GdbPage.SurfaceWidth;
+  SetMultiLinesLabel(LabelPageExplanation, 3);
+  
+  // Drop down list label
+  LabelComboBoxSelection := TLabel.Create(GdbPage);  
+  LabelComboBoxSelection.Parent := GdbPage.Surface;
+  LabelComboBoxSelection.Caption := CustomMessage('LabelGdbSelection'); 
+  LabelComboBoxSelection.Top := LabelPageExplanation.Top + LabelPageExplanation.Height + ScaleY(12);
+  LabelComboBoxSelection.Width := GdbPage.SurfaceWidth;
+  LabelComboBoxSelection.Font.Style := [fsBold];  
 
-  // Row 1
+  // Drop down list (main component of this page)
+  GdbComboBoxSelection := TNewComboBox.Create(GdbPage);
+  GdbComboBoxSelection.OnChange := @GdbComboBoxSelectionChange;  
+  GdbComboBoxSelection.Parent := GdbPage.Surface; 
+  GdbComboBoxSelection.Top := LabelComboBoxSelection.Top + LabelComboBoxSelection.Height + ScaleY(8);
+  GdbComboBoxSelection.Width := GdbPage.SurfaceWidth; 
+  GdbComboBoxSelection.Style := csDropDownList;
 
-  // Python 2.7
-  RadioButtonPython27 := CreateGdbPythonButton('2.7', RowLeft1, RadioButtonNone, True);
-
-  // Python 3.3
-  RadioButtonPython33 := CreateGdbPythonButton('3.3', RowLeft1, RadioButtonPython27, False);
-
-  // Python 3.4
-  RadioButtonPython34 := CreateGdbPythonButton('3.4', RowLeft1, RadioButtonPython33, False);
-
-  // Python 3.5
-  RadioButtonPython35 := CreateGdbPythonButton('3.5', RowLeft1, RadioButtonPython34, False);
-
-  // Row 2
-
-  // Python 3.6
-  RadioButtonPython36 := CreateGdbPythonButton('3.6', RowLeft2, RadioButtonNone, True);
-
-  // Python 3.7
-  RadioButtonPython37 := CreateGdbPythonButton('3.7', RowLeft2, RadioButtonPython27, False);
-
-  // Python 3.8
-  RadioButtonPython38 := CreateGdbPythonButton('3.8', RowLeft2, RadioButtonPython33, False);
-
-  // Python 3.9
-  RadioButtonPython39 := CreateGdbPythonButton('3.9', RowLeft2, RadioButtonPython34, False);
-
-  // Row 3
-
-  // Python 3.10
-  RadioButtonPython310 := CreateGdbPythonButton('3.10', RowLeft3, RadioButtonNone, True);
-
-  // Python 3.11
-  RadioButtonPython311 := CreateGdbPythonButton('3.11', RowLeft3, RadioButtonPython27, False);
-
-  // Python 3.12
-  RadioButtonPython312 := CreateGdbPythonButton('3.12', RowLeft3, RadioButtonPython33, False);
-
+  // Hint text for drop down list
+  GdbLabelSelectionHint := TLabel.Create(GdbPage);  
+  GdbLabelSelectionHint.Parent := GdbPage.Surface;
+  GdbLabelSelectionHint.Caption := '(Dynamic)'; 
+  GdbLabelSelectionHint.Top := GdbComboBoxSelection.Top + GdbComboBoxSelection.Height + ScaleY(4);
+  GdbLabelSelectionHint.Width := GdbPage.SurfaceWidth;
+  SetMultiLinesLabel(GdbLabelSelectionHint, 3);         
+ 
   Result := GdbPage.ID;
 end;

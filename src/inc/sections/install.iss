@@ -38,20 +38,6 @@ Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{code:GetApplicationMainPat
 Source: "{#SourcePackagesBinary}\*"; DestDir: "{code:GetApplicationPackagesPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 Source: "{#SourcePackagesSource}\*"; DestDir: "{code:GetApplicationPackagesPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
 
-; GDB
-Source: "{#SourceDirectoryGdb}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPythonNone
-Source: "{#SourceDirectoryGdbPython27}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython27
-Source: "{#SourceDirectoryGdbPython33}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython33
-Source: "{#SourceDirectoryGdbPython34}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython34
-Source: "{#SourceDirectoryGdbPython35}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython35
-Source: "{#SourceDirectoryGdbPython36}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython36
-Source: "{#SourceDirectoryGdbPython37}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython37
-Source: "{#SourceDirectoryGdbPython38}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython38
-Source: "{#SourceDirectoryGdbPython39}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython39
-Source: "{#SourceDirectoryGdbPython310}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython310
-Source: "{#SourceDirectoryGdbPython311}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython311
-Source: "{#SourceDirectoryGdbPython312}\*"; DestDir: "{code:GetApplicationToolchainSuperHPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsGdbPython312
-
 ; Addons
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{code:GetApplicationAddonsPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
 Source: "{#SourceDirectoryAddons}\pvr2png\*"; DestDir: "{code:GetApplicationAddonsPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\pvr2png
