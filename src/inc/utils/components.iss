@@ -117,6 +117,22 @@ begin
   Log('InitializeComponentsListNames ended');
 end;
 
+function GetComponentsListItemIndex(const Text: String; StartIndex: Integer): Integer;
+var
+  i: Integer;
+
+begin
+  if StartIndex = 0 then
+    Result := WizardForm.ComponentsList.Items.IndexOf(Text)
+  else 
+    for i := StartIndex to WizardForm.ComponentsList.Items.Count - 1 do
+      if WizardForm.ComponentsList.Items[i] = Text then
+      begin
+        Result := i;
+        Break;
+      end;
+end;
+
 // Returns component name by index
 function GetComponentName(Index: Integer): String;
 begin

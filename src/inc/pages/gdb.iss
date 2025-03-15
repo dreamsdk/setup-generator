@@ -4,7 +4,8 @@ type
     RootComponentsListItemIndex: Integer;
     GdbPackages: TGdbPackageArray;
   end;
-  TTResetGdbContextArray = array of TResetGdbContext;
+  TResetGdbContextArray = array of TResetGdbContext;
+  TGdbComponentsListStateOperation = (gclsoLock, gclsoUnlock);
 
 var
   GdbComboBoxSelection: TNewComboBox;
@@ -83,35 +84,18 @@ begin
     mbConfirmation, MB_YESNO) = IDYES);
 end;
 
-function GetComponentsListItemIndex(const Text: String; StartIndex: Integer): Integer;
+procedure SetGdbComponentsControlState(
+  const Operation: TGdbComponentsListStateOperation);
 var
-  i: Integer;
-
-begin
-  if StartIndex = 0 then
-    Result := WizardForm.ComponentsList.Items.IndexOf(Text)
-  else 
-    for i := StartIndex to WizardForm.ComponentsList.Items.Count - 1 do
-      if WizardForm.ComponentsList.Items[i] = Text then
-      begin
-        Result := i;
-        Break;
-      end;
-end;
-
-procedure ResetGdbSelection();
-var
-  ContextIndex, i,
+  ContextIndex,
+  i,
   RootComponentsListItemIndex,
   ComponentsListItemIndex: Integer;
   GdbPackages: TGdbPackageArray; 
-  ResetGdbContext: TTResetGdbContextArray;
-#if InstallerMode == DEBUG
-  IsComponentsListItemIndexUpdated: Boolean;
-#endif
+  ResetGdbContext: TResetGdbContextArray;
 
 begin
-  Log('ResetGdbSelection called');
+  Log('SetGdbComponentsControlState called');
 
   SetArrayLength(ResetGdbContext, 2);
 
@@ -123,11 +107,12 @@ begin
   ResetGdbContext[1].RootComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
   ResetGdbContext[1].GdbPackages := Gdb64Packages;
 
-  // Reset all 32-bit and 64-bit checkboxes
+  // Processing all 32-bit and 64-bit checkboxes
   for ContextIndex := Low(ResetGdbContext) to High(ResetGdbContext) do
   begin
     GdbPackages := ResetGdbContext[ContextIndex].GdbPackages;
-    RootComponentsListItemIndex := ResetGdbContext[ContextIndex].RootComponentsListItemIndex;    
+    RootComponentsListItemIndex := ResetGdbContext[ContextIndex]
+      .RootComponentsListItemIndex;    
 
 #if InstallerMode == DEBUG
     Log(Format('+ RootComponentsListItemIndex=%d, Name="%s" [%d of %d]', [
@@ -137,60 +122,44 @@ begin
       (High(ResetGdbContext) + 1)
     ]));
 #endif
-
-    with WizardForm.ComponentsList do
-    begin      
-      // Process all GDB packages
-      for i := High(GdbPackages) downto Low(GdbPackages) do
-      begin        
-        // Update ComponentsListItemIndex from GdbPackages[i] if needed 
-        ComponentsListItemIndex := GdbPackages[i].ComponentsListItemIndex;
-#if InstallerMode == DEBUG
-        IsComponentsListItemIndexUpdated := False;
-#endif                 
-        if (ComponentsListItemIndex = -1) then
-        begin
-          ComponentsListItemIndex := GetComponentsListItemIndex(GdbPackages[i].Name, RootComponentsListItemIndex);          
-          GdbPackages[i].ComponentsListItemIndex := ComponentsListItemIndex;
-#if InstallerMode == DEBUG
-          IsComponentsListItemIndexUpdated := True;
-#endif
-        end;
+    
+    // Process the root node
+    WizardForm.ComponentsList.ItemEnabled[RootComponentsListItemIndex] := (Operation = gclsoUnlock);
+    if (Operation = gclsoUnlock) then
+      WizardForm.ComponentsList.Checked[ComponentsListItemIndex] := False;
+     
+    // Process all GDB packages
+    for i := High(GdbPackages) downto Low(GdbPackages) do
+    begin        
+      // Update ComponentsListItemIndex from GdbPackages[i] if needed 
+      ComponentsListItemIndex := GdbPackages[i].ComponentsListItemIndex;
 
 #if InstallerMode == DEBUG
-        Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IsComponentsListItemIndexUpdated="%s"', [
-          ComponentsListItemIndex,
-          WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex],
-          BoolToStrCustom(IsComponentsListItemIndexUpdated, 'Updated', 'Not Updated')
-        ]));
+      Log(Format('++ ComponentsListItemIndex=%d, Name="%s"', [
+        ComponentsListItemIndex,
+        WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex]        
+      ]));
 #endif
 
-        // Uncheck all packages that are linked to the root node
-        ItemEnabled[ComponentsListItemIndex] := True;
-        (*CheckItem(ComponentsListItemIndex, coUncheck);
-        Checked[ComponentsListItemIndex] := False;
-        ItemEnabled[ComponentsListItemIndex] := False;*)
-      end;
-
-      // Uncheck the root node
-      ItemEnabled[RootComponentsListItemIndex] := True;
-      //CheckItem(RootComponentsListItemIndex, coUncheck);
-      Checked[RootComponentsListItemIndex] := False;
-      //ItemEnabled[RootComponentsListItemIndex] := False;
-
-      Invalidate();
+      // Process the current node
+      WizardForm.ComponentsList.ItemEnabled[ComponentsListItemIndex] := (Operation = gclsoUnlock);
+      if (Operation = gclsoUnlock) then
+        WizardForm.ComponentsList.Checked[ComponentsListItemIndex] := False;
+    end;
+    
+    // Refresh the UI
+    WizardForm.ComponentsList.Invalidate();
 
 #if InstallerMode == DEBUG
-        Log(Format('+ RootComponentsListItemIndex=%d, Name="%s", Status="%s"', [
-          ComponentsListItemIndex,
-          WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
-          BoolToStrCustom(WizardForm.ComponentsList.Checked[RootComponentsListItemIndex], 'Checked', 'Unchecked')
-        ]));
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s", Status="%s"', [
+      ComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      BoolToStrCustom(WizardForm.ComponentsList.Checked[RootComponentsListItemIndex], 'Checked', 'Unchecked')
+    ]));
 #endif
-    end;    
-  end;
+  end; // ResetGdbContext
 
-  Log('ResetGdbSelection ended');
+  Log('SetGdbComponentsControlState ended');
 end;
 
 procedure UpdateGdbSelection();
@@ -229,11 +198,10 @@ begin
     // Tick the correct Gdb in the ComponentsList then force UI refresh
     if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then
     begin
+      SetGdbComponentsControlState(gclsoUnlock);
+
       with WizardForm.ComponentsList do
       begin
-        // Uncheck all GDB packages              
-        ResetGdbSelection();
-
         // Check only the choice the user made
         if SelectedGdb.ComponentsListItemIndex <> -1 then
         begin
@@ -241,18 +209,19 @@ begin
           CheckItem(GdbComponentsListItemIndex, coCheck);        
           Checked[GdbComponentsListItemIndex] := True;
 
-          // Check the specified GDB packaged in that GBD node
-          Log(Format('Checking: %d', [SelectedGdb.ComponentsListItemIndex]));
+          // Check the specified GDB packaged in that GDB node
           CheckItem(SelectedGdb.ComponentsListItemIndex, coCheck);
           Checked[SelectedGdb.ComponentsListItemIndex] := True;
 
-          // Refresh UI
-          Invalidate();
+#if InstallerMode == DEBUG
+          Log(Format('UpdateGdbSelection: Checking: ComponentsListItemIndex=%d, Name="%s", Status="%s"', [
+            SelectedGdb.ComponentsListItemIndex,
+            WizardForm.ComponentsList.ItemCaption[SelectedGdb.ComponentsListItemIndex],
+            BoolToStrCustom(WizardForm.ComponentsList.Checked[SelectedGdb.ComponentsListItemIndex], 'Checked', 'Unchecked')
+          ]));
+#endif
         end;
       end;
-
-      // Force recalculation of disk space usage
-      WizardForm.TypesCombo.OnChange(WizardForm.TypesCombo);
     end;      
   end;  
 end;
@@ -275,26 +244,6 @@ begin
   GdbComboBoxSelection.Items.Objects[NewItemIndex] := Integer(GdbProfileIndex);
 end;
 
-(*procedure GdbInitialize();
-var
-  ComponentsListItemIndex,
-  RootComponentsListItemIndex: Integer;
-
-begin
-    // Save the item position in ComponentsList
-    RootComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
-    if IsFoundationMinGW64 then
-      RootComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
-    ComponentsListItemIndex := GetComponentsListItemIndex(GdbItemText, RootComponentsListItemIndex);    
-    GdbPackages[GdbProfileIndex].ComponentsListItemIndex := ComponentsListItemIndex;
-    
-    Log(Format('GdbComboBoxSelectionAddItem: %s, index=%d, componentListIndex=%d', [
-      Text,
-      GdbProfileIndex,
-      ComponentsListItemIndex
-    ]));  
-end;*)
-
 procedure GdbComboBoxSelectionInitialize();
 var
   i: Integer;
@@ -302,11 +251,6 @@ var
   GdbPackages: TGdbPackageArray;  
   
 begin
-  (*if FirstInitialization then
-  begin
-    GdbInitialize();    
-  end;*)
-
   // Populate the Gdb list
   GdbComboBoxSelection.Items.Clear;
   
@@ -326,6 +270,79 @@ begin
   UpdateGdbSelection();
 end;
 
+procedure GdbComponentsListItemIndexInitialize();
+var
+  ContextIndex,
+  i,
+  RootComponentsListItemIndex,
+  ComponentsListItemIndex: Integer;
+  GdbPackages: TGdbPackageArray; 
+  ResetGdbContext: TResetGdbContextArray;
+#if InstallerMode == DEBUG
+  IsComponentsListItemIndexUpdated: Boolean;
+#endif
+
+begin
+  Log('InitializeGdbComponentsListItemIndexes called');
+
+  SetArrayLength(ResetGdbContext, 2);
+
+  // 32-bit
+  ResetGdbContext[0].RootComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
+  ResetGdbContext[0].GdbPackages := Gdb32Packages;
+
+  // 64-bit
+  ResetGdbContext[1].RootComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
+  ResetGdbContext[1].GdbPackages := Gdb64Packages;
+
+  // Reset all 32-bit and 64-bit checkboxes
+  for ContextIndex := Low(ResetGdbContext) to High(ResetGdbContext) do
+  begin
+    GdbPackages := ResetGdbContext[ContextIndex].GdbPackages;
+    RootComponentsListItemIndex := ResetGdbContext[ContextIndex]
+      .RootComponentsListItemIndex;    
+
+#if InstallerMode == DEBUG
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s" [%d of %d]', [
+      RootComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      (ContextIndex + 1),
+      (High(ResetGdbContext) + 1)
+    ]));
+#endif
+    
+    // Process all GDB packages
+    for i := High(GdbPackages) downto Low(GdbPackages) do
+    begin        
+      // Update ComponentsListItemIndex from GdbPackages[i] if needed 
+      ComponentsListItemIndex := GdbPackages[i].ComponentsListItemIndex;
+
+#if InstallerMode == DEBUG
+      IsComponentsListItemIndexUpdated := False;
+#endif
+               
+      if (ComponentsListItemIndex = -1) then
+      begin
+        ComponentsListItemIndex := GetComponentsListItemIndex(GdbPackages[i].Name, RootComponentsListItemIndex);          
+        GdbPackages[i].ComponentsListItemIndex := ComponentsListItemIndex;
+#if InstallerMode == DEBUG
+        IsComponentsListItemIndexUpdated := True;
+#endif
+      end;
+
+#if InstallerMode == DEBUG
+      Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IndexUpdated="%s"', [
+        ComponentsListItemIndex,
+        WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex],
+        BoolToStr(IsComponentsListItemIndexUpdated)
+      ]));
+#endif
+    end;
+  end;    
+
+  Log('InitializeGdbComponentsListItemIndexes ended');
+end;
+
 procedure GdbPageInitialize(const FirstInitialization: Boolean);
 begin
   Log(Format('GdbPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
@@ -338,6 +355,7 @@ begin
       WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb32}'));
     ComponentGdb64ComponentsListItemIndex :=
       WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb64}'));
+    GdbComponentsListItemIndexInitialize();
   end;
 
   Log(Format('GdbPageInitialize: gdb32ComponentListIndex=%d, gdb64ComponentListIndex=%d', [
@@ -354,11 +372,13 @@ begin
     if (GdbComboBoxSelectionStoredItemIndex <> -1) 
       and (IsFoundationMinGW64 = IsGdbComboBoxSelection64) then
     begin
-      Log(Format('+ Re-selection: %d', [GdbComboBoxSelectionStoredItemIndex]));
       GdbComboBoxSelection.ItemIndex := GdbComboBoxSelectionStoredItemIndex;
+#if InstallerMode == DEBUG
+      Log(Format('+ Re-selection: %d', [GdbComboBoxSelectionStoredItemIndex]));
+#endif      
     end;
-
-    UpdateGdbSelection();    
+    
+    UpdateGdbSelection();  
   end;
 end;
 

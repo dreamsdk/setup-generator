@@ -283,7 +283,9 @@ begin
         // Update radio buttons in the Components List
         UpdateFoundation();
         UpdateToolchainSelection();
+
         UpdateGdbSelection();
+        SetGdbComponentsControlState(gclsoLock);
       end;
   end;
 end;
