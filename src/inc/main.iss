@@ -70,7 +70,7 @@ function InitializeSetup: Boolean;
 begin
   Result := True;
   SetUninstallMode(False);
-  GlobalInitialization;
+  GlobalInitialization();
 
   // Check modules running
   if IsModulesRunning then
@@ -105,130 +105,140 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
   
-  // Select Directory Page
-  if (CurPageID = wpSelectDir) then
-  begin
-    // Avoid spaces in the Installation Path  
-    Result := (Pos(' ', WizardDirValue) = 0);
-    if not Result then
-    begin
-      MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
-      Exit;
-    end;
-    SetWizardDirValueInitialized(True);
-  end;
+  case CurPageID of
+    // Select Directory Page
+    wpSelectDir:
+      begin
+        // Avoid spaces in the Installation Path  
+        Result := (Pos(' ', WizardDirValue) = 0);
+        if not Result then
+        begin
+          MsgBox(CustomMessage('InstallationDirectoryContainSpaces'), mbError, MB_OK);
+          Exit;
+        end;
+        SetWizardDirValueInitialized(True);
+      end;
 
-  // Toolchains Page
-  if (CurPageID = ToolchainsPageID) then
-  begin
-    if IsModernWindowsForToolchain and (not IsSelectedToolchainForModernWindowsOnly) then
-    begin
-      Result := ConfirmLegacyToolchainsUsage;
-      if not Result then
-        Exit;
-    end;
+    // Toolchains Page
+    ToolchainsPageID:
+      begin
+        if IsModernWindowsForToolchain and (not IsSelectedToolchainForModernWindowsOnly) then
+        begin
+          Result := ConfirmLegacyToolchainsUsage;
+          if not Result then
+            Exit;
+        end;
 
-    if (not IsModernWindowsForToolchain) and IsSelectedToolchainForModernWindowsOnly then
-    begin
-      Result := ConfirmModernToolchainsUsage;
-      if not Result then
-        Exit;
-    end;
-  end;
+        if (not IsModernWindowsForToolchain) and IsSelectedToolchainForModernWindowsOnly then
+        begin
+          Result := ConfirmModernToolchainsUsage;
+          if not Result then
+            Exit;
+        end;
+      end;
 
-  // Ruby Page
-  if (CurPageID = RubyPageID) then
-  begin
-    if IsRubyEnabled then
-    begin
-      // Check Ruby prerequisites
-      Result := CheckRubyPrerequisites;
-      if not Result then
-        Exit;
+    // GDB Page
+    GdbPageID:
+      begin
+        Result := GdbCheckUnsupportedPythonUsage();
+        if not Result then
+          Exit;
+      end;
 
-      // Sure to continue?
-      Result := ConfirmRubyUsage;
-      if not Result then
-        Exit;
-    end;  
-  end;
-  
-  // KallistiOS Page
-  if (CurPageID = KallistiEmbeddedPageID) then
-  begin
-    // Checking if the user is SURE to use the embedded KOS
-    if IsKallistiEmbedded then
-    begin
-      { Offline }     
+    // Ruby Page
+    RubyPageID:
+      begin
+        if IsRubyEnabled then
+        begin
+          // Check Ruby prerequisites
+          Result := CheckRubyPrerequisites;
+          if not Result then
+            Exit;
 
-      // Check mandatory prerequisites
-      Result := CheckOfflinePrerequisitesMandatory;
-      if not Result then
-        Exit;
+          // Sure to continue?
+          Result := ConfirmRubyUsage;
+          if not Result then
+            Exit;
+        end;  
+      end;
+    
+    // KallistiOS Page
+    KallistiEmbeddedPageID:
+      begin
+        // Checking if the user is SURE to use the embedded KOS
+        if IsKallistiEmbedded then
+        begin
+          { Offline }     
 
-      // Check optional prerequisites
-      Result := CheckOfflinePrerequisitesOptional;
-      if not Result then      
-        Exit;
-        
-      // Sure to continue?
-      Result := ConfirmKallistiEmbeddedUsage;
-      if not Result then
-        Exit;             
-    end
-    else
-    begin
-      { Online }
-      
-      // Check Internet connection
-      Result := CheckInternetConnection;
-      if not Result then 
-        Exit;
+          // Check mandatory prerequisites
+          Result := CheckOfflinePrerequisitesMandatory;
+          if not Result then
+            Exit;
 
-      // Check mandatory prerequisites
-      Result := CheckOnlinePrerequisitesMandatory;
-      if not Result then
-        Exit;
+          // Check optional prerequisites
+          Result := CheckOfflinePrerequisitesOptional;
+          if not Result then      
+            Exit;
+            
+          // Sure to continue?
+          Result := ConfirmKallistiEmbeddedUsage;
+          if not Result then
+            Exit;             
+        end
+        else
+        begin
+          { Online }
+          
+          // Check Internet connection
+          Result := CheckInternetConnection;
+          if not Result then 
+            Exit;
 
-      // Check optional prerequisites
-      Result := CheckOnlinePrerequisitesOptional;
-      if not Result then      
-        Exit;
-    end;
-  end;
+          // Check mandatory prerequisites
+          Result := CheckOnlinePrerequisitesMandatory;
+          if not Result then
+            Exit;
 
-  // Foundation Page
-  if (CurPageID = FoundationPageID) then
-  begin
-    if IsFoundationMinGW and IsFoundationPossibleMinGW64 then
-    begin      
-      // Sure to continue?
-      Result := ConfirmFoundationMinGW;
-      if not Result then
-        Exit;      
-    end;       
-  end;
+          // Check optional prerequisites
+          Result := CheckOnlinePrerequisitesOptional;
+          if not Result then      
+            Exit;
+        end;
+      end;
 
-  // Code::Blocks Page
-  if (CurPageID = IntegratedDevelopmentEnvironmentSettingsPageID) then
-  begin
-    // Checking if the Code::Blocks Integration page is well filled
-    Result := IsCodeBlocksIntegrationEnabled and IsCodeBlocksIntegrationReady;
-  end;
+    // Foundation Page
+    FoundationPageID:
+      begin
+        if IsFoundationMinGW and IsFoundationPossibleMinGW64 then
+        begin      
+          // Sure to continue?
+          Result := ConfirmFoundationMinGW;
+          if not Result then
+            Exit;      
+        end;       
+      end;
 
-  // Finalizing the installation.
-  if (CurPageID = wpInfoAfter) then
-  begin
-    WizardForm.NextButton.Enabled := False;
+    // Code::Blocks Page
+    IntegratedDevelopmentEnvironmentSettingsPageID:
+      begin
+        // Checking if the Code::Blocks Integration page is well filled
+        Result := IsCodeBlocksIntegrationEnabled and IsCodeBlocksIntegrationReady;
+      end;
 
-    // Install Code::Blocks Integration if requested.
-    if IsCodeBlocksIntegrationEnabled then
-      InstallCodeBlocksIntegration;
+    // Finalizing the installation.
+    wpInfoAfter:
+      begin
+        WizardForm.NextButton.Enabled := False;
 
-    // Patch fstab and setup KallistiOS.
-    FinalizeSetup;
+        // Install Code::Blocks Integration if requested.
+        if IsCodeBlocksIntegrationEnabled then
+          InstallCodeBlocksIntegration;
 
-    WizardForm.NextButton.Enabled := True;
+        // Patch fstab and setup KallistiOS.
+        FinalizeSetup;
+
+        WizardForm.NextButton.Enabled := True;
+      end;
   end;
 end;
 
@@ -329,8 +339,10 @@ begin
   InitializeArrayToolchain;
   InitializeArrayGdb;
 
+#if InstallerMode != RELEASE
   // Retrieve components name from the ComponentsList
-  InitializeComponentsListNames;
+  InitializeComponentsListNames; // TODO: OPTIMIZE THIS
+#endif
 
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
@@ -362,7 +374,7 @@ function InitializeUninstall: Boolean;
 begin
   Result := True;
   SetUninstallMode(True);
-  GlobalInitialization;
+  GlobalInitialization();
 
   // Check modules running
   if IsModulesRunning then

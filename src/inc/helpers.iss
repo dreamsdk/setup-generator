@@ -134,7 +134,7 @@ begin
   RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
 end;
 
-procedure GlobalInitialization;
+procedure GlobalInitialization();
 begin
   Log('GlobalInitialization called');
 

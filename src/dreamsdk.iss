@@ -171,6 +171,10 @@ SignedUninstaller=yes
 // SECTIONS
 // ============================================================================
 
+//#if FileExists("test.iss")
+//#include "test.iss"
+//#endif
+
 #include "inc/sections/labels.iss"
 
 #include "inc/sections/install.iss"

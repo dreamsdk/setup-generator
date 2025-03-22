@@ -17,13 +17,16 @@ type
   
   TGdbPackage = record
     Name: String;
-    Description: String;
+    Version: String;
+    IsPythonRuntimeInstalled: Boolean;
     ComponentsListItemIndex: Integer;
   end;
   TGdbPackageArray = array of TGdbPackage;
 
 var
   Foundation: TEnvironmentFoundationKind;
+  PreviousFoundation: TEnvironmentFoundationKind;
+
   UninstallMode,
   WizardDirValueInitialized: Boolean;  
   
@@ -32,9 +35,9 @@ var
   SelectedToolchainPackage: Integer;
   
   // GDB
-  Gdb32Packages: TGdbPackageArray;  
+  Gdb32Packages: TGdbPackageArray;
   Gdb64Packages: TGdbPackageArray;
-  SelectedGdbPackage: Integer;  
+  SelectedGdbPackage: Integer;
 
 //=============================================================================
 // UNINSTALL MODE
@@ -83,9 +86,16 @@ begin
   Result := (Foundation = efkMinGWMSYS) or (not IsFoundationPossibleMinGW64);
 end;
 
-procedure SetFoundation(SelectedFoundation: TEnvironmentFoundationKind);
+function IsFoundationChanged: Boolean;
 begin
+  Result := (PreviousFoundation <> Foundation); 
+end;
+
+procedure SetFoundation(SelectedFoundation: TEnvironmentFoundationKind);
+begin  
+  PreviousFoundation := Foundation;
   Foundation := SelectedFoundation;
+
   Log(Format('Initialized Foundation: IsFoundationMinGW64=%d, IsFoundationMinGW=%d', [
     IsFoundationMinGW64,
     IsFoundationMinGW
@@ -145,7 +155,6 @@ begin
   for i := Low(Gdb32Packages) to High(Gdb32Packages) do
   begin
     Gdb32Packages[i].Name := sEmptyStr;
-    Gdb32Packages[i].Description := sEmptyStr;
     Gdb32Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
@@ -159,7 +168,6 @@ begin
   for i := Low(Gdb64Packages) to High(Gdb64Packages) do
   begin
     Gdb64Packages[i].Name := sEmptyStr;
-    Gdb64Packages[i].Description := sEmptyStr;
     Gdb64Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
@@ -188,6 +196,21 @@ begin
   Result := -1;
   if IsSelectedGdb then
     Result := SelectedGdbPackage;
+end;
+
+function GetSelectedGdbPackage(var SelectedGdbPackage: TGdbPackage): Boolean;
+var
+  GdbPackages: TGdbPackageArray;
+  ItemIndex: Integer;
+
+begin
+  ItemIndex := GetSelectedGdb();
+  Result := (ItemIndex <> -1);
+  if Result then
+  begin
+    GetGdbPackagesList(GdbPackages); 
+    SelectedGdbPackage := GdbPackages[ItemIndex];
+  end;
 end;
 
 function SetSelectedGdb(GdbPackageIndex: Integer): Boolean;

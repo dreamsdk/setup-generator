@@ -143,11 +143,13 @@ GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbIntroduction=Customize your GNU Debugger (GDB) {#GdbVersion} for SuperH installation.
 LabelGdbDescription=You may enable now Python extensions for GDB {#GdbVersion}, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
 LabelGdbSelection=GNU Debugger (GDB) Profile:
-GdbNotSupportedForOldWindows=(unsupported on your OS)
-GdbLegacyConfirmation=This GDB is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
-GdbUnsupportedModernConfirmation=This GDB is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
-GdbNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
-GdbAllWindows=Compatible on all Windows starting from Windows XP.
+GdbPythonRuntimeNotFound=This GDB is binded with Python %s 32-bits, which was not found on your system.
+GdbConfirmUnsupportedPythonUsage=Python %s 32-bits was not found on your system, which is required for the selected build. Continue anyway? You can change that later in {#FullAppManagerName}.
+;GdbNotSupportedForOldWindows=(unsupported on your OS)
+;GdbLegacyConfirmation=This GDB is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
+;GdbUnsupportedModernConfirmation=This GDB is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
+;GdbNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
+;GdbAllWindows=Compatible on all Windows starting from Windows XP.
 
 ; Ruby
 RubyTitlePage=Ruby Configuration

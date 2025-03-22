@@ -57,45 +57,81 @@ procedure InitializeArrayGdb();
 begin
   // x86 (32-bit)
   InitializeGdb32Packages({#Gdb32Count});
+
   // None
   Gdb32Packages[0].Name := ExpandConstant('{cm:GdbPython_None}');
+  Gdb32Packages[0].Version := '';
+
   // Python 2.7
   Gdb32Packages[1].Name := ExpandConstant('{cm:GdbPython_27}');
+  Gdb32Packages[1].Version := '2.7';
+
   // Python 3.3
   Gdb32Packages[2].Name := ExpandConstant('{cm:GdbPython_33}');
+  Gdb32Packages[2].Version := '3.3';
+
   // Python 3.4
   Gdb32Packages[3].Name := ExpandConstant('{cm:GdbPython_34}');
+  Gdb32Packages[3].Version := '3.4';
+
   // Python 3.5
   Gdb32Packages[4].Name := ExpandConstant('{cm:GdbPython_35}');
+  Gdb32Packages[4].Version := '3.5';
+
   // Python 3.6
   Gdb32Packages[5].Name := ExpandConstant('{cm:GdbPython_36}');
+  Gdb32Packages[5].Version := '3.6';
+
   // Python 3.7
   Gdb32Packages[6].Name := ExpandConstant('{cm:GdbPython_37}');
+  Gdb32Packages[6].Version := '3.7';
+
   // Python 3.8
   Gdb32Packages[7].Name := ExpandConstant('{cm:GdbPython_38}');
+  Gdb32Packages[7].Version := '3.8';
+
   // Python 3.9
   Gdb32Packages[8].Name := ExpandConstant('{cm:GdbPython_39}');
+  Gdb32Packages[8].Version := '3.9';
+
   // Python 3.10
   Gdb32Packages[9].Name := ExpandConstant('{cm:GdbPython_310}');
+  Gdb32Packages[9].Version := '3.10';
+
   // Python 3.11
   Gdb32Packages[10].Name := ExpandConstant('{cm:GdbPython_311}');
+  Gdb32Packages[10].Version := '3.11';
+
   // Python 3.12
   Gdb32Packages[11].Name := ExpandConstant('{cm:GdbPython_312}');
+  Gdb32Packages[11].Version := '3.12';
+
   // Python 3.13
   Gdb32Packages[12].Name := ExpandConstant('{cm:GdbPython_313}');
+  Gdb32Packages[12].Version := '3.13';
 
   // x64 (64-bit)
   InitializeGdb64Packages({#Gdb64Count});
+
   // None
-  Gdb64Packages[0].Name := ExpandConstant('{cm:GdbPython_None}');  
+  Gdb64Packages[0].Name := ExpandConstant('{cm:GdbPython_None}');
+  Gdb64Packages[0].Version := '';
+      
   // Python 3.10
   Gdb64Packages[1].Name := ExpandConstant('{cm:GdbPython_310}');
+  Gdb64Packages[1].Version := '3.10';
+
   // Python 3.11
   Gdb64Packages[2].Name := ExpandConstant('{cm:GdbPython_311}');
+  Gdb64Packages[2].Version := '3.11';
+
   // Python 3.12
   Gdb64Packages[3].Name := ExpandConstant('{cm:GdbPython_312}');
+  Gdb64Packages[3].Version := '3.12';
+  
   // Python 3.13
   Gdb64Packages[4].Name := ExpandConstant('{cm:GdbPython_313}');  
+  Gdb64Packages[4].Version := '3.13';
 end;
 
 [Files]

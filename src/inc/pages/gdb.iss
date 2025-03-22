@@ -13,7 +13,8 @@ var
   ComponentGdb32ComponentsListItemIndex,
   ComponentGdb64ComponentsListItemIndex,
   GdbComboBoxSelectionStoredItemIndex: Integer;
-  IsGdbComboBoxSelection64: Boolean;
+  IsUnsupportedGdbSelected: Boolean;
+  SavedStateIsFoundationMinGW64: Boolean;
 
 function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
 begin
@@ -61,27 +62,21 @@ begin
   end;
 end;
 
-function IsSelectedGdbForModernWindowsOnly(): Boolean;
+function GdbCheckUnsupportedPythonUsage(): Boolean;
 var
-  SelectedGdb: Integer;
+  SelectedGdbPackage: TGdbPackage;
 
 begin
-  Result := False;
-  (*SelectedGdb := GetSelectedGdb;
-  if SelectedGdb <> -1 then
-    Result := GdbPackages[SelectedGdb].IsModernWindowsOnly;   *)
-end;
-
-function ConfirmModernGdbUsage(): Boolean;
-begin
-  Result := (MsgBox(CustomMessage('GdbUnsupportedModernConfirmation'),
-    mbError, MB_YESNO) = IDYES);
-end;
-
-function ConfirmLegacyGdbUsage(): Boolean;
-begin
-  Result := (MsgBox(CustomMessage('GdbLegacyConfirmation'),
-    mbConfirmation, MB_YESNO) = IDYES);
+  Result := True;
+  if IsUnsupportedGdbSelected 
+    and GetSelectedGdbPackage(SelectedGdbPackage) then
+  begin    
+    Result := (MsgBox(
+      Format(CustomMessage('GdbConfirmUnsupportedPythonUsage'), [
+        SelectedGdbPackage.Version
+      ]),
+      mbError, MB_YESNO) = IDYES);
+  end;
 end;
 
 procedure SetGdbComponentsControlState(
@@ -181,19 +176,29 @@ begin
   GdbProfileIndex := GdbComboBoxSelection.Items.Objects[GdbComboBoxSelection.ItemIndex];    
   if SetSelectedGdb(GdbProfileIndex) then
   begin
-    GdbComboBoxSelectionStoredItemIndex := GdbComboBoxSelection.ItemIndex;
-    IsGdbComboBoxSelection64 := IsFoundationMinGW64;
+    GdbComboBoxSelectionStoredItemIndex := GdbComboBoxSelection.ItemIndex;    
+    SavedStateIsFoundationMinGW64 := IsFoundationMinGW64;
 
     SelectedGdb := Gdb32Packages[GetSelectedGdb];
     GdbComponentsListItemIndex := ComponentGdb32ComponentsListItemIndex;
-    if IsGdbComboBoxSelection64 then
+    if SavedStateIsFoundationMinGW64 then
     begin
       SelectedGdb := Gdb64Packages[GetSelectedGdb];
       GdbComponentsListItemIndex := ComponentGdb64ComponentsListItemIndex;
     end;
 
-    // Display Gdb information
-    GdbLabelSelectionHint.Caption := SelectedGdb.Description;
+    // Display GDB information
+    IsUnsupportedGdbSelected := False;
+    GdbLabelSelectionHint.Caption := sEmptyStr;
+    if SelectedGdb.Version <> sEmptyStr then
+      if not SelectedGdb.IsPythonRuntimeInstalled then
+      begin
+        IsUnsupportedGdbSelected := True;
+        GdbLabelSelectionHint.Caption := Format(
+          CustomMessage('GdbPythonRuntimeNotFound'), [
+            SelectedGdb.Version
+          ]);
+      end;
           
     // Tick the correct Gdb in the ComponentsList then force UI refresh
     if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then
@@ -228,19 +233,11 @@ end;
 
 procedure GdbComboBoxSelectionAddItem(Text: String; GdbProfileIndex: Integer);
 var
-  GdbItemText: String;
   NewItemIndex: Integer;
-  GdbPackages: TGdbPackageArray;  
 
-begin
-  GetGdbPackagesList(GdbPackages);
-  
-  GdbItemText := Text;  
-  (*if (not IsModernWindowsForGdb) and GdbPackages[GdbProfileIndex].IsModernWindowsOnly then
-    GdbItemText := Format('%s %s', [Text, ExpandConstant('{cm:GdbNotSupportedForOldWindows}')]);*)
-
+begin    
   // Add the Gdb to the ComboBox
-  NewItemIndex := GdbComboBoxSelection.Items.Add(GdbItemText);  
+  NewItemIndex := GdbComboBoxSelection.Items.Add(Text);  
   GdbComboBoxSelection.Items.Objects[NewItemIndex] := Integer(GdbProfileIndex);
 end;
 
@@ -270,7 +267,7 @@ begin
   UpdateGdbSelection();
 end;
 
-procedure GdbComponentsListItemIndexInitialize();
+procedure GdbPackagesInitialize();
 var
   ContextIndex,
   i,
@@ -283,7 +280,7 @@ var
 #endif
 
 begin
-  Log('InitializeGdbComponentsListItemIndexes called');
+  Log('GdbPackagesInitialize called');
 
   SetArrayLength(ResetGdbContext, 2);
 
@@ -320,7 +317,8 @@ begin
 #if InstallerMode == DEBUG
       IsComponentsListItemIndexUpdated := False;
 #endif
-               
+      
+      // Assign ComponentsListItemIndex if needed         
       if (ComponentsListItemIndex = -1) then
       begin
         ComponentsListItemIndex := GetComponentsListItemIndex(GdbPackages[i].Name, RootComponentsListItemIndex);          
@@ -329,6 +327,9 @@ begin
         IsComponentsListItemIndexUpdated := True;
 #endif
       end;
+
+      // Check if Python runtime is installed. Currently only support 32-bits
+      GdbPackages[i].IsPythonRuntimeInstalled := TestPythonVersion(GdbPackages[i].Version);
 
 #if InstallerMode == DEBUG
       Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IndexUpdated="%s"', [
@@ -340,7 +341,7 @@ begin
     end;
   end;    
 
-  Log('InitializeGdbComponentsListItemIndexes ended');
+  Log('GdbPackagesInitialize ended');
 end;
 
 procedure GdbPageInitialize(const FirstInitialization: Boolean);
@@ -349,13 +350,14 @@ begin
 
   if FirstInitialization then
   begin
+    IsUnsupportedGdbSelected := False;
     GdbComboBoxSelectionStoredItemIndex := -1;
-    IsGdbComboBoxSelection64 := False;
+    SavedStateIsFoundationMinGW64 := False;
     ComponentGdb32ComponentsListItemIndex :=
       WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb32}'));
     ComponentGdb64ComponentsListItemIndex :=
       WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentGdb64}'));
-    GdbComponentsListItemIndexInitialize();
+    GdbPackagesInitialize();
   end;
 
   Log(Format('GdbPageInitialize: gdb32ComponentListIndex=%d, gdb64ComponentListIndex=%d', [
@@ -369,12 +371,12 @@ begin
     GdbComboBoxSelection.ItemIndex := 0;
 
     // Handle re-selection but only if we are in the same flavour (32 or 64-bit)
-    if (GdbComboBoxSelectionStoredItemIndex <> -1) 
-      and (IsFoundationMinGW64 = IsGdbComboBoxSelection64) then
+    if (GdbComboBoxSelectionStoredItemIndex <> -1)
+      and (SavedStateIsFoundationMinGW64 = IsFoundationMinGW64)then
     begin
       GdbComboBoxSelection.ItemIndex := GdbComboBoxSelectionStoredItemIndex;
 #if InstallerMode == DEBUG
-      Log(Format('+ Re-selection: %d', [GdbComboBoxSelectionStoredItemIndex]));
+      Log(Format('+ GDB ItemIndex Restore: %d', [GdbComboBoxSelectionStoredItemIndex]));
 #endif      
     end;
     
