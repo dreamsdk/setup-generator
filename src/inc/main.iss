@@ -14,7 +14,6 @@ var
   IntegratedDevelopmentEnvironmentSettingsPageID, 
   GdbPageID,
   KallistiEmbeddedPageID,
-  RubyPageID,
   ToolchainsPageID,
   FoundationPageID: Integer;
 
@@ -143,23 +142,6 @@ begin
         Result := GdbCheckUnsupportedPythonUsage();
         if not Result then
           Exit;
-      end;
-
-    // Ruby Page
-    RubyPageID:
-      begin
-        if IsRubyEnabled then
-        begin
-          // Check Ruby prerequisites
-          Result := CheckRubyPrerequisites;
-          if not Result then
-            Exit;
-
-          // Sure to continue?
-          Result := ConfirmRubyUsage;
-          if not Result then
-            Exit;
-        end;  
       end;
     
     // KallistiOS Page
@@ -366,7 +348,6 @@ begin
 
   // Creates pages before Select Components
   // Creates pages in the specified order  
-  RubyPageID := CreateRubyPage;
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
   GdbPageID := CreateGdbPage;
   ToolchainsPageID := CreateToolchainsPage;    

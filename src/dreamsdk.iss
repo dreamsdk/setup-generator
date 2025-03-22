@@ -96,7 +96,6 @@
 
 #include "inc/pages/foundation.iss"
 #include "inc/pages/kos.iss"
-#include "inc/pages/ruby.iss"
 #include "inc/pages/ide.iss"
 #include "inc/pages/gdb.iss"
 #include "inc/pages/toolchains.iss"

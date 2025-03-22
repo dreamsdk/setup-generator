@@ -20,18 +20,14 @@ procedure SetupApplication;
 var
   ResultCode: Integer;
   ManagerFileName,
-  Parameters,
-  RubySwitch: String;
+  Parameters: String;
 
 begin
   ManagerFileName := ExpandConstant('{code:GetApplicationComponentManagerFilePath}');
-  
-  RubySwitch := '';
-  if IsRubyEnabled then
-    RubySwitch := ' --enable-ruby';
-
-  Parameters := Format('--post-install --home-dir "%s"%s', [
-    ExpandConstant('{app}'), RubySwitch]);
+   
+  Parameters := Format('--post-install --home-dir "%s"', [
+    ExpandConstant('{app}')
+  ]);
 
   Log(Format('%s %s', [ManagerFileName, Parameters]));
 
