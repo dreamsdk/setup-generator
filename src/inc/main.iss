@@ -280,11 +280,22 @@ begin
         ComponentsListItemsCountWithoutIde := 
           GetComponentsListCount - GetComponentRootLevelItemsCount('{#IdeComponentsListName}');
 
-        // Update radio buttons in the Components List
+        // Update radio buttons for Foundation in Components List
         UpdateFoundation();
+
+        // Update radio buttons for Toolchains in Components List
         UpdateToolchainSelection();
 
+        // Update radio buttons for GDB in Components List
         UpdateGdbSelection();
+
+        (* Lock GDB Components List items selection
+         *
+         * WARNING: This procedure should/can be executed *ONLY* here!
+         * Indeed, if you execute this procedure in another location, the
+         * radiobuttons will remains unchecked, so an undefined behaviour is
+         * happening... sounds like a bug in Inno Setup but nevermind.
+         *)
         SetGdbComponentsControlState(gclsoLock);
       end;
   end;
