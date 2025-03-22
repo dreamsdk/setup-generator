@@ -171,10 +171,6 @@ SignedUninstaller=yes
 // SECTIONS
 // ============================================================================
 
-//#if FileExists("test.iss")
-//#include "test.iss"
-//#endif
-
 #include "inc/sections/labels.iss"
 
 #include "inc/sections/install.iss"
@@ -187,5 +183,10 @@ SignedUninstaller=yes
 // ============================================================================
 // MAIN
 // ============================================================================
+
+#if FileExists(GENERATED_COMPONENTS_LIST_FILE)
+#include GENERATED_COMPONENTS_LIST_FILE
+#define ComponentsListNameGenerated
+#endif
 
 #include "inc/main.iss"

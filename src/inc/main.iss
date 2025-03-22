@@ -339,9 +339,26 @@ begin
   InitializeArrayToolchain;
   InitializeArrayGdb;
 
+#ifdef ComponentsListNameGenerated
+  Log('ComponentsListNameGenerated defined');
+  InitializeComponentsListName();
+#endif
+
 #if InstallerMode != RELEASE
-  // Retrieve components name from the ComponentsList
-  InitializeComponentsListNames; // TODO: OPTIMIZE THIS
+  // Basically this means DEBUG, but this is NOT Debug code
+  // This is a trick used for Setup initialization in Release mode
+
+  if GetArrayLength(ComponentsListName) = 0 then
+  begin
+    // Retrieve components name from the ComponentsList
+    InitializeComponentsListNames;
+
+    (* Generate the Component List inventory file that will be used in RELEASE
+     * mode, while rebuilding this Setup.
+     *)
+    if DirExists('..\src') then
+      SaveComponentsListName('..\src\{#GENERATED_COMPONENTS_LIST_FILE}');
+  end;
 #endif
 
   // Create BrowseForFolderEx component

@@ -9,3 +9,5 @@
 
 #define UNINSTALL_REQUIRED 1
 #define UNINSTALL_IGNORED 0
+
+#define GENERATED_COMPONENTS_LIST_FILE "components.out"
