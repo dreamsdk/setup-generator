@@ -83,9 +83,15 @@
 
 #include "inc/global.iss"
 
+#if FileExists(GENERATED_COMPONENTS_LIST_FILE)
+#include GENERATED_COMPONENTS_LIST_FILE
+#define ComponentsListNameGenerated
+#endif
+
 #include "inc/paths/sources.iss"
 #include "inc/paths/targets.iss"
 
+#include "inc/helpers/components.iss"
 #include "inc/helpers/git.iss"
 #include "inc/helpers/junction.iss"
 #include "inc/helpers/inet.iss"
@@ -182,10 +188,5 @@ SignedUninstaller=yes
 // ============================================================================
 // MAIN
 // ============================================================================
-
-#if FileExists(GENERATED_COMPONENTS_LIST_FILE)
-#include GENERATED_COMPONENTS_LIST_FILE
-#define ComponentsListNameGenerated
-#endif
 
 #include "inc/main.iss"

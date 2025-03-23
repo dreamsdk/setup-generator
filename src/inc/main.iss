@@ -1,12 +1,6 @@
 [Code]
 
 const
-  // This should match the [Types] section of this file.
-  TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION_WITHOUT_IDE = 0;
-  TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION = 1;
-  TYPES_COMBO_ITEMINDEX_COMPACT_INSTALLATION = 2;
-  TYPES_COMBO_ITEMINDEX_CUSTOM_INSTALLATION = 3;
-
   CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
 
 var
@@ -16,41 +10,6 @@ var
   KallistiEmbeddedPageID,
   ToolchainsPageID,
   FoundationPageID: Integer;
-
-  ComponentsListDisabledItemsCount,
-  ComponentsListItemsCountWithoutIde: Integer;  
-
-procedure ComponentsListCheckChanges;
-var
-  SelectedComponentsCount,
-  ComponentsCount: Integer;  
-
-begin
-  SelectedComponentsCount := GetSelectedComponentsCount;
-  ComponentsCount := GetComponentsListCount;
-
-  Log(Format('Components List Status: %d selected of %d', [SelectedComponentsCount, ComponentsCount]));
-  
-  if (SelectedComponentsCount = ComponentsCount) then
-    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION
-  else if (SelectedComponentsCount = ComponentsListDisabledItemsCount) then
-    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_COMPACT_INSTALLATION
-  else if not IsComponentSelected('{#IdeComponentsListName}') and (SelectedComponentsCount = ComponentsListItemsCountWithoutIde) then
-    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_FULL_INSTALLATION_WITHOUT_IDE
-  else
-    WizardForm.TypesCombo.ItemIndex := TYPES_COMBO_ITEMINDEX_CUSTOM_INSTALLATION;
-end;
-
-procedure ComponentsListClickCheck(Sender: TObject);
-begin
-  ComponentsListCheckChanges;
-end;
-
-procedure HandleComponentsListTypesCombo;
-begin
-  // Thanks to: https://stackoverflow.com/a/36989894/3726096
-  WizardForm.ComponentsList.OnClickCheck := @ComponentsListClickCheck;
-end;
 
 function IsModulesRunning: Boolean;
 begin
@@ -269,14 +228,7 @@ begin
       end;
 
     wpSelectComponents:
-      begin
-        // Get all disabled items from the ComponentsList
-        ComponentsListDisabledItemsCount := GetComponentsListDisabledItemsCount;
-
-        // Get the IDE items from the ComponentsList
-        ComponentsListItemsCountWithoutIde := 
-          GetComponentsListCount - GetComponentRootLevelItemsCount('{#IdeComponentsListName}');
-
+      begin       
         // Update radio buttons for Foundation in Components List
         UpdateFoundation();
 
@@ -286,14 +238,16 @@ begin
         // Update radio buttons for GDB in Components List
         UpdateGdbSelection();
 
-        (* Lock GDB Components List items selection
-         *
-         * WARNING: This procedure should/can be executed *ONLY* here!
-         * Indeed, if you execute this procedure in another location, the
-         * radiobuttons will remains unchecked, so an undefined behaviour is
-         * happening... sounds like a bug in Inno Setup but nevermind.
-         *)
+        { Lock GDB Components List items selection
+          WARNING: This procedure should/can be executed *ONLY* here!
+          Indeed, if you execute this procedure in another location, the
+          radiobuttons will remains unchecked, so an undefined behaviour is
+          happening... sounds like a bug in Inno Setup but nevermind. }
         SetGdbComponentsControlState(gclsoLock);
+
+        { Initialize the component list items count. This needs to have all
+          the GDB items disabled (see SetGdbComponentsControlState() above). }
+        ComponentsListInitialize(False);
       end;
   end;
 end;
@@ -326,27 +280,8 @@ begin
   InitializeArrayToolchain;
   InitializeArrayGdb;
 
-#ifdef ComponentsListNameGenerated
-  Log('ComponentsListNameGenerated defined');
-  InitializeComponentsListName();
-#endif
-
-#if InstallerMode != RELEASE
-  // Basically this means DEBUG, but this is NOT Debug code
-  // This is a trick used for Setup initialization in Release mode
-
-  if GetArrayLength(ComponentsListName) = 0 then
-  begin
-    // Retrieve components name from the ComponentsList
-    InitializeComponentsListNames;
-
-    (* Generate the Component List inventory file that will be used in RELEASE
-     * mode, while rebuilding this Setup.
-     *)
-    if DirExists('..\src') then
-      SaveComponentsListName('..\src\{#GENERATED_COMPONENTS_LIST_FILE}');
-  end;
-#endif
+  // Components List custom code handling
+  ComponentsListInitialize(True);
 
   // Create BrowseForFolderEx component
   BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
@@ -360,9 +295,6 @@ begin
 
   // Create page after Select Components
   IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
-
-  // Initialize the components list dropdown
-  HandleComponentsListTypesCombo;
 
   // First initialization of pages using generated configuration
   ToolchainsPageInitialize(True);
