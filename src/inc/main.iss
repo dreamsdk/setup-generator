@@ -252,17 +252,22 @@ end;
 procedure CurPageChanged(CurPageID: Integer);
 begin
   case CurPageID of
-
+  
     ToolchainsPageID:
       begin        
         ToolchainsPageInitialize(False);        
       end;
 	  
-	GdbPageID:
-	  begin
-	    GdbPageInitialize(False);
-	  end;
+    GdbPageID:
+      begin
+        GdbPageInitialize(False);
+      end;
     
+    KallistiEmbeddedPageID:
+      begin
+        KallistiPageInitialize(False);
+      end;
+
     wpSelectComponents:
       begin
         // Get all disabled items from the ComponentsList
@@ -362,6 +367,7 @@ begin
   // First initialization of pages using generated configuration
   ToolchainsPageInitialize(True);
   GdbPageInitialize(True);
+  KallistiPageInitialize(True);
 end;
 
 //=============================================================================

@@ -37,4 +37,6 @@ Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
 #include "../../cfg/toolchains.iss"
 Name: "main\gdb"; Description: "{cm:ComponentGdb}"; Flags: fixed
 #include "../../cfg/gdb.iss"
-Name: "main\kos"; Description: "{cm:ComponentKOS}"; Flags: fixed
+Name: "main\kos"; Description: "{cm:ComponentKallisti}"; Flags: fixed
+Name: "main\kos\online"; Description: "{cm:ComponentKallistiOnline}"; Flags: exclusive fixed
+Name: "main\kos\offline"; Description: "{cm:ComponentKallistiOffline}"; Flags: exclusive fixed

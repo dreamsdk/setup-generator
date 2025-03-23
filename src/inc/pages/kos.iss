@@ -2,16 +2,63 @@
 var
   RadioButtonOnline,
   RadioButtonOffline: TNewRadioButton;
+  KallistiOnlineComponentsListItemIndex,
+  KallistiOfflineComponentsListItemIndex: Integer;
 
 function IsKallistiEmbedded: Boolean;
 begin
-  Result := RadioButtonOffline.Checked;
+  Result := Assigned(RadioButtonOffline)
+    and RadioButtonOffline.Checked;
 end;
 
 function ConfirmKallistiEmbeddedUsage: Boolean;
 begin
   Result := (MsgBox(CustomMessage('KallistiEmbeddedOfflineConfirmation'),
     mbError, MB_YESNO) = IDYES);
+end;
+
+procedure KallistiUpdateSelection();
+var
+  CheckIndex: Integer;
+
+begin
+  CheckIndex := KallistiOnlineComponentsListItemIndex;
+  if IsKallistiEmbedded then
+    CheckIndex := KallistiOfflineComponentsListItemIndex;
+  
+  if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then  
+    with WizardForm.ComponentsList do
+    begin
+      CheckItem(CheckIndex, coCheck);
+      Checked[CheckIndex] := True;
+      Invalidate;
+    end;
+end;
+
+procedure KallistiRadioButtonSelectionClick(Sender: TObject);
+begin
+  Log('KallistiRadioButtonSelectionClick called');
+  KallistiUpdateSelection();
+end;
+
+procedure KallistiPageInitialize(const FirstInitialization: Boolean);
+begin
+  Log(Format('KallistiPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
+
+  if FirstInitialization then
+  begin    
+    KallistiOnlineComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentKallistiOnline}'));
+    KallistiOfflineComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentKallistiOffline}'));
+  end;
+  
+  KallistiUpdateSelection();
+
+  Log(Format('KallistiPageInitialize: kallistiOnlineComponentListIndex=%d, kallistiOfflineComponentListIndex=%d', [
+    KallistiOnlineComponentsListItemIndex,
+    KallistiOfflineComponentsListItemIndex
+  ]));
 end;
 
 function CreateKallistiEmbeddedPage: Integer;
@@ -24,7 +71,7 @@ var
   BtnImage: TBitmapImage;
 
 begin
-  KallistiEmbeddedPage := CreateCustomPage(wpSelectComponents,
+  KallistiEmbeddedPage := CreateCustomPage(wpSelectDir,
     CustomMessage('KallistiEmbeddedTitlePage'), 
     CustomMessage('KallistiEmbeddedSubtitlePage'));
 
@@ -49,6 +96,7 @@ begin
       
   // Online
   RadioButtonOnline := TNewRadioButton.Create(KallistiEmbeddedPage);
+  RadioButtonOnline.OnClick := @KallistiRadioButtonSelectionClick;
   RadioButtonOnline.Parent := KallistiEmbeddedPage.Surface;
   RadioButtonOnline.Caption := CustomMessage('KallistiEmbeddedOnline');  
   RadioButtonOnline.Top := LabelKallistiEmbeddedDescription.Top 
@@ -66,6 +114,7 @@ begin
 
   // Offline
   RadioButtonOffline := TNewRadioButton.Create(KallistiEmbeddedPage);
+  RadioButtonOffline.OnClick := @KallistiRadioButtonSelectionClick;
   RadioButtonOffline.Parent := KallistiEmbeddedPage.Surface;
   RadioButtonOffline.Caption := CustomMessage('KallistiEmbeddedOffline');  
   RadioButtonOffline.Top := LabelKallistiEmbeddedDescriptionOnline.Top 
