@@ -121,7 +121,7 @@ begin
     // Process the root node
     WizardForm.ComponentsList.ItemEnabled[RootComponentsListItemIndex] := (Operation = gclsoUnlock);
     if (Operation = gclsoUnlock) then
-      WizardForm.ComponentsList.Checked[ComponentsListItemIndex] := False;
+      WizardForm.ComponentsList.Checked[RootComponentsListItemIndex] := False;
      
     // Process all GDB packages
     for i := High(GdbPackages) downto Low(GdbPackages) do
