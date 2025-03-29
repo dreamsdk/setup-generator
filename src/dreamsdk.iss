@@ -91,6 +91,7 @@
 #include "inc/paths/sources.iss"
 #include "inc/paths/targets.iss"
 
+#include "inc/helpers/helperlib.iss"
 #include "inc/helpers/components.iss"
 #include "inc/helpers/git.iss"
 #include "inc/helpers/junction.iss"

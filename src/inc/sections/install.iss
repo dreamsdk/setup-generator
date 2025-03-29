@@ -9,9 +9,10 @@ Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion:
 [Files]
 ; Install helpers
 Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+Source: "..\.helpers\{#HelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 
 ; Temporary files used for the installation
-Source: "..\.helpers\*"; Flags: dontcopy noencryption nocompression
+Source: "..\.helpers\*.exe"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
 ; Some additional resources

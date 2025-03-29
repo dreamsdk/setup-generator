@@ -4,7 +4,8 @@ const
   sEmptyStr = '';  
   sLineBreak = #13#10;
   MAX_RAND_SEED = $FFFFFFFF;  
-      
+  MAX_PATH = 260;
+
 // Thanks Michel (Phidels.com)
 function Left(SubStr, S: String): String;
 begin
