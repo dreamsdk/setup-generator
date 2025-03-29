@@ -152,6 +152,47 @@ begin
   end;
 end;
 
+function Count(What, Where: String): Integer;
+begin
+   Result := 0;
+    if Length(What) = 0 then
+        exit;
+    while Pos(What,Where)>0 do
+    begin
+        Where := Copy(Where,Pos(What,Where)+Length(What),Length(Where));
+        Result := Result + 1;
+    end;
+end;
+ 
+// Split text to array
+procedure Explode(var ADest: TArrayOfString; aText, aSeparator: String);
+var tmp: Integer;
+begin
+    if aSeparator='' then
+        exit;
+ 
+    SetArrayLength(ADest,Count(aSeparator,aText)+1)
+ 
+    tmp := 0;
+    repeat
+        if Pos(aSeparator,aText)>0 then
+        begin
+ 
+            ADest[tmp] := Copy(aText,1,Pos(aSeparator,aText)-1);
+            aText := Copy(aText,Pos(aSeparator,aText)+Length(aSeparator),Length(aText));
+            tmp := tmp + 1;
+ 
+        end else
+        begin
+ 
+             ADest[tmp] := aText;
+             aText := '';
+ 
+        end;
+    until Length(aText)=0;
+end;
+
+// DUPLICATE OF EXPLODE...
 // Split a string into an array using passed delimeter.
 // Thanks to: https://stackoverflow.com/a/36895908/3726096
 function Split(Expression, Delimiter: String): TArrayOfString;
@@ -187,6 +228,22 @@ begin
   until Length(curString) = 0;
 
   Result:= tmpArray;
+end;
+
+function ArrayToString(const Arr: TArrayOfString): String;
+var
+  i: Integer;
+  ResultStr: String;
+
+begin
+  ResultStr := sEmptyStr;
+  for i := 0 to GetArrayLength(Arr) - 1 do
+  begin
+    if i > 0 then
+      ResultStr := ResultStr + sLineBreak;
+    ResultStr := ResultStr + Arr[i];
+  end;
+  Result := ResultStr;
 end;
 
 function FormatSize(Size: Int64): String;

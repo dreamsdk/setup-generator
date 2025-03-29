@@ -2,8 +2,7 @@
 type
   TWindowsTerminalIntegrationOperation = (wtiInstall, wtiUninstall, wtiStatus);
 
-const
-  WT_HELPER_FILE = 'wtcheck.exe';    
+const  
   WT_CONFIG_FILE = '{code:GetApplicationHelpersPath}\wtconfig.exe';
 
 function RunWindowsTerminalConfigTool(
@@ -28,24 +27,6 @@ begin
   );
             
   Result := not IsInString('Error: ', Buffer);
-end;
-
-function IsWindowsTerminalInstalled: Boolean;
-var
-  WindowsTerminalHelperFileName: String;
-  Buffer: String;
-
-begin
-  if IsUninstallMode then
-    Result := RunWindowsTerminalConfigTool(wtiStatus, Buffer)
-  else
-  begin
-    WindowsTerminalHelperFileName := ExpandConstant('{tmp}\' + WT_HELPER_FILE);
-    if not FileExists(WindowsTerminalHelperFileName) then
-      ExtractTemporaryFile(WT_HELPER_FILE);
-    Buffer := RunCommand(WindowsTerminalHelperFileName, True);
-    Result := not IsInString('Error: ', Buffer); 
-  end;
 end;
 
 procedure InstallWindowsTerminalIntegration;

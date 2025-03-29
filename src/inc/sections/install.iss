@@ -12,7 +12,6 @@ Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{code:GetApplicat
 Source: "..\.helpers\{#HelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 
 ; Temporary files used for the installation
-Source: "..\.helpers\*.exe"; Flags: dontcopy noencryption nocompression
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 
 ; Some additional resources

@@ -306,7 +306,7 @@ end;
 // UNINSTALL
 //=============================================================================
 
-function InitializeUninstall: Boolean;
+function InitializeUninstall(): Boolean;
 begin
   Result := True;
   SetUninstallMode(True);
@@ -319,12 +319,16 @@ begin
     Exit;
   end;
 
-  // Unload the DLL, otherwise the dll is not deleted
-  PSVinceUnload;
-
   // As we are on Uninstall, we can't change the foundation base, but we must
   // retrieve it as this has an impact on the uninstallation
   LoadFoundationFromFile;
+end;
+
+procedure DeinitializeUninstall();
+begin
+  // Unload the DLLs, otherwise dlls aren't deleted
+  PSVinceUnload;
+  HelperLibraryUnload;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

@@ -21,7 +21,7 @@
 ToolchainsName_Stable=Stable
 ToolchainsDesc_Stable=Stable toolchain is based on GCC 13.2.0 with Newlib 4.3.0.20230120. It's the current toolchain officially supported.
 ToolchainsName_1420=14.2.0
-ToolchainsDesc_1420=14.2.0 toolchain is indeed based on GCC 14.2.0 with Newlib 4.x. This is the most modern toolchain.
+ToolchainsDesc_1420=14.2.0 toolchain is indeed based on GCC 14.2.0 with Newlib 4.5.0.20241231. This is the most modern toolchain.
 ToolchainsName_950winxp=9.5.0-winxp
 ToolchainsDesc_950winxp=This legacy toolchain is based on GCC 9.5.0 with Newlib 4.3.0.20230120. This was the previous, officially supported toolchains for the past decade.
 

@@ -10,7 +10,7 @@ type
   TToolchainPackage = record
     Name: String;
     Description: String;
-    IsModernWindowsOnly: Boolean;
+    IsModernWindowsOnly: Boolean; // Windows 10+ 64-bit only
     ComponentsListItemIndex: Integer;
   end;
   TToolchainPackageArray = array of TToolchainPackage;
@@ -18,6 +18,7 @@ type
   TGdbPackage = record
     Name: String;
     Version: String;
+    IsWindows64: Boolean;
     IsPythonRuntimeInstalled: Boolean;
     ComponentsListItemIndex: Integer;
   end;
@@ -43,7 +44,7 @@ var
 // UNINSTALL MODE
 //=============================================================================
 
-function IsUninstallMode: Boolean;
+function IsUninstallMode(): Boolean;
 begin
   Result := UninstallMode;
 end;

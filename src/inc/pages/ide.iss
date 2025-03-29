@@ -3,9 +3,7 @@ type
   TCodeBlocksPatcherOperation = (cbpInstall, cbpUninstall);
 
 const  
-  CB_HELPER_FILE = '{tmp}\cbhelper.exe';
-  CB_PATCH_FILE = '{code:GetApplicationPackagesPath}\ide\codeblocks\codeblocks-patcher.exe';
-   
+  CB_PATCH_FILE = '{code:GetApplicationPackagesPath}\ide\codeblocks\codeblocks-patcher.exe';   
   CB_BACKUP_DIR = '{code:GetApplicationSupportPath}\ide\codeblocks';
         
 var
@@ -16,61 +14,58 @@ var
   ButtonCodeBlocksInitialize: TButton;
   LabelCodeBlocksDetectedVersion: TLabel;
 
-function IsCodeBlocksIntegrationEnabled: Boolean;
+function IsCodeBlocksIntegrationEnabled(): Boolean;
 begin
   Result := IsComponentSelected('ide\codeblocks');
 end;
 
-function IsCodeBlocksInstallationMode: Boolean;
+function IsCodeBlocksInstallationMode(): Boolean;
 begin
   Result := Assigned( EditCodeBlocksInstallationDirectory );
 end;
 
-function IsCodeBlocksUsersAvailable: Boolean;
+function IsCodeBlocksUsersAvailable(): Boolean;
 begin
   Result := (EditCodeBlocksUsersList.Lines.Count > 0);
 end;
 
-function GetCodeBlocksInstallationDirectory: String;
+function GetCodeBlocksInstallationDirectory(): String;
 begin                        
   Result := '';   
   if IsCodeBlocksInstallationMode then
-    Result := RemoveBackslash(EditCodeBlocksInstallationDirectory.Text); 
+    Result := RemoveBackslash(EditCodeBlocksInstallationDirectory.Text);
+  Log(Format('GetCodeBlocksInstallationDirectory: "%s"', [Result]));
 end;
 
 procedure HandleCodeBlocksUsersList(InitializeProfiles: Boolean);
 var
-  Switches: String;
+  AvailableUsers: TArrayOfString;
 
 begin
+  Log(Format('HandleCodeBlocksUsersList: InitializeProfiles="%s"', [BoolToStr(InitializeProfiles)]));
+
   WizardForm.NextButton.Enabled := False;
   ButtonCodeBlocksRefreshUsersList.Enabled := False;
   ButtonCodeBlocksInitialize.Enabled := False;  
   
-  Switches := '';
   if InitializeProfiles then
-    Switches := '--initialize ';
-
-  Switches := Switches + '--get-available-users';
-
-  EditCodeBlocksUsersList.Text := RunCommand( Format('%s %s', [
-      ExpandConstant(CB_HELPER_FILE),
-      Switches
-    ]),
-    False
-  );
+    CodeBlocksInitializeProfiles();
+  
+  EditCodeBlocksUsersList.Text := sEmptyStr;
+  if CodeBlocksGetAvailableUsers(AvailableUsers) then
+    EditCodeBlocksUsersList.Text := ArrayToString(AvailableUsers);
   
   ButtonCodeBlocksInitialize.Enabled := True;
   ButtonCodeBlocksRefreshUsersList.Enabled := True;
   WizardForm.NextButton.Enabled := True;
 end;
 
-procedure RetrieveCodeBlocksUsersList;
+procedure RetrieveCodeBlocksUsersList();
 begin
   HandleCodeBlocksUsersList(False);
 end;
 
-procedure InitializeCodeBlocks;
+procedure InitializeCodeBlocks();
 begin
   HandleCodeBlocksUsersList(True);
 end;
@@ -106,20 +101,14 @@ begin
   Result := IsInString('is now ', Buffer);
 end;
                                                                                  
-procedure InstallCodeBlocksIntegration;
+procedure InstallCodeBlocksIntegration();
 var
   Buffer: String;
   IsSuccess: Boolean;
 
 begin
   // Cleanup previous C::B for DreamSDK install if necessary
-  RunCommand(
-    Format('%s %s', [
-      ExpandConstant(CB_HELPER_FILE),
-      '--cleanup' 
-    ]),
-    False
-  );
+  CodeBlocksRemoveProfiles();
   
   // Executing the Patcher  
   IsSuccess := RunCodeBlocksPatcher(cbpInstall, Buffer);
@@ -127,7 +116,7 @@ begin
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationSetupFailed'), [Buffer]), mbCriticalError, MB_OK);
 end;
 
-procedure UninstallCodeBlocksIntegration;
+procedure UninstallCodeBlocksIntegration();
 var
   Buffer: String;
   IsSuccess: Boolean;
@@ -139,19 +128,13 @@ begin
     MsgBox(Format(CustomMessage('CodeBlocksIntegrationRemoveFailed'), [Buffer]), mbCriticalError, MB_OK); 
 end;
 
-function GetCodeBlocksVersion: String;
+function GetCodeBlocksVersion(): String;
 begin  
-  Result := RunCommand(
-    Format('%s %s "%s"', [
-      ExpandConstant(CB_HELPER_FILE),
-      '--version',
-      GetCodeBlocksInstallationDirectory 
-    ]),
-    True
-  );
+  Result := CodeBlocksDetectVersion(GetCodeBlocksInstallationDirectory);
+  Log(Format('GetCodeBlocksVersion: %s', [Result]));
 end;
 
-function RetrieveCodeBlocksVersion: String;
+function RetrieveCodeBlocksVersion(): String;
 begin
   Result := GetCodeBlocksVersion;
   LabelCodeBlocksDetectedVersion.Caption :=
@@ -186,7 +169,7 @@ begin
   LabelCodeBlocksDetectedVersion.Caption := '';
 end;
 
-function IsCodeBlocksIntegrationReady: Boolean;
+function IsCodeBlocksIntegrationReady(): Boolean;
 var
   CodeBlocksVersion: String;
 
@@ -224,18 +207,13 @@ begin
   end;
 end;
 
-function GetCodeBlocksDefaultInstallationDirectory: String;
+function GetCodeBlocksDefaultInstallationDirectory(): String;
 begin  
-  Result := RunCommand(
-    Format('%s %s', [
-      ExpandConstant(CB_HELPER_FILE),
-      '--detect'      
-    ]),
-    True
-  );
+  Result := CodeBlocksDetectInstallationPath();
+  Log(Format('GetCodeBlocksDefaultInstallationDirectory: "%s"', [Result]));
 end;
 
-function CreateIntegratedDevelopmentEnvironmentPage: Integer;
+function CreateIntegratedDevelopmentEnvironmentPage(): Integer;
 var
   ButtonCodeBlocksInstallationDirectory: TButton;
   LabelCodeBlocksIntroduction, LabelCodeBlocksInstallationDirectory, 
@@ -244,8 +222,6 @@ var
   BtnImage: TBitmapImage;
 
 begin
-  ExtractTemporaryFile('cbhelper.exe');
-
   IntegratedDevelopmentEnvironmentPage := CreateCustomPage(wpSelectComponents,
     CustomMessage('CodeBlocksTitlePage'),
     CustomMessage('CodeBlocksSubtitlePage'));

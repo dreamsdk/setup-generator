@@ -91,14 +91,13 @@
 #include "inc/paths/sources.iss"
 #include "inc/paths/targets.iss"
 
+#include "inc/helpers/psvince.iss"
 #include "inc/helpers/helperlib.iss"
 #include "inc/helpers/components.iss"
 #include "inc/helpers/git.iss"
 #include "inc/helpers/junction.iss"
 #include "inc/helpers/inet.iss"
 #include "inc/helpers/preq.iss"
-#include "inc/helpers/psvince.iss"
-#include "inc/helpers/renbckp.iss"
 #include "inc/helpers/wt.iss"
 
 #include "inc/pages/foundation.iss"

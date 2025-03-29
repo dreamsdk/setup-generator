@@ -16,50 +16,46 @@ var
   IsUnsupportedGdbSelected: Boolean;
   SavedStateIsFoundationMinGW64: Boolean;
 
-function RunSimpleCommandOnPython(CommandName, PythonFileName: String): String;
-begin
-  Result := RunCommand(
-      ExpandConstant(
-        Format('{tmp}\%s "%s"', [CommandName, PythonFileName])
-      ),
-      True
-    );  
-end;
-
-function TestPythonVersion(Version: String): Boolean;
+function TestPythonVersion(Version: String; IsWin64Binary: Boolean): Boolean;
 var
   i: Integer;
   Buffer,
-  PythonFileName,
-  PythonBitness,
+  PythonFileName,  
   PythonFilePath,
   VersionWithoutDot: String;
   PythonFilePaths: TArrayOfString;
+  PythonBitness: TPortableExecutableBitness;
   
 begin
   Result := False;
+  if Trim(Version) = sEmptyStr then
+    Exit;
+
   Log(Format('TestPythonVersion: %s', [Version]));
 
   VersionWithoutDot := Version;
   StringChangeEx(VersionWithoutDot, '.', '', True);
   PythonFileName := Format('python%s.dll', [VersionWithoutDot]);    
   
-  Buffer := RunSimpleCommandOnPython('whereis.exe', PythonFileName);
-  Explode(PythonFilePaths, Buffer, sLineBreak);  
-  
-  for i := 0 to Length(PythonFilePaths) - 1 do
-  begin
-    PythonFilePath := PythonFilePaths[i];
-    if FileExists(PythonFilePath) then
+  if GetFileLocationsInSystemPath(PythonFileName, PythonFilePaths) then     
+    for i := 0 to Length(PythonFilePaths) - 1 do
     begin
-      Log(Format('Python %s is installed: %s', [Version, PythonFilePath]));
-      PythonBitness := RunSimpleCommandOnPython('pecheck.exe', PythonFilePath);
-      Result := Result or (PythonBitness = '32-bits'); // 32-bits only
-      Log(Format('Python %s bitness is %s', [Version, PythonBitness]));
-    end
-    else
-      Log(Format('Python %s is not installed', [Version]));
-  end;
+      PythonFilePath := PythonFilePaths[i];
+      if FileExists(PythonFilePath) then
+      begin
+        Log(Format('Python %s: installed path="%s"', [Version, PythonFilePath]));
+        PythonBitness := GetPortableExecutableBitness(PythonFilePath);
+        Result := ((not IsWin64Binary) and (PythonBitness = peb32)) or 
+          (IsWin64Binary and (PythonBitness = peb64));
+        Log(Format('Python %s: bitness="%s"; expected Win64=%s', [
+          Version, 
+          PortableExecutableBitnessToString(PythonBitness),
+          BoolToStr(IsWin64Binary)
+        ]));
+      end
+      else
+        Log(Format('Python %s: not installed', [Version]));
+    end;
 end;
 
 function GdbCheckUnsupportedPythonUsage(): Boolean;
@@ -328,8 +324,9 @@ begin
 #endif
       end;
 
-      // Check if Python runtime is installed. Currently only support 32-bits
-      GdbPackages[i].IsPythonRuntimeInstalled := TestPythonVersion(GdbPackages[i].Version);
+      // Check if Python runtime is installed.
+      GdbPackages[i].IsPythonRuntimeInstalled := TestPythonVersion(
+        GdbPackages[i].Version, GdbPackages[i].IsWindows64);
 
 #if InstallerMode == DEBUG
       Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IndexUpdated="%s"', [
@@ -392,11 +389,7 @@ var
   LabelComboBoxSelection: TLabel;
   BtnImage: TBitmapImage;
 
-begin
-  // Extract utility files
-  ExtractTemporaryFile('whereis.exe');
-  ExtractTemporaryFile('pecheck.exe');
-  
+begin  
   GdbPage := CreateCustomPage(
     wpSelectDir,
     CustomMessage('GdbTitlePage'), 

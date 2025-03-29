@@ -25,46 +25,6 @@ begin
   VersionDyncFuncBeforeUninstall := ABeforeUninstall;
 end;
 
-function Count(What, Where: String): Integer;
-begin
-   Result := 0;
-    if Length(What) = 0 then
-        exit;
-    while Pos(What,Where)>0 do
-    begin
-        Where := Copy(Where,Pos(What,Where)+Length(What),Length(Where));
-        Result := Result + 1;
-    end;
-end;
- 
-// Split text to array
-procedure Explode(var ADest: TArrayOfString; aText, aSeparator: String);
-var tmp: Integer;
-begin
-    if aSeparator='' then
-        exit;
- 
-    SetArrayLength(ADest,Count(aSeparator,aText)+1)
- 
-    tmp := 0;
-    repeat
-        if Pos(aSeparator,aText)>0 then
-        begin
- 
-            ADest[tmp] := Copy(aText,1,Pos(aSeparator,aText)-1);
-            aText := Copy(aText,Pos(aSeparator,aText)+Length(aSeparator),Length(aText));
-            tmp := tmp + 1;
- 
-        end else
-        begin
- 
-             ADest[tmp] := aText;
-             aText := '';
- 
-        end;
-    until Length(aText)=0;
-end;
-
 // Compares two version numbers, returns -1 if vA is newer, 0 if both are identical, 1 if vB is newer
 function CompareVersion(vA, vB: String): Integer;
 var

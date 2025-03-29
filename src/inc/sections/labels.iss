@@ -119,19 +119,19 @@ ComponentUtilities_vmutool=VMU Tool PC – Visual Memory data manager (GUI)
 ; Foundation
 FoundationTitlePage=Foundation Configuration
 FoundationSubtitlePage=Which foundation do you want to use?
-LabelFoundationIntroduction=Customize your foundation...
-LabelFoundationDescription=Here you can choose a great thing
+LabelFoundationIntroduction=Customize the base environment you want to use.
+LabelFoundationDescription=Here you can choose which environment you will use. The foundation provides the core environment (such as GNU Bash), host toolchain (GCC for Windows), and additional utilities. This can't be changed later, so please choose wisely.
 FoundationMinGW=MinGW/MSYS
-LabelFoundationDescriptionMinGW=The legacy option
+LabelFoundationDescriptionMinGW=The legacy option. This environment is compatible with Windows XP and later, but unfortunately, it's quite outdated (e.g., GCC for Windows is still 9.x). Included packages are no longer updated.
 FoundationMinGW64=MinGW-w64/MSYS2 (highly recommanded)
-LabelFoundationDescriptionMinGW64=The modern option
-FoundationUseMinGWConfirmation=Are you sure to continue?
+LabelFoundationDescriptionMinGW64=The modern option, compatible with Windows 10 and later. It's recommended to use this option whenever possible.
+FoundationUseMinGWConfirmation=MinGW/MSYS is deprecated. Are you sure to continue?
 
 ; Toolchains
 ToolchainsTitlePage=Toolchain Configuration
 ToolchainsSubtitlePage=Which toolchain profile do you want to use?
 LabelToolchainsIntroduction=Customize your toolchain installation.
-LabelToolchainsDescription=Toolchains are used to build Sega Dreamcast programs. Please choose your prefered toolchain profile now. You may change this later in {#FullAppManagerName}.
+LabelToolchainsDescription=Toolchains are used to build Sega Dreamcast programs. Please choose your preferred toolchain profile now. You may change this later in {#FullAppManagerName}.
 LabelToolchainsSelection=Toolchain Profile:
 ToolchainsNotSupportedForOldWindows=(unsupported on your OS)
 ToolchainsLegacyConfirmation=This toolchain is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
@@ -147,11 +147,6 @@ LabelGdbDescription=You may enable now Python extensions for GDB {#GdbVersion}, 
 LabelGdbSelection=GNU Debugger (GDB) Profile:
 GdbPythonRuntimeNotFound=This GDB is binded with Python %s 32-bits, which was not found on your system.
 GdbConfirmUnsupportedPythonUsage=Python %s 32-bits was not found on your system, which is required for the selected build. Continue anyway? You can change that later in {#FullAppManagerName}.
-;GdbNotSupportedForOldWindows=(unsupported on your OS)
-;GdbLegacyConfirmation=This GDB is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
-;GdbUnsupportedModernConfirmation=This GDB is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
-;GdbNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
-;GdbAllWindows=Compatible on all Windows starting from Windows XP.
 
 ; Ruby
 RubyTitlePage=Ruby Configuration
