@@ -14,8 +14,8 @@
 #define ToolchainsCount 3
 
 #define SourceDirectoryToolchain_Stable SourceDirectoryBase + "\toolchain-stable"
-#define SourceDirectoryToolchain_1420 SourceDirectoryBase + "\toolchain-oldstable"
-#define SourceDirectoryToolchain_950winxp SourceDirectoryBase + "\toolchain-legacy"
+#define SourceDirectoryToolchain_1420 SourceDirectoryBase + "\toolchain-1420"
+#define SourceDirectoryToolchain_950winxp SourceDirectoryBase + "\toolchain-950winxp"
 
 [CustomMessages]
 ToolchainsName_Stable=Stable
