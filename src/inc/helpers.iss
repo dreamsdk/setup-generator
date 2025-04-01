@@ -1,22 +1,59 @@
 [Code]
 
-procedure PatchMountPoint;
+const
+  CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
+
+function IsModulesRunning(): Boolean;
+begin
+  Result := False;
+
+  // Check if Code::Blocks is running
+  Result := IsProcessRunning(CODEBLOCKS_EXE_NAME);
+  if Result then
+  begin
+    MsgBox(CustomMessage('CodeBlocksRunning'), mbError, MB_OK);
+    Exit;    
+  end;   
+end;
+
+procedure PatchMountPoint();
 var
   InstallPath,
   fstabFileName: String;
 
 begin
-  if IsFoundationMinGW then
-  begin
-    InstallPath := ExpandConstant('{app}');
-    StringChangeEx(InstallPath, '\', '/', True);
-    fstabFileName := ExpandConstant('{app}\msys\1.0\etc\fstab');
-    PatchFile(fstabFileName, '{app}', InstallPath);
-    PatchFile(fstabFileName + '.sample', '{app}', InstallPath); 
-  end;
+  if not IsFoundationMinGW then
+    Exit;
+
+  InstallPath := ExpandConstant('{app}');
+  StringChangeEx(InstallPath, '\', '/', True);
+  fstabFileName := ExpandConstant('{code:GetMsysInstallationPath}\etc\fstab');
+  PatchFile(fstabFileName, '{app}', InstallPath);
+  PatchFile(fstabFileName + '.sample', '{app}', InstallPath); 
 end;
 
-procedure SetupApplication;
+procedure PatchSystemSettings();
+var
+  MSystemFilePath,
+  ProfileFilePath: String;
+
+begin
+  MSystemFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\msystem');
+  PatchFile(MSystemFilePath, '{MSYSTEM:-MSYS}', '{MSYSTEM:-MINGW64}');
+  ProfileFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\profile');
+  PatchFile(ProfileFilePath, '{MSYS2_PATH_TYPE:-minimal}', '{MSYS2_PATH_TYPE:-inherit}');
+end;
+
+procedure ApplyPostInstallPatches();
+begin
+  if IsFoundationMinGW() then
+    PatchMountPoint();
+
+  if IsFoundationMinGW64() then
+    PatchSystemSettings();
+end;
+
+procedure SetupApplication();
 var
   ResultCode: Integer;
   ManagerFileName,
@@ -26,7 +63,7 @@ begin
   ManagerFileName := ExpandConstant('{code:GetApplicationComponentManagerFilePath}');
    
   Parameters := Format('--post-install --home-dir "%s"', [
-    ExpandConstant('{app}')
+    ExpandConstant('{code:GetApplicationRootPath}')
   ]);
 
   Log(Format('%s %s', [ManagerFileName, Parameters]));
@@ -36,7 +73,7 @@ begin
       MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
 end;
 
-procedure SetPackageVersion;
+procedure SetPackageVersion();
 var
   VersionFileName: String;
 
@@ -47,21 +84,25 @@ begin
   PatchFile(VersionFileName, '(BUILD_NUMBER)', '{#FullVersionNumber}');
 end;
 
-procedure CreateJunctions;
+procedure CreateJunctions();
 begin
+  if not IsFoundationMinGW then
+    Exit;
+
   Log('CreateJunctions');
-  if IsFoundationMinGW then
-    CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr');
+  CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr');
 end;
 
-procedure RemoveJunctions;
+procedure RemoveJunctions();
 begin
+  if not IsFoundationMinGW then
+    Exit;
+
   Log('RemoveJunctions');
-  if IsFoundationMinGW then
-    RemoveJunction('{app}\usr');
+  RemoveJunction('{app}\usr');
 end;
 
-procedure AddGitSafeDirectories;
+procedure AddGitSafeDirectories();
 begin
   AddGitSafeDirectory('kos');
   AddGitSafeDirectory('kos-ports');
@@ -69,7 +110,7 @@ begin
   AddGitSafeDirectory('dcload\dcload-ip');
 end;
 
-procedure LoadFoundationFromFile;
+procedure LoadFoundationFromFile();
 var
   Buffer: AnsiString;
   FoundationIndex: Integer;
@@ -79,13 +120,13 @@ begin
   LoadStringFromFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer);
   FoundationIndex := StrToIntDef(Buffer, -1);  
   Log(Format('  FoundationIndex: %d', [FoundationIndex]));
-  if (FoundationIndex = 2) then
+  if (FoundationIndex = 2) then   // TODO: Improve this
     SetFoundation(efkMinGW64MSYS2)
   else
     SetFoundation(efkMinGWMSYS);  
 end;
 
-procedure SaveFoundationToFile;
+procedure SaveFoundationToFile();
 var
   Buffer: String;
   
@@ -95,7 +136,7 @@ begin
   SaveStringToFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer, False);
 end;
 
-procedure RemoveFoundationFile;
+procedure RemoveFoundationFile();
 var
   FileName: String;
 
@@ -105,11 +146,11 @@ begin
     DeleteFile(FileName);
 end;
 
-procedure RenamePreviousDirectoriesBeforeInstallation;
+procedure RenamePreviousDirectoriesBeforeInstallation();
 begin
   Log('RenamePreviousDirectoriesBeforeInstallation');
   RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
-  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetMsysOptBasePath}\mruby'));
 end;
 
 function VersionSanitizer(const VersionNumber: String): String;
@@ -120,14 +161,13 @@ begin
   Log(Format('VersionSanitizer: Old=%s, New=%s', [VersionNumber, Result]));
 end;
 
-procedure VersionBeforeUninstall;
+procedure VersionBeforeUninstall();
 begin
   Log('VersionBeforeUninstall called');
   
-  LoadFoundationFromFile;
+  LoadFoundationFromFile();
 
-  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
-  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationOptBasePath}\mruby'));
+  RenamePreviousDirectoriesBeforeInstallation();
 end;
 
 procedure GlobalInitialization();
@@ -138,3 +178,4 @@ begin
   VersionSetDynamicFunctionSanitize(@VersionSanitizer);
   SetDoBeforeUninstall(@VersionBeforeUninstall);
 end;
+

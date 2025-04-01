@@ -19,19 +19,19 @@ Source: "..\rsrc\text\license.rtf"; DestDir: "{code:GetApplicationSupportPath}";
 Source: "..\rsrc\uninst\uninst.ico"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion
 
 ; MinGW/MSYS Base
-Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
-Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
-Source: "{#SourceDirectoryAppSystemObjectsMSYS}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
+Source: "{#SourceDirectoryMinGW}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw; Excludes: "msys\1.0\etc\profile,msys\1.0\etc\fstab,msys\1.0\etc\fstab.sample,msys\1.0\home\*"
+Source: "{#SourceDirectoryMSYS}\*"; DestDir: "{code:GetMsysUserBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
+Source: "{#SourceDirectoryAppSystemObjectsMSYS}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
 Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
 
 ; MinGW-w64/MSYS2 Base
-Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64; Excludes: "clang32,clang64,clangarm64,mingw32,ucrt64,autorebase.bat,clang32.exe,clang32.ico,clang32.ini,clang64.exe,clang64.ico,clang64.ini,clangarm64.exe,clangarm64.ico,clangarm64.ini,mingw32.exe,mingw32.ico,mingw32.ini,mingw64.exe,mingw64.ico,mingw64.ini,msys2.exe,msys2.ico,msys2.ini,msys2_shell.cmd,test.log,ucrt64.exe,ucrt64.ico,ucrt64.ini"
-Source: "{#SourceDirectoryMSYS2}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
-Source: "{#SourceDirectoryAppSystemObjectsMSYS2}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
+Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64; Excludes: "clang32,clang64,clangarm64,dev\mqueue,dev\shm,etc\pacman.d\gnupg,etc\hosts,etc\mtab,etc\networks,etc\protocols,etc\services,home\*,mingw32,ucrt64,autorebase.bat,clang32.exe,clang32.ico,clang32.ini,clang64.exe,clang64.ico,clang64.ini,clangarm64.exe,clangarm64.ico,clangarm64.ini,mingw32.exe,mingw32.ico,mingw32.ini,mingw64.exe,mingw64.ico,mingw64.ini,msys2.exe,msys2.ico,msys2.ini,msys2_shell.cmd,test.log,ucrt64.exe,ucrt64.ico,ucrt64.ini"
+Source: "{#SourceDirectoryMSYS2}\*"; DestDir: "{code:GetMsysUserBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
+Source: "{#SourceDirectoryAppSystemObjectsMSYS2}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
 
 ; Common
 Source: "{#SourceDirectoryAppCommonObjects}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
-Source: "{#SourceDirectorySystemUtilities}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
+Source: "{#SourceDirectorySystemUtilities}\*"; DestDir: "{code:GetMsysUserBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
                                                       
 ; DreamSDK
 Source: "{#SourceDirectoryAppBinaries}\*"; DestDir: "{code:GetApplicationMainPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base
@@ -47,8 +47,6 @@ Source: "{#SourceDirectoryAddons}\vmutool\*"; DestDir: "{code:GetApplicationAddo
 
 ; KallistiOS Embedded
 Source: "{#SourceDirectoryEmbeddedKallisti}\*"; DestDir: "{code:GetApplicationToolchainBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
-Source: "{#SourceDirectoryEmbeddedRuby}\mruby\*"; DestDir: "{code:GetApplicationOptBasePath}\mruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
-Source: "{#SourceDirectoryEmbeddedRuby}\samples\*"; DestDir: "{code:GetApplicationToolchainBasePath}\ruby"; Flags: ignoreversion recursesubdirs createallsubdirs; Check: IsKallistiEmbedded
 
 ; GUI Tools
 Source: "{#SourceDirectoryTools}\bdreams\*"; DestDir: "{code:GetApplicationToolsPath}\bdreams"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: tools\bdreams

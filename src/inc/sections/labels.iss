@@ -125,7 +125,7 @@ FoundationMinGW=MinGW/MSYS
 LabelFoundationDescriptionMinGW=The legacy option. This environment is compatible with Windows XP and later, but unfortunately, it's quite outdated (e.g., GCC for Windows is still 9.x). Included packages are no longer updated.
 FoundationMinGW64=MinGW-w64/MSYS2 (highly recommanded)
 LabelFoundationDescriptionMinGW64=The modern option, compatible with Windows 10 and later. It's recommended to use this option whenever possible.
-FoundationUseMinGWConfirmation=MinGW/MSYS is deprecated. Are you sure to continue?
+FoundationUseMinGWConfirmation=MinGW/MSYS is deprecated. This can't be changed later. Are you sure to continue?
 
 ; Toolchains
 ToolchainsTitlePage=Toolchain Configuration

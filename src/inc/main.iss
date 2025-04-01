@@ -1,8 +1,5 @@
 [Code]
 
-const
-  CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
-
 var
   BrowseForFolderExFakePageID,
   IntegratedDevelopmentEnvironmentSettingsPageID, 
@@ -11,19 +8,6 @@ var
   ToolchainsPageID,
   FoundationPageID: Integer;
 
-function IsModulesRunning: Boolean;
-begin
-  Result := False;
-
-  // Check if Code::Blocks is running
-  Result := IsProcessRunning(CODEBLOCKS_EXE_NAME);
-  if Result then
-  begin
-    MsgBox(CustomMessage('CodeBlocksRunning'), mbError, MB_OK);
-    Exit;    
-  end;   
-end;
-
 function InitializeSetup: Boolean;
 begin
   Result := True;
@@ -31,7 +15,7 @@ begin
   GlobalInitialization();
 
   // Check modules running
-  if IsModulesRunning then
+  if IsModulesRunning() then
   begin
     Result := False;
     Exit;
@@ -49,14 +33,14 @@ begin
 #endif
 end;
 
-procedure FinalizeSetup;
+procedure FinalizeSetup();
 begin
-  SaveFoundationToFile;
-  SetPackageVersion;
-  PatchMountPoint;
-  SetupApplication;
-  CreateJunctions;
-  AddGitSafeDirectories;
+  SaveFoundationToFile();
+  SetPackageVersion();  
+  ApplyPostInstallPatches();
+  SetupApplication();  
+  CreateJunctions(); 
+  AddGitSafeDirectories();
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -176,7 +160,7 @@ begin
           InstallCodeBlocksIntegration;
 
         // Patch fstab and setup KallistiOS.
-        FinalizeSetup;
+        FinalizeSetup();
 
         WizardForm.NextButton.Enabled := True;
       end;
@@ -258,9 +242,9 @@ begin
     ssInstall:
       begin
 #if InstallerMode == DEBUG
-        LogCalculatedTargets;
+        LogCalculatedTargets();
 #endif
-        RenamePreviousDirectoriesBeforeInstallation;
+        RenamePreviousDirectoriesBeforeInstallation();
       end;
 
     ssPostInstall:
@@ -268,7 +252,7 @@ begin
         if IsTaskSelected('envpath') then
           EnvAddPath(ExpandConstant('{code:GetApplicationMainPath}'));
         if IsTaskSelected('wtconfig') then
-          InstallWindowsTerminalIntegration;
+          InstallWindowsTerminalIntegration();
       end;
 
   end;
@@ -313,7 +297,7 @@ begin
   GlobalInitialization();
 
   // Check modules running
-  if IsModulesRunning then
+  if IsModulesRunning() then
   begin
     Result := False;
     Exit;
@@ -321,14 +305,14 @@ begin
 
   // As we are on Uninstall, we can't change the foundation base, but we must
   // retrieve it as this has an impact on the uninstallation
-  LoadFoundationFromFile;
+  LoadFoundationFromFile();
 end;
 
 procedure DeinitializeUninstall();
 begin
   // Unload the DLLs, otherwise dlls aren't deleted
-  PSVinceUnload;
-  HelperLibraryUnload;
+  PSVinceUnload();
+  HelperLibraryUnload();
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
@@ -338,17 +322,17 @@ begin
     usUninstall:
       begin
 #if InstallerMode == DEBUG
-        LogCalculatedTargets;
-#endif
-        RemoveFoundationFile;
-        RemoveJunctions;
-        UninstallCodeBlocksIntegration;
-        UninstallWindowsTerminalIntegration;
+        LogCalculatedTargets();
+#endif        
+        RemoveFoundationFile();        
+        UninstallCodeBlocksIntegration();
+        UninstallWindowsTerminalIntegration();
+        RemoveJunctions();
       end;
     
     usPostUninstall:
       begin
-        EnvRemovePath(ExpandConstant('{code:GetApplicationMainPath}'));
+        EnvRemovePath(ExpandConstant('{code:GetApplicationMainPath}'));        
       end;
 
   end;  

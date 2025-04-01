@@ -19,7 +19,19 @@ function GetMsysInstallationPath(Dummy: String): String;
 begin  
   Result := ExpandConstant('{code:GetApplicationRootPath}');
   if IsFoundationMinGW then
-    Result := ExpandConstant('{code:GetApplicationRootPath}\msys\1.0\');
+    Result := ExpandConstant('{code:GetApplicationRootPath}\msys\1.0');
+end;
+
+function GetMsysUserBasePath(Dummy: String): String;
+begin  
+  Result := ExpandConstant('{code:GetMsysInstallationPath}\usr');
+  if IsFoundationMinGW() then
+    Result := ExpandConstant('{code:GetMsysInstallationPath}');
+end;
+
+function GetMsysOptBasePath(Dummy: String): String;
+begin
+  Result := ExpandConstant('{code:GetMsysInstallationPath}\opt');
 end;
 
 function GetApplicationSupportPath(Dummy: String): String;
@@ -32,14 +44,9 @@ begin
   Result := ExpandConstant('{code:GetApplicationSupportPath}\shortcuts');
 end;
 
-function GetApplicationOptBasePath(Dummy: String): String;
-begin
-  Result := ExpandConstant('{code:GetMsysInstallationPath}\opt');
-end;
-
 function GetApplicationToolchainBasePath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{code:GetApplicationOptBasePath}\toolchains\dc'); 
+  Result := ExpandConstant('{code:GetMsysOptBasePath}\toolchains\dc'); 
 end;
 
 function GetApplicationToolchainSuperHPath(Dummy: String): String;
@@ -49,7 +56,7 @@ end;
 
 function GetApplicationMainPath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{code:GetApplicationOptBasePath}\dreamsdk');
+  Result := ExpandConstant('{code:GetMsysOptBasePath}\dreamsdk');
 end;
 
 function GetApplicationHelpersPath(Dummy: String): String;
@@ -117,9 +124,12 @@ begin
 
   Log('--- Calculated Target Directory Paths ---');  
   Log(Format('GetApplicationRootPath: "%s"', [GetApplicationRootPath(Dummy)]));
+
+  Log(Format('GetMsysOptBasePath: "%s"', [GetMsysOptBasePath(Dummy)]));
+  Log(Format('GetMsysUserBasePath: "%s"', [GetMsysUserBasePath(Dummy)]));
+
   Log(Format('GetApplicationSupportPath: "%s"', [GetApplicationSupportPath(Dummy)]));
-  Log(Format('GetApplicationShortcutsPath: "%s"', [GetApplicationShortcutsPath(Dummy)]));
-  Log(Format('GetApplicationOptBasePath: "%s"', [GetApplicationOptBasePath(Dummy)]));
+  Log(Format('GetApplicationShortcutsPath: "%s"', [GetApplicationShortcutsPath(Dummy)]));  
   Log(Format('GetApplicationToolchainBasePath: "%s"', [GetApplicationToolchainBasePath(Dummy)]));
   Log(Format('GetApplicationToolchainSuperHPath: "%s"', [GetApplicationToolchainSuperHPath(Dummy)]));
   Log(Format('GetApplicationMainPath: "%s"', [GetApplicationMainPath(Dummy)]));

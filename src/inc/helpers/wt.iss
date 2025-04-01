@@ -19,9 +19,10 @@ begin
     UtilitySwitch := 'status';
 
   Buffer := RunCommand(
-    Format('"%s" %s', [
+    Format('"%s" %s --home-dir "%s"', [
       ExpandConstant(WT_CONFIG_FILE),
-      UtilitySwitch
+      UtilitySwitch,
+      ExpandConstant('{code:GetApplicationRootPath}')
     ]),
     False
   );

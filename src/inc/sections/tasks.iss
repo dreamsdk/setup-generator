@@ -6,5 +6,5 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Run]
 Filename: "{code:GetApplicationComponentGettingStartedFilePath}"; WorkingDir: "{code:GetApplicationMainPath}"; Flags: nowait postinstall skipifsilent shellexec; Description: "{cm:LaunchGettingStarted}"
-Filename: "{code:GetApplicationComponentManagerFilePath}"; Parameters: "--home-dir ""{app}"""; WorkingDir: "{code:GetApplicationMainPath}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
+Filename: "{code:GetApplicationComponentManagerFilePath}"; Parameters: "--home-dir ""{code:GetApplicationRootPath}"""; WorkingDir: "{code:GetApplicationMainPath}"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:LaunchProgram,{#StringChange(FullAppManagerName, '&', '&&')}}"
 Filename: "{code:GetApplicationComponentHelpFilePath}"; WorkingDir: "{code:GetApplicationMainPath}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:LaunchProgram,{#StringChange(MyAppNameHelp, '&', '&&')}}"

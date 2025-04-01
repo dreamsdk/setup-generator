@@ -89,10 +89,10 @@ begin
   end;
 
   Buffer := RunCommand(
-    Format('"%s" --operation=%s --home-dir="%s" %s --no-logo --show-splash --verbose', [
+    Format('"%s" --operation=%s --home-dir "%s" %s --no-logo --show-splash --verbose', [
       ExpandConstant(CB_PATCH_FILE),
       PatcherSwitch,
-      ExpandConstant('{app}'),
+      ExpandConstant('{code:GetApplicationRootPath}'),
       ParamExtraOption
     ]),
     False

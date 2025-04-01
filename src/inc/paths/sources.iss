@@ -26,7 +26,6 @@
 // Embedded libraries
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
 #define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
-#define SourceDirectoryEmbeddedRuby SourceDirectoryEmbedded + "\ruby"
 
 // Packages
 #define SourcePackagesBinary SourceDirectoryBase + "\binary-packages"
