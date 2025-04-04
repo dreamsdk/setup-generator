@@ -25,7 +25,7 @@ Source: "{#SourceDirectoryAppSystemObjectsMSYS}\*"; DestDir: "{code:GetApplicati
 Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw
 
 ; MinGW-w64/MSYS2 Base
-Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64; Excludes: "clang32,clang64,clangarm64,dev\mqueue,dev\shm,etc\pacman.d\gnupg,etc\hosts,etc\mtab,etc\networks,etc\protocols,etc\services,home\*,mingw32,ucrt64,autorebase.bat,clang32.exe,clang32.ico,clang32.ini,clang64.exe,clang64.ico,clang64.ini,clangarm64.exe,clangarm64.ico,clangarm64.ini,mingw32.exe,mingw32.ico,mingw32.ini,mingw64.exe,mingw64.ico,mingw64.ini,msys2.exe,msys2.ico,msys2.ini,msys2_shell.cmd,test.log,ucrt64.exe,ucrt64.ico,ucrt64.ini"
+Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64; Excludes: "dev\mqueue,dev\shm,etc\pacman.d\gnupg,etc\hosts,etc\mtab,etc\networks,etc\protocols,etc\services,home\*"
 Source: "{#SourceDirectoryMSYS2}\*"; DestDir: "{code:GetMsysUserBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
 Source: "{#SourceDirectoryAppSystemObjectsMSYS2}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
 

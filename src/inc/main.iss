@@ -308,13 +308,6 @@ begin
   LoadFoundationFromFile();
 end;
 
-procedure DeinitializeUninstall();
-begin
-  // Unload the DLLs, otherwise dlls aren't deleted
-  PSVinceUnload();
-  HelperLibraryUnload();
-end;
-
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   case CurUninstallStep of
@@ -328,6 +321,7 @@ begin
         UninstallCodeBlocksIntegration();
         UninstallWindowsTerminalIntegration();
         RemoveJunctions();
+        UnloadHelperLibraries();
       end;
     
     usPostUninstall:

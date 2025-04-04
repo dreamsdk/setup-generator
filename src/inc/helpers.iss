@@ -1,7 +1,13 @@
 [Code]
-
 const
   CODEBLOCKS_EXE_NAME = 'codeblocks.exe';
+
+// Unload all helper DLLs, otherwise they aren't deleted
+procedure UnloadHelperLibraries();
+begin
+  PSVinceUnload();
+  HelperLibraryUnload();
+end;
 
 function IsModulesRunning(): Boolean;
 begin
