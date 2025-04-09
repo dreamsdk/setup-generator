@@ -39,29 +39,29 @@ external 'IsWindowsTerminalInstalled@files:{#CommonHelperLibraryFileName} stdcal
 function IsWindowsTerminalInstalledUninstall: Boolean;
 external 'IsWindowsTerminalInstalled@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
-function GetFileLocationsInSystemPathSetup(const lpFileName: AnsiString;
-  const lpDelimiter: AnsiChar; lpPathFileNames: AnsiString;
+function GetFileLocationsInSystemPathSetup(const lpFileName: String;
+  const lpDelimiter: AnsiChar; lpPathFileNames: String;
   const uBufferMaxSize: Cardinal): Cardinal;   
-external 'GetFileLocationsInSystemPathA@files:{#CommonHelperLibraryFileName} stdcall setuponly';
+external 'GetFileLocationsInSystemPathW@files:{#CommonHelperLibraryFileName} stdcall setuponly';
 
-function GetFileLocationsInSystemPathUninstall(const lpFileName: AnsiString;
-  const lpDelimiter: AnsiChar; lpPathFileNames: AnsiString;
+function GetFileLocationsInSystemPathUninstall(const lpFileName: String;
+  const lpDelimiter: AnsiChar; lpPathFileNames: String;
   const uBufferMaxSize: Cardinal): Cardinal; 
-external 'GetFileLocationsInSystemPathA@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
+external 'GetFileLocationsInSystemPathW@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
 function RenameFileOrDirectoryAsBackupSetup(
-  const OldDirectoryFullPath: AnsiString): Boolean;
-external 'RenameFileOrDirectoryAsBackupA@files:{#CommonHelperLibraryFileName} stdcall setuponly';
+  const OldDirectoryFullPath: String): Boolean;
+external 'RenameFileOrDirectoryAsBackupW@files:{#CommonHelperLibraryFileName} stdcall setuponly';
 
 function RenameFileOrDirectoryAsBackupUninstall(
-  const OldDirectoryFullPath: AnsiString): Boolean;
-external 'RenameFileOrDirectoryAsBackupA@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
+  const OldDirectoryFullPath: String): Boolean;
+external 'RenameFileOrDirectoryAsBackupW@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
-function GetPortableExecutableBitnessSetup(const FileName: AnsiString): Byte; 
-external 'GetPortableExecutableBitnessA@files:{#CommonHelperLibraryFileName} stdcall setuponly';
+function GetPortableExecutableBitnessSetup(const FileName: String): Byte; 
+external 'GetPortableExecutableBitnessW@files:{#CommonHelperLibraryFileName} stdcall setuponly';
 
-function GetPortableExecutableBitnessUninstall(const FileName: AnsiString): Byte; 
-external 'GetPortableExecutableBitnessA@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
+function GetPortableExecutableBitnessUninstall(const FileName: String): Byte; 
+external 'GetPortableExecutableBitnessW@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
 // ============================================================================
 // EXPOSED FUNCTIONS // COMMON
@@ -74,14 +74,14 @@ begin
   else
     Result := IsWindowsTerminalInstalledSetup();
   Log(Format('IsWindowsTerminalInstalled: %s', [BoolToStr(Result)]));
-end;           
+end;
 
 function GetFileLocationsInSystemPath(const FileName: String;
   var OutputPathList: TArrayOfString): Boolean;
 var
-  Buffer: AnsiString;
+  Buffer,
+  OutputBuffer: String;
   BufferSize: Cardinal;
-  Output: String;
 
 begin
   SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
@@ -92,10 +92,10 @@ begin
     BufferSize := GetFileLocationsInSystemPathSetup(FileName,
       HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
   SetLength(Buffer, BufferSize);
-  Output := Copy(Buffer, 1, Length(Buffer));
-  Result := Length(Output) > 0;
+  OutputBuffer := Copy(Buffer, 1, Length(Buffer));
+  Result := Length(OutputBuffer) > 0;
   if Result then
-    Explode(OutputPathList, Output, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
+    Explode(OutputPathList, OutputBuffer, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
 end;
 
 function RenameFileOrDirectoryAsBackup(const TargetFileOrDirectory: String): Boolean;
@@ -138,36 +138,36 @@ function CodeBlocksGetAvailableUsersSetup(const lpDelimiter: AnsiChar;
 external 'CodeBlocksGetAvailableUsersW@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
 
 function CodeBlocksGetAvailableUsersUninstall(const lpDelimiter: AnsiChar;
-  lpAvailableUsers: AnsiString; const uBufferMaxSize: Cardinal): Cardinal;
-external 'CodeBlocksGetAvailableUsersA@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+  lpAvailableUsers: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'CodeBlocksGetAvailableUsersW@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
 function CodeBlocksRemoveProfilesSetup: Boolean;
-external 'CodeBlocksRemoveProfilesA@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
+external 'CodeBlocksRemoveProfiles@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
 
 function CodeBlocksRemoveProfilesUninstall: Boolean;
-external 'CodeBlocksRemoveProfilesA@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+external 'CodeBlocksRemoveProfiles@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
-function CodeBlocksDetectInstallationPathSetup(lpInstallationPath: AnsiString;
+function CodeBlocksDetectInstallationPathSetup(lpInstallationPath: String;
   const uBufferMaxSize: Cardinal): Cardinal;
-external 'CodeBlocksDetectInstallationPathA@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
+external 'CodeBlocksDetectInstallationPathW@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
 
-function CodeBlocksDetectInstallationPathUninstall(lpInstallationPath: AnsiString;
+function CodeBlocksDetectInstallationPathUninstall(lpInstallationPath: String;
   const uBufferMaxSize: Cardinal): Cardinal;
-external 'CodeBlocksDetectInstallationPathA@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+external 'CodeBlocksDetectInstallationPathW@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
-function CodeBlocksDetectVersionSetup(const lpCodeBlocksInstallationDirectory: AnsiString;
-  lpCodeBlockVersion: AnsiString; const uBufferMaxSize: Cardinal): Cardinal;
-external 'CodeBlocksDetectVersionA@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
+function CodeBlocksDetectVersionSetup(const lpCodeBlocksInstallationDirectory: String;
+  lpCodeBlockVersion: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'CodeBlocksDetectVersionW@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
 
-function CodeBlocksDetectVersionUninstall(const lpCodeBlocksInstallationDirectory: AnsiString;
-  lpCodeBlockVersion: AnsiString; const uBufferMaxSize: Cardinal): Cardinal;
-external 'CodeBlocksDetectVersionA@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+function CodeBlocksDetectVersionUninstall(const lpCodeBlocksInstallationDirectory: String;
+  lpCodeBlockVersion: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'CodeBlocksDetectVersionW@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
 procedure CodeBlocksInitializeProfilesSetup;
-external 'CodeBlocksInitializeProfilesA@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
+external 'CodeBlocksInitializeProfiles@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
 
 procedure CodeBlocksInitializeProfilesUninstall;
-external 'CodeBlocksInitializeProfilesA@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+external 'CodeBlocksInitializeProfiles@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
 // ============================================================================
 // EXPOSED FUNCTIONS // CODE::BLOCKS
@@ -175,9 +175,9 @@ external 'CodeBlocksInitializeProfilesA@{#CodeBlocksHelperLibraryUninstallFullPa
 
 function CodeBlocksGetAvailableUsers(var AvailableUsers: TArrayOfString): Boolean;
 var
-  Buffer: String;
+  Buffer,
+  OutputBuffer: String;
   BufferSize: Cardinal;
-  Output: String;
 
 begin
   SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
@@ -188,10 +188,10 @@ begin
     BufferSize := CodeBlocksGetAvailableUsersSetup(
       HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
   SetLength(Buffer, BufferSize);  
-  Output := Copy(Buffer, 1, Length(Buffer)); 
-  Result := Length(Output) > 0; 
+  OutputBuffer := Copy(Buffer, 1, Length(Buffer)); 
+  Result := Length(OutputBuffer) > 0; 
   if Result then
-    Explode(AvailableUsers, Output, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
+    Explode(AvailableUsers, OutputBuffer, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
 end;
 
 function CodeBlocksRemoveProfiles(): Boolean;
@@ -204,7 +204,8 @@ end;
 
 function CodeBlocksDetectInstallationPath(): String;
 var
-  Buffer: AnsiString;
+  Buffer,
+  OutputBuffer: String;
   BufferSize: Cardinal;
 
 begin
@@ -216,12 +217,14 @@ begin
     BufferSize := CodeBlocksDetectInstallationPathSetup(Buffer,
       HELPER_LIBRARY_BUFFER_SIZE_SMALL);
   SetLength(Buffer, BufferSize);
-  Result := Copy(Buffer, 1, Length(Buffer));
+  OutputBuffer := Copy(Buffer, 1, Length(Buffer));   
+  Result := OutputBuffer;
 end;
 
 function CodeBlocksDetectVersion(CodeBlocksInstallationPath: String): String;
 var
-  Buffer: AnsiString;
+  Buffer,
+  OutputBuffer: String;
   BufferSize: Cardinal;
 
 begin
@@ -233,7 +236,8 @@ begin
     BufferSize := CodeBlocksDetectVersionSetup(CodeBlocksInstallationPath, 
       Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
   SetLength(Buffer, BufferSize);
-  Result := Copy(Buffer, 1, Length(Buffer));
+  OutputBuffer := Copy(Buffer, 1, Length(Buffer));
+  Result := OutputBuffer;
 end;
 
 procedure CodeBlocksInitializeProfiles();
