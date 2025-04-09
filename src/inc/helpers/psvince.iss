@@ -5,6 +5,9 @@
 #define PSVinceLibraryFileName "psvince.dll"
 #define PSVinceLibraryUninstallFullPath "{app}\" + AppSupportDirectoryName + "\" + PSVinceLibraryFileName
 
+[Files]
+Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+
 [Code]
 
 // ============================================================================

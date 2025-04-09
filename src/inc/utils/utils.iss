@@ -275,3 +275,12 @@ function BoolToStr(B: Boolean): String;
 begin
   Result := BoolToStrCustom(B, 'True', 'False');
 end;
+
+function SetFileAttributes(lpFileName: string; dwFileAttributes: DWORD): BOOL;
+  external 'SetFileAttributesW@kernel32.dll stdcall';
+
+function HideDirectory(const DirectoryPath: string): Boolean;
+begin
+  Result := SetFileAttributes(DirectoryPath,
+    FILE_ATTRIBUTE_HIDDEN or FILE_ATTRIBUTE_SYSTEM);
+end;

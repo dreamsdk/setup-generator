@@ -7,11 +7,6 @@ Name: "{code:GetApplicationShortcutsPath}\{cm:UsefulLinksGroupDirectory}"; MinVe
 Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion: 0,6.2
 
 [Files]
-; Install helpers
-Source: "..\rsrc\helpers\{#PSVinceLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
-Source: "..\.helpers\{#CommonHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
-Source: "..\.helpers\{#CodeBlocksHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
-
 ; Temporary files used for the installation
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
 

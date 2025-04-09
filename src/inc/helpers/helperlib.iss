@@ -4,6 +4,10 @@
 #define CodeBlocksHelperLibraryFileName "cbhelper.dll"
 #define CodeBlocksHelperLibraryUninstallFullPath "{app}\" + AppSupportDirectoryName + "\" + CodeBlocksHelperLibraryFileName
 
+[Files]
+Source: "..\.helpers\{#CommonHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+Source: "..\.helpers\{#CodeBlocksHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+
 [Code]
 
 type

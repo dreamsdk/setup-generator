@@ -8,7 +8,7 @@ var
   ToolchainsPageID,
   FoundationPageID: Integer;
 
-function InitializeSetup: Boolean;
+function InitializeSetup(): Boolean;
 begin
   Result := True;
   SetUninstallMode(False);
@@ -258,11 +258,11 @@ begin
   end;
 end;
 
-procedure InitializeWizard;
+procedure InitializeWizard();
 begin
   // Parse generated configuration
-  InitializeArrayToolchain;
-  InitializeArrayGdb;
+  InitializeArrayToolchain();
+  InitializeArrayGdb();
 
   // Components List custom code handling
   ComponentsListInitialize(True);
@@ -272,13 +272,13 @@ begin
 
   // Creates pages before Select Components
   // Creates pages in the specified order  
-  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage;  
-  GdbPageID := CreateGdbPage;
-  ToolchainsPageID := CreateToolchainsPage;    
-  FoundationPageID := CreateFoundationPage;
+  KallistiEmbeddedPageID := CreateKallistiEmbeddedPage();
+  GdbPageID := CreateGdbPage();
+  ToolchainsPageID := CreateToolchainsPage();
+  FoundationPageID := CreateFoundationPage();
 
   // Create page after Select Components
-  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage;
+  IntegratedDevelopmentEnvironmentSettingsPageID := CreateIntegratedDevelopmentEnvironmentPage();
 
   // First initialization of pages using generated configuration
   ToolchainsPageInitialize(True);

@@ -92,20 +92,29 @@ end;
 
 procedure CreateJunctions();
 begin
-  if not IsFoundationMinGW then
-    Exit;
-
   Log('CreateJunctions');
-  CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr');
+
+  if IsFoundationMinGW() then
+    CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr')
+  else
+  begin
+    ForceDirectories(ExpandConstant('{app}\msys'));
+    CreateJunction('{code:GetMsysInstallationPath}', '{app}\msys\1.0');
+    HideDirectory(ExpandConstant('{app}\msys'));
+  end;
 end;
 
 procedure RemoveJunctions();
 begin
-  if not IsFoundationMinGW then
-    Exit;
-
   Log('RemoveJunctions');
-  RemoveJunction('{app}\usr');
+
+  if IsFoundationMinGW then
+    RemoveJunction('{app}\usr')
+  else
+  begin
+    RemoveJunction('{app}\msys\1.0');
+    DelTree(ExpandConstant('{app}\msys'), True, False, False);
+  end;
 end;
 
 procedure AddGitSafeDirectories();
@@ -155,8 +164,12 @@ end;
 procedure RenamePreviousDirectoriesBeforeInstallation();
 begin
   Log('RenamePreviousDirectoriesBeforeInstallation');
+
   RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
   RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetMsysOptBasePath}\mruby'));
+
+  if IsFoundationMinGW64() then
+    RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationRootPath}\msys'));
 end;
 
 function VersionSanitizer(const VersionNumber: String): String;
