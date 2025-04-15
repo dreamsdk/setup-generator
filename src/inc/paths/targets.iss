@@ -9,9 +9,10 @@
 
 function GetApplicationRootPath(Dummy: String): String;
 begin
+  Result := sEmptyStr;
   if (not UninstallMode) and (not IsWizardDirValueInitialized) then
-    Result := GetRegistryValue('{#MyAppID}', 'Inno Setup: App Path')
-  else
+    Result := GetRegistryValue('{#MyAppID}', 'Inno Setup: App Path');
+  if (Result = sEmptyStr) then
     Result := ExpandConstant('{app}');
 end;
 

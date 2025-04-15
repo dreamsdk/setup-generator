@@ -279,8 +279,8 @@ end;
 function SetFileAttributes(lpFileName: string; dwFileAttributes: DWORD): BOOL;
   external 'SetFileAttributesW@kernel32.dll stdcall';
 
-function HideDirectory(const DirectoryPath: string): Boolean;
+function HideFileOrDirectory(const Path: string): Boolean;
 begin
-  Result := SetFileAttributes(DirectoryPath,
-    FILE_ATTRIBUTE_HIDDEN or FILE_ATTRIBUTE_SYSTEM);
+  Result := SetFileAttributes(Path, FILE_ATTRIBUTE_HIDDEN
+    or FILE_ATTRIBUTE_SYSTEM);
 end;

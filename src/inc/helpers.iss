@@ -100,7 +100,7 @@ begin
   begin
     ForceDirectories(ExpandConstant('{app}\msys'));
     CreateJunction('{code:GetMsysInstallationPath}', '{app}\msys\1.0');
-    HideDirectory(ExpandConstant('{app}\msys'));
+    HideFileOrDirectory(ExpandConstant('{app}\msys'));
   end;
 end;
 
@@ -109,10 +109,10 @@ begin
   Log('RemoveJunctions');
 
   if IsFoundationMinGW then
-    RemoveJunction('{app}\usr')
+    RemoveJunction(ExpandConstant('{app}\usr'))
   else
   begin
-    RemoveJunction('{app}\msys\1.0');
+    RemoveJunction(ExpandConstant('{app}\msys\1.0'));
     DelTree(ExpandConstant('{app}\msys'), True, False, False);
   end;
 end;
@@ -149,6 +149,7 @@ begin
   Log('SaveFoundationToFile');
   Buffer := IntToStr(Ord(Foundation));
   SaveStringToFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer, False);
+  HideFileOrDirectory(ExpandConstant('{code:GetFoundationFilePath}'));
 end;
 
 procedure RemoveFoundationFile();
