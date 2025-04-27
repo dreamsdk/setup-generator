@@ -50,33 +50,21 @@
 ; Installer version
 
 ; This is the major release number, the one displayed in the package name.
-; If VersionNumberMajor is set to "3" then it will display "DreamSDK R3". 
-#define VersionNumberMajor "3"
+; If VersionNumberMajor is set to "4" then it will display "DreamSDK R4". 
+#define VersionNumberMajor "4"
 
 ; This is the minor release number, mainly used if some fixes are provided for
 ; the VersionNumberMajor you are currently making.
 #define VersionNumberMinor "0"
 
-; This should be incremented when distributing the package. Currently, 3 
-; packages has been officially released: DreamSDK R1 (1), DreamSDK R2 (2 and 3).
-#define VersionNumberBuild "4"
-
-; Toolchains version (displayed on-screen, just for information)
-; This should match what you put in "prepare.ini" from "prepare" utility.
-
-; Stable
-#define ToolchainsStableVersionSuperH "13.2.0"
-#define ToolchainsStableVersionNewlib "4.3.0.20230120"
-#define ToolchainsStableVersionAICA "8.5.0"
-
-; Old Stable
-#define ToolchainsOldStableVersionSuperH "9.5.0"
-#define ToolchainsOldStableVersionNewlib "4.3.0.20230120"
-#define ToolchainsOldStableVersionAICA "8.5.0"
-
-; Legacy
-#define ToolchainsLegacyVersion "4.7.4"
-#define ToolchainsLegacyVersionNewlib "2.0.0"
-
-; GNU Debugger (GDB)
-#define GdbVersion "10.2"
+; This should be incremented when distributing the package. 
+; Below the list of all packages that has been officially released:
+;    1: [Production] R1
+;    2: [Debug]      R2-dev-beta1
+;    3: [Production] R2
+;    4: [Production] R3
+;    5: [Debug]      R4-dev-alpha1
+;    6: [Debug]      R4-dev-alpha2
+;    7: [Debug]      R4-dev-alpha3
+;    8: [Debug]      R4-dev-alpha4
+#define VersionNumberBuild "8"
