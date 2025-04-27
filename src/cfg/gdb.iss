@@ -11,6 +11,9 @@
 ; THIS FILE HAS BEEN GENERATED. PLEASE DON'T UPDATE IT.
 ;
 
+; GNU Debugger (GDB)
+#define GdbVersion "10.2"
+
 ; x86 (32-bit)
 #define Gdb32Count 12
 
