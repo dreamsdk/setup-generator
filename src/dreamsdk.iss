@@ -9,7 +9,17 @@
 ; =============================================================================
 
 #include "inc/const.iss"
-#include "cfg/config.iss"
+
+; Handle the configuration
+#define CUSTOM_CONFIG_FILE "cfg/config.iss"
+#if FileExists(CUSTOM_CONFIG_FILE)
+; Use custom configuration file, this will override the default one
+#include CUSTOM_CONFIG_FILE
+#define CustomConfigurationEnabled
+#else
+; Use default configuration file
+#include "cfg/config.default.iss"
+#endif
 
 #define MyAppName "DreamSDK"
 
