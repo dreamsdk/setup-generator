@@ -8,19 +8,19 @@ type
 
 type
   TToolchainPackage = record
+    ComponentsListItemIndex: Integer;
     Name: String;
     Description: String;
-    IsModernWindowsOnly: Boolean; // Windows 10+ 64-bit only
-    ComponentsListItemIndex: Integer;
+    IsWindows64: Boolean;
   end;
   TToolchainPackageArray = array of TToolchainPackage;
   
   TGdbPackage = record
+    ComponentsListItemIndex: Integer;
     Name: String;
     Version: String;
     IsWindows64: Boolean;
     IsPythonRuntimeInstalled: Boolean;
-    ComponentsListItemIndex: Integer;
   end;
   TGdbPackageArray = array of TGdbPackage;
 
@@ -32,12 +32,15 @@ var
   WizardDirValueInitialized: Boolean;  
   
   // Toolchains
-  ToolchainPackages: TToolchainPackageArray;
+  Toolchain32Packages: TToolchainPackageArray;
+  Toolchain64Packages: TToolchainPackageArray;
   SelectedToolchainPackage: Integer;
   
   // GDB
   Gdb32Packages: TGdbPackageArray;
+  Gdb32Version: String;
   Gdb64Packages: TGdbPackageArray;
+  Gdb64Version: String;
   SelectedGdbPackage: Integer;
 
 //=============================================================================
@@ -107,10 +110,49 @@ end;
 // TOOLCHAINS
 //=============================================================================
 
-function IsSelectedToolchain(): Boolean;
+procedure InitializeToolchain32Packages(const ItemsCount: Integer);
+var
+  i: Integer;
+
 begin
-  Result := (SelectedToolchainPackage >= Low(ToolchainPackages)) and
-    (SelectedToolchainPackage <= High(ToolchainPackages));
+  SetArrayLength(Toolchain32Packages, ItemsCount);
+  for i := Low(Toolchain32Packages) to High(Toolchain32Packages) do
+  begin
+    Toolchain32Packages[i].Name := sEmptyStr;
+    Toolchain32Packages[i].ComponentsListItemIndex := -1;
+  end;
+end;
+
+procedure InitializeToolchain64Packages(const ItemsCount: Integer);
+var
+  i: Integer;
+
+begin
+  SetArrayLength(Toolchain64Packages, ItemsCount);
+  for i := Low(Toolchain64Packages) to High(Toolchain64Packages) do
+  begin
+    Toolchain64Packages[i].Name := sEmptyStr;
+    Toolchain64Packages[i].ComponentsListItemIndex := -1;
+  end;
+end;
+
+function GetToolchainPackagesList(var ToolchainPackages: TToolchainPackageArray): Boolean;
+begin
+  Result := True;
+  ToolchainPackages := Toolchain32Packages;
+  if IsFoundationMinGW64 then
+    ToolchainPackages := Toolchain64Packages;
+end;
+
+function IsSelectedToolchain(): Boolean;
+var
+  ToolchainPackages: TToolchainPackageArray;
+   
+begin
+  Result := False;
+  if GetToolchainPackagesList(ToolchainPackages) then
+    Result := (SelectedToolchainPackage >= Low(ToolchainPackages)) and
+      (SelectedToolchainPackage <= High(ToolchainPackages));
 end;
 
 function GetSelectedToolchain(): Integer;
@@ -120,38 +162,61 @@ begin
     Result := SelectedToolchainPackage;
 end;
 
-function SetSelectedToolchain(ToolchainProfileIndex: Integer): Boolean;
+function GetSelectedToolchainPackage(
+  var SelectedToolchainPackage: TToolchainPackage): Boolean;
 var
-  SelectedToolchainName: String;
+  ToolchainPackages: TToolchainPackageArray;
+  ItemIndex: Integer;
 
 begin
-  SelectedToolchainName := '(Undefined)';
-  SelectedToolchainPackage := ToolchainProfileIndex;
-  Result := IsSelectedToolchain;
-
-  // Check with IsSelectedToolchain
+  ItemIndex := GetSelectedToolchain();
+  Result := (ItemIndex <> -1);
   if Result then
-    // Index is valid, we can retrieve the profile name
-    SelectedToolchainName := ToolchainPackages[ToolchainProfileIndex].Name  
-  else  
-    // Reset index, has we can't select the correct item
-    SelectedToolchainPackage := -1;  
+  begin
+    GetToolchainPackagesList(ToolchainPackages); 
+    SelectedToolchainPackage := ToolchainPackages[ItemIndex];
+  end;
+end;
 
-  Log(Format('SelectedToolchain: "%s" (index=%d)', [
-    SelectedToolchainName, 
-    ToolchainProfileIndex
-  ]));
+function SetSelectedToolchain(ToolchainProfileIndex: Integer): Boolean;
+var
+  ToolchainPackages: TToolchainPackageArray;
+  SelectedToolchainName: String;  
+   
+begin
+  Result := GetToolchainPackagesList(ToolchainPackages);
+  if Result then
+  begin
+    SelectedToolchainName := '(Undefined)';
+    SelectedToolchainPackage := ToolchainProfileIndex;
+    Result := IsSelectedToolchain;
+
+    // Check with IsSelectedToolchain
+    if Result then
+      // Index is valid, we can retrieve the profile name
+      SelectedToolchainName := ToolchainPackages[ToolchainProfileIndex].Name  
+    else  
+      // Reset index, has we can't select the correct item
+      SelectedToolchainPackage := -1;  
+
+    Log(Format('SelectedToolchain: "%s" (index=%d)', [
+      SelectedToolchainName, 
+      ToolchainProfileIndex
+    ]));
+  end;
 end;
 
 //=============================================================================
 // GDB
 //=============================================================================
 
-procedure InitializeGdb32Packages(const ItemsCount: Integer);
+procedure InitializeGdb32Packages(const ItemsCount: Integer;
+  const GdbVersion: String);
 var
   i: Integer;
 
 begin
+  Gdb32Version := GdbVersion;
   SetArrayLength(Gdb32Packages, ItemsCount);
   for i := Low(Gdb32Packages) to High(Gdb32Packages) do
   begin
@@ -160,11 +225,13 @@ begin
   end;
 end;
 
-procedure InitializeGdb64Packages(const ItemsCount: Integer);
+procedure InitializeGdb64Packages(const ItemsCount: Integer;
+  const GdbVersion: String);
 var
   i: Integer;
 
 begin
+  Gdb64Version := GdbVersion;
   SetArrayLength(Gdb64Packages, ItemsCount);
   for i := Low(Gdb64Packages) to High(Gdb64Packages) do
   begin

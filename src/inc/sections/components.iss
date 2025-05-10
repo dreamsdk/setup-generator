@@ -33,10 +33,10 @@ Name: "main"; Description: "{cm:ComponentMain}"; Flags: fixed
 Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
 Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
 Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
-Name: "main\toolchains"; Description: "{cm:ComponentToolchains}"; Flags: fixed
-#include "../../cfg/toolchains.iss"
+Name: "main\toolchains"; Description: "{cm:ComponentToolchain}"; Flags: fixed
+#include "../../cfg/toolchains.config.out"
 Name: "main\gdb"; Description: "{cm:ComponentGdb}"; Flags: fixed
-#include "../../cfg/gdb.iss"
+#include "../../cfg/gdb.config.out"
 Name: "main\kos"; Description: "{cm:ComponentKallisti}"; Flags: fixed
 Name: "main\kos\online"; Description: "{cm:ComponentKallistiOnline}"; Flags: exclusive fixed
 Name: "main\kos\offline"; Description: "{cm:ComponentKallistiOffline}"; Flags: exclusive fixed

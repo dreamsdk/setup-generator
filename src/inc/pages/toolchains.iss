@@ -1,8 +1,19 @@
 [Code]
+type
+  TResetToolchainContext = record
+    RootComponentsListItemIndex: Integer;
+    ToolchainPackages: TToolchainPackageArray;
+  end;
+  TResetToolchainContextArray = array of TResetToolchainContext;
+  TToolchainComponentsListStateOperation = (tclsoLock, tclsoUnlock);
+
 var
   ToolchainsComboBoxSelection: TNewComboBox;
-  ToolchainsComboBoxSelectionStoredItemIndex: Integer;
+  ComponentToolchain32ComponentsListItemIndex,
+  ComponentToolchain64ComponentsListItemIndex,
+  ToolchainComboBoxSelectionStoredItemIndex: Integer;
   ToolchainsLabelSelectionHint: TLabel;
+  IsUnsupportedToolchainSelected: Boolean;  
 
 function IsModernWindowsForToolchain(): Boolean;
 begin
@@ -10,14 +21,19 @@ begin
 end;
 
 function IsSelectedToolchainForModernWindowsOnly(): Boolean;
-var
-  SelectedToolchain: Integer;
+(*var
+  ToolchainPackages: TToolchainPackageArray; 
+  SelectedToolchain: Integer;*)
 
 begin
-  Result := False;
-  SelectedToolchain := GetSelectedToolchain;
-  if SelectedToolchain <> -1 then
-    Result := ToolchainPackages[SelectedToolchain].IsModernWindowsOnly;   
+  Result := IsFoundationMinGW64;
+  (*Result := False;
+  if GetToolchainPackagesList(ToolchainPackages) then
+  begin
+    SelectedToolchain := GetSelectedToolchain;
+    if SelectedToolchain <> -1 then
+      Result := ToolchainPackages[SelectedToolchain].IsModernWindowsOnly;
+  end;*)
 end;
 
 function ConfirmModernToolchainsUsage(): Boolean;
@@ -32,10 +48,88 @@ begin
     mbConfirmation, MB_YESNO) = IDYES);
 end;
 
+procedure SetToolchainComponentsControlState(
+  const Operation: TToolchainComponentsListStateOperation);
+var
+  ContextIndex,
+  i,
+  RootComponentsListItemIndex,
+  ComponentsListItemIndex: Integer;
+  ToolchainPackages: TToolchainPackageArray; 
+  ResetToolchainContext: TResetToolchainContextArray;
+
+begin
+  Log('SetToolchainComponentsControlState called');
+
+  SetArrayLength(ResetToolchainContext, 2);
+
+  // 32-bit
+  ResetToolchainContext[0].RootComponentsListItemIndex := ComponentToolchain32ComponentsListItemIndex;
+  ResetToolchainContext[0].ToolchainPackages := Toolchain32Packages;
+
+  // 64-bit
+  ResetToolchainContext[1].RootComponentsListItemIndex := ComponentToolchain64ComponentsListItemIndex;
+  ResetToolchainContext[1].ToolchainPackages := Toolchain64Packages;
+
+  // Processing all 32-bit and 64-bit checkboxes
+  for ContextIndex := Low(ResetToolchainContext) to High(ResetToolchainContext) do
+  begin
+    ToolchainPackages := ResetToolchainContext[ContextIndex].ToolchainPackages;
+    RootComponentsListItemIndex := ResetToolchainContext[ContextIndex]
+      .RootComponentsListItemIndex;    
+
+#if InstallerMode == DEBUG
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s" [%d of %d]', [
+      RootComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      (ContextIndex + 1),
+      (High(ResetToolchainContext) + 1)
+    ]));
+#endif
+    
+    // Process the root node
+    WizardForm.ComponentsList.ItemEnabled[RootComponentsListItemIndex] := (Operation = tclsoUnlock);
+    if (Operation = tclsoUnlock) then
+      WizardForm.ComponentsList.Checked[RootComponentsListItemIndex] := False;
+     
+    // Process all Toolchain packages
+    for i := High(ToolchainPackages) downto Low(ToolchainPackages) do
+    begin        
+      // Update ComponentsListItemIndex from ToolchainPackages[i] if needed 
+      ComponentsListItemIndex := ToolchainPackages[i].ComponentsListItemIndex;
+
+#if InstallerMode == DEBUG
+      Log(Format('++ ComponentsListItemIndex=%d, Name="%s"', [
+        ComponentsListItemIndex,
+        WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex]        
+      ]));
+#endif
+
+      // Process the current node
+      WizardForm.ComponentsList.ItemEnabled[ComponentsListItemIndex] := (Operation = tclsoUnlock);
+      if (Operation = tclsoUnlock) then
+        WizardForm.ComponentsList.Checked[ComponentsListItemIndex] := False;
+    end;
+    
+    // Refresh the UI
+    WizardForm.ComponentsList.Invalidate();
+
+#if InstallerMode == DEBUG
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s", Status="%s"', [
+      ComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      BoolToStrCustom(WizardForm.ComponentsList.Checked[RootComponentsListItemIndex], 'Checked', 'Unchecked')
+    ]));
+#endif
+  end; // ResetToolchainContext
+
+  Log('SetToolchainComponentsControlState ended');
+end;
+
 procedure UpdateToolchainSelection();
 var
-  i,
-  ToolchainProfileIndex: Integer;
+  ToolchainProfileIndex,
+  ToolchainComponentsListItemIndex: Integer;
   ToolchainDescription,
   ToolchainWindowsText: String;
   SelectedToolchain: TToolchainPackage;
@@ -47,76 +141,77 @@ begin
   // Select the correct toolchain
   ToolchainProfileIndex := ToolchainsComboBoxSelection.Items
     .Objects[ToolchainsComboBoxSelection.ItemIndex];
-    
-  if SetSelectedToolchain(ToolchainProfileIndex) then
+  SetSelectedToolchain(ToolchainProfileIndex);
+
+  if GetSelectedToolchainPackage(SelectedToolchain) then
   begin
-    ToolchainsComboBoxSelectionStoredItemIndex := ToolchainsComboBoxSelection.ItemIndex;
-    SelectedToolchain := ToolchainPackages[GetSelectedToolchain];
+    ToolchainComboBoxSelectionStoredItemIndex := ToolchainsComboBoxSelection.ItemIndex;
+//    SavedStateIsFoundationMinGW64 := IsFoundationMinGW64;
 
     // Display toolchain information
     ToolchainsLabelSelectionHint.Caption := SelectedToolchain.Description;
     
-    // Append Windows information to toolchain information
-    ToolchainWindowsText := ExpandConstant('{cm:ToolchainsAllWindows}');
+    // Append Windows information to toolchain information    
+    (*ToolchainWindowsText := ExpandConstant('{cm:ToolchainsAllWindows}');
     if SelectedToolchain.IsModernWindowsOnly then
       ToolchainWindowsText := ExpandConstant('{cm:ToolchainsNewWindowsOnly}');
     ToolchainsLabelSelectionHint.Caption := Format('%s %s', [
       ToolchainsLabelSelectionHint.Caption,
       ToolchainWindowsText
-    ]);
+    ]);*)
     
     // Tick the correct toolchain in the ComponentsList then force UI refresh
     if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then
     begin
+      SetToolchainComponentsControlState(gclsoUnlock);
+
       with WizardForm.ComponentsList do
       begin
-        for i := High(ToolchainPackages) downto Low(ToolchainPackages) do
-          Checked[ToolchainPackages[i].ComponentsListItemIndex] := False;
-        Checked[SelectedToolchain.ComponentsListItemIndex] := True;         
-        Invalidate;  
-      end;
+        // Check only the choice the user made
+        if SelectedToolchain.ComponentsListItemIndex <> -1 then
+        begin
+          // Check the root Toolchain node
+          CheckItem(ToolchainComponentsListItemIndex, coCheck);
+          Checked[ToolchainComponentsListItemIndex] := True;
 
-      // Force recalculation of disk space usage
-      WizardForm.TypesCombo.OnChange(WizardForm.TypesCombo);
+          // Check the specified Toolchain packaged in that Toolchain node
+          CheckItem(SelectedToolchain.ComponentsListItemIndex, coCheck);
+          Checked[SelectedToolchain.ComponentsListItemIndex] := True;
+
+#if InstallerMode == DEBUG
+          Log(Format('UpdateToolchainSelection: Checking: ComponentsListItemIndex=%d, Name="%s", Status="%s"', [
+            SelectedToolchain.ComponentsListItemIndex,
+            WizardForm.ComponentsList.ItemCaption[SelectedToolchain.ComponentsListItemIndex],
+            BoolToStrCustom(WizardForm.ComponentsList.Checked[SelectedToolchain.ComponentsListItemIndex], 'Checked', 'Unchecked')
+          ]));
+#endif
+        end;
+      end;
     end;      
   end;  
 end;
 
 procedure ToolchainsComboBoxSelectionAddItem(Text: String; ToolchainProfileIndex: Integer);
 var
-  ToolchainItemText: String;
-  NewItemIndex,
-  ComponentsListItemIndex: Integer;
+  NewItemIndex: Integer;
 
-begin
-  ToolchainItemText := Text;  
-  if (not IsModernWindowsForToolchain) and ToolchainPackages[ToolchainProfileIndex].IsModernWindowsOnly then
-    ToolchainItemText := Format('%s %s', [Text, ExpandConstant('{cm:ToolchainsNotSupportedForOldWindows}')]);
-
+begin    
   // Add the toolchain to the ComboBox
-  NewItemIndex := ToolchainsComboBoxSelection.Items.Add(ToolchainItemText);
+  NewItemIndex := ToolchainsComboBoxSelection.Items.Add(Text);  
   ToolchainsComboBoxSelection.Items.Objects[NewItemIndex] := Integer(ToolchainProfileIndex);
-  
-  // Save the item position in ComponentsList
-  ComponentsListItemIndex := WizardForm.ComponentsList.Items.IndexOf(Text);
-  ToolchainPackages[ToolchainProfileIndex].ComponentsListItemIndex := ComponentsListItemIndex;
-
-  Log(Format('ToolchainsComboBoxSelectionAddItem: %s, index=%d, componentListIndex=%d', [
-    Text,
-    ToolchainProfileIndex,
-    ComponentsListItemIndex
-  ]));
 end;
 
-procedure ToolchainsComboBoxSelectionInitialize();
+procedure ToolchainComboBoxSelectionInitialize();
 var
   i: Integer;
   Name: String;
+  ToolchainPackages: TToolchainPackageArray;
 
 begin
-  Log('ToolchainsComboBoxSelectionInitialize called');
-
-  // Populate the toolchains list
+  // Populate the toolchain list
+  ToolchainsComboBoxSelection.Items.Clear;
+  
+  GetToolchainPackagesList(ToolchainPackages);
   for i := Low(ToolchainPackages) to High(ToolchainPackages) do
   begin
     Name := ToolchainPackages[i].Name;
@@ -132,24 +227,112 @@ begin
   UpdateToolchainSelection();
 end;
 
+procedure ToolchainPackagesInitialize();
+var
+  ContextIndex,
+  i,
+  RootComponentsListItemIndex,
+  ComponentsListItemIndex: Integer;
+  ToolchainPackages: TToolchainPackageArray; 
+  ResetToolchainContext: TResetToolchainContextArray;
+#if InstallerMode == DEBUG
+  IsComponentsListItemIndexUpdated: Boolean;
+#endif
+
+begin
+  Log('ToolchainPackagesInitialize called');
+
+  SetArrayLength(ResetToolchainContext, 2);
+
+  // 32-bit
+  ResetToolchainContext[0].RootComponentsListItemIndex := ComponentToolchain32ComponentsListItemIndex;
+  ResetToolchainContext[0].ToolchainPackages := Toolchain32Packages;
+
+  // 64-bit
+  ResetToolchainContext[1].RootComponentsListItemIndex := ComponentToolchain64ComponentsListItemIndex;
+  ResetToolchainContext[1].ToolchainPackages := Toolchain64Packages;
+
+  // Reset all 32-bit and 64-bit checkboxes
+  for ContextIndex := Low(ResetToolchainContext) to High(ResetToolchainContext) do
+  begin
+    ToolchainPackages := ResetToolchainContext[ContextIndex].ToolchainPackages;
+    RootComponentsListItemIndex := ResetToolchainContext[ContextIndex]
+      .RootComponentsListItemIndex;    
+
+#if InstallerMode == DEBUG
+    Log(Format('+ RootComponentsListItemIndex=%d, Name="%s" [%d of %d]', [
+      RootComponentsListItemIndex,
+      WizardForm.ComponentsList.ItemCaption[RootComponentsListItemIndex],
+      (ContextIndex + 1),
+      (High(ResetToolchainContext) + 1)
+    ]));
+#endif
+    
+    // Process all Toolchain packages
+    for i := High(ToolchainPackages) downto Low(ToolchainPackages) do
+    begin        
+      // Update ComponentsListItemIndex from ToolchainPackages[i] if needed 
+      ComponentsListItemIndex := ToolchainPackages[i].ComponentsListItemIndex;
+
+#if InstallerMode == DEBUG
+      IsComponentsListItemIndexUpdated := False;
+#endif
+      
+      // Assign ComponentsListItemIndex if needed         
+      if (ComponentsListItemIndex = -1) then
+      begin
+        ComponentsListItemIndex := GetComponentsListItemIndex(ToolchainPackages[i].Name, RootComponentsListItemIndex);          
+        ToolchainPackages[i].ComponentsListItemIndex := ComponentsListItemIndex;
+#if InstallerMode == DEBUG
+        IsComponentsListItemIndexUpdated := True;
+#endif
+      end;
+
+#if InstallerMode == DEBUG
+      Log(Format('++ ComponentsListItemIndex=%d, Name="%s", IndexUpdated="%s"', [
+        ComponentsListItemIndex,
+        WizardForm.ComponentsList.ItemCaption[ComponentsListItemIndex],
+        BoolToStr(IsComponentsListItemIndexUpdated)
+      ]));
+#endif
+    end;
+  end;    
+
+  Log('ToolchainPackagesInitialize ended');
+end;
+
 procedure ToolchainsPageInitialize(const FirstInitialization: Boolean);
 begin
-  Log(Format('ToolchainsPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
+  Log(Format('ToolchainPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
 
   if FirstInitialization then
   begin
-    ToolchainsComboBoxSelectionStoredItemIndex := -1;
+    ToolchainComboBoxSelectionStoredItemIndex := -1;
+    ComponentToolchain32ComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentToolchain32}'));
+    ComponentToolchain64ComponentsListItemIndex :=
+      WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:ComponentToolchain64}'));
+    ToolchainPackagesInitialize();
   end;
 
+  Log(Format('ToolchainPageInitialize: Toolchain32ComponentListIndex=%d, Toolchain64ComponentListIndex=%d', [
+    ComponentToolchain32ComponentsListItemIndex,
+    ComponentToolchain64ComponentsListItemIndex
+  ]));
+
+  ToolchainComboBoxSelectionInitialize();
   if ToolchainsComboBoxSelection.Enabled then
   begin
     ToolchainsComboBoxSelection.ItemIndex := 0;
 
-    // Handle re-selection
-    if ToolchainsComboBoxSelectionStoredItemIndex <> -1 then
+    // Handle re-selection but only if we are in the same flavour (32 or 64-bit)
+    if (ToolchainComboBoxSelectionStoredItemIndex <> -1) then
+//      and (ToolchainSavedStateIsFoundationMinGW64 = IsFoundationMinGW64)then
     begin
-      Log(Format('+ Re-selection: %d', [ToolchainsComboBoxSelectionStoredItemIndex]));
-      ToolchainsComboBoxSelection.ItemIndex := ToolchainsComboBoxSelectionStoredItemIndex;
+      ToolchainsComboBoxSelection.ItemIndex := ToolchainComboBoxSelectionStoredItemIndex;
+#if InstallerMode == DEBUG
+      Log(Format('+ Toolchain ItemIndex Restore: %d', [ToolchainComboBoxSelectionStoredItemIndex]));
+#endif      
     end;
     
     UpdateToolchainSelection();
@@ -205,7 +388,6 @@ begin
   ToolchainsComboBoxSelection.Top := LabelComboBoxSelection.Top + LabelComboBoxSelection.Height + ScaleY(8);
   ToolchainsComboBoxSelection.Width := ToolchainsPage.SurfaceWidth; 
   ToolchainsComboBoxSelection.Style := csDropDownList;
-  ToolchainsComboBoxSelectionInitialize();
 
   // Hint text for drop down list
   ToolchainsLabelSelectionHint := TLabel.Create(ToolchainsPage);  
