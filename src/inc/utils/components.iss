@@ -66,10 +66,8 @@ var
   CheckBack,
   EnabledBack: array of Boolean;
   Buffer: TStringList;
-  UncheckableComponentsList,
   CurrentComponentsList: TArrayOfString;
   ComponentName: String;
-  Done: Boolean;
 
 begin
   Log('InitializeComponentsListNames called');

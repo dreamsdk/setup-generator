@@ -138,8 +138,6 @@ LabelToolchainsSelection=Toolchain Profile:
 ToolchainsNotSupportedForOldWindows=(unsupported on your OS)
 ToolchainsLegacyConfirmation=This toolchain is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
 ToolchainsUnsupportedModernConfirmation=This toolchain is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
-ToolchainsNewWindowsOnly=Only compatible with Windows 10+ 64-bit.
-ToolchainsAllWindows=Compatible on all Windows starting from Windows XP.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger (GDB) Configuration

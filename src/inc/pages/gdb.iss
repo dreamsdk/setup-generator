@@ -19,7 +19,6 @@ var
 function TestPythonVersion(Version: String; IsWin64Binary: Boolean): Boolean;
 var
   i: Integer;
-  Buffer,
   PythonFileName,  
   PythonFilePath,
   VersionWithoutDot: String;
@@ -157,8 +156,6 @@ procedure UpdateGdbSelection();
 var
   GdbProfileIndex,
   GdbComponentsListItemIndex: Integer;
-  GdbDescription,
-  GdbWindowsText: String;
   SelectedGdb: TGdbPackage;
   GdbPackages: TGdbPackageArray;
    

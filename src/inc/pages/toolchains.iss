@@ -13,7 +13,6 @@ var
   ComponentToolchain64ComponentsListItemIndex,
   ToolchainComboBoxSelectionStoredItemIndex: Integer;
   ToolchainsLabelSelectionHint: TLabel;
-  IsUnsupportedToolchainSelected: Boolean;  
 
 function IsModernWindowsForToolchain(): Boolean;
 begin
@@ -130,8 +129,6 @@ procedure UpdateToolchainSelection();
 var
   ToolchainProfileIndex,
   ToolchainComponentsListItemIndex: Integer;
-  ToolchainDescription,
-  ToolchainWindowsText: String;
   SelectedToolchain: TToolchainPackage;
    
 begin
@@ -146,20 +143,10 @@ begin
   if GetSelectedToolchainPackage(SelectedToolchain) then
   begin
     ToolchainComboBoxSelectionStoredItemIndex := ToolchainsComboBoxSelection.ItemIndex;
-//    SavedStateIsFoundationMinGW64 := IsFoundationMinGW64;
 
     // Display toolchain information
     ToolchainsLabelSelectionHint.Caption := SelectedToolchain.Description;
-    
-    // Append Windows information to toolchain information    
-    (*ToolchainWindowsText := ExpandConstant('{cm:ToolchainsAllWindows}');
-    if SelectedToolchain.IsModernWindowsOnly then
-      ToolchainWindowsText := ExpandConstant('{cm:ToolchainsNewWindowsOnly}');
-    ToolchainsLabelSelectionHint.Caption := Format('%s %s', [
-      ToolchainsLabelSelectionHint.Caption,
-      ToolchainWindowsText
-    ]);*)
-    
+
     // Tick the correct toolchain in the ComponentsList then force UI refresh
     if Assigned(WizardForm) and Assigned(WizardForm.ComponentsList) then
     begin
@@ -170,11 +157,11 @@ begin
         // Check only the choice the user made
         if SelectedToolchain.ComponentsListItemIndex <> -1 then
         begin
-          // Check the root Toolchain node
+          // Check the root toolchain node
           CheckItem(ToolchainComponentsListItemIndex, coCheck);
           Checked[ToolchainComponentsListItemIndex] := True;
 
-          // Check the specified Toolchain packaged in that Toolchain node
+          // Check the specified toolchain packaged in that toolchain node
           CheckItem(SelectedToolchain.ComponentsListItemIndex, coCheck);
           Checked[SelectedToolchain.ComponentsListItemIndex] := True;
 

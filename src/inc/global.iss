@@ -119,6 +119,7 @@ begin
   for i := Low(Toolchain32Packages) to High(Toolchain32Packages) do
   begin
     Toolchain32Packages[i].Name := sEmptyStr;
+    Toolchain32Packages[i].IsWindows64 := False;
     Toolchain32Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
@@ -132,6 +133,7 @@ begin
   for i := Low(Toolchain64Packages) to High(Toolchain64Packages) do
   begin
     Toolchain64Packages[i].Name := sEmptyStr;
+    Toolchain64Packages[i].IsWindows64 := True;
     Toolchain64Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
@@ -221,6 +223,7 @@ begin
   for i := Low(Gdb32Packages) to High(Gdb32Packages) do
   begin
     Gdb32Packages[i].Name := sEmptyStr;
+    Gdb32Packages[i].IsWindows64 := False;
     Gdb32Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
@@ -236,6 +239,7 @@ begin
   for i := Low(Gdb64Packages) to High(Gdb64Packages) do
   begin
     Gdb64Packages[i].Name := sEmptyStr;
+    Gdb64Packages[i].IsWindows64 := True;
     Gdb64Packages[i].ComponentsListItemIndex := -1;
   end;
 end;
