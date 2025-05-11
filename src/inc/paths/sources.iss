@@ -16,17 +16,25 @@
 #define SourceDirectoryMSYS2 SourceDirectoryBase + "\msys2-base"
 #define SourceDirectoryAppSystemObjectsMSYS2 SourceDirectoryBase + "\msys2-system-objects"
 
-// Foundation: Common
+// Addons
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons-cmd"
 #define SourceDirectoryTools SourceDirectoryBase + "\addons-gui"
-#define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
+
+// DreamSDK Common
 #define SourceDirectoryAppCommonObjects SourceDirectoryBase + "\dreamsdk-objects"
 #define SourceDirectorySystemUtilities SourceDirectoryBase + "\utilities"
 
-// Embedded libraries
+// DreamSDK Binaries: x86
+#define SourceDirectoryAppBinaries SourceDirectoryBase + "\dreamsdk-binaries"
+#define SourcePackagesBinary SourceDirectoryBase + "\binary-packages"
+
+// DreamSDK Binaries: x64
+#define SourceDirectoryAppBinaries64 SourceDirectoryBase + "\dreamsdk-binaries-x64"
+#define SourcePackagesBinary64 SourceDirectoryBase + "\binary-packages-x64"
+
+// Source Packages
+#define SourcePackagesSource SourceDirectoryBase + "\source-packages"
+
+// Embedded Libraries
 #define SourceDirectoryEmbedded SourceDirectoryBase + "\lib-embedded"
 #define SourceDirectoryEmbeddedKallisti SourceDirectoryEmbedded + "\lib"
-
-// Packages
-#define SourcePackagesBinary SourceDirectoryBase + "\binary-packages"
-#define SourcePackagesSource SourceDirectoryBase + "\source-packages"
