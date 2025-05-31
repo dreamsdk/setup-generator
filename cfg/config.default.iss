@@ -46,25 +46,3 @@
 ; it will sign your installer with the provided signature. Please note, it will
 ; try to dual-sign the binary with SHA-1 (deprecated) and SHA-256 (current).
 #define DigitalSignatureMode SIGNATURE_DISABLED
-
-; Installer version
-
-; This is the major release number, the one displayed in the package name.
-; If VersionNumberMajor is set to "4" then it will display "DreamSDK R4". 
-#define VersionNumberMajor "4"
-
-; This is the minor release number, mainly used if some fixes are provided for
-; the VersionNumberMajor you are currently making.
-#define VersionNumberMinor "0"
-
-; This should be incremented when distributing the package. 
-; Below the list of all packages that has been officially released:
-;    1: [Production] R1
-;    2: [Debug]      R2-dev-beta1
-;    3: [Production] R2
-;    4: [Production] R3
-;    5: [Debug]      R4-dev-alpha1
-;    6: [Debug]      R4-dev-alpha2
-;    7: [Debug]      R4-dev-alpha3
-;    8: [Debug]      R4-dev-alpha4
-#define VersionNumberBuild "8"

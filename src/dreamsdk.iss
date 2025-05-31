@@ -8,20 +8,21 @@
 ; DreamSDK Setup - Inno Setup Script
 ; =============================================================================
 
+#include "inc/options.iss"
 #include "inc/const.iss"
 
+#include "../.context/version.context.iss"
+
 ; Handle the configuration
-#define CUSTOM_CONFIG_FILE "cfg/config.iss"
+#define CUSTOM_CONFIG_FILE "../cfg/config.iss"
 #if FileExists(CUSTOM_CONFIG_FILE)
 ; Use custom configuration file, this will override the default one
 #include CUSTOM_CONFIG_FILE
 #define CustomConfigurationEnabled
 #else
 ; Use default configuration file
-#include "cfg/config.default.iss"
+#include "../cfg/config.default.iss"
 #endif
-
-#define MyAppName "DreamSDK"
 
 #if InstallerMode == DEBUG && SourceMode == DEBUG && DebugUninstallHandlingMode == UNINSTALL_IGNORED
 ; This fake GUID is used for testing the DreamSDK Setup package
@@ -31,14 +32,13 @@
 ; Real production GUID
 #define MyAppID "{DF847892-5D85-4FFA-8603-E71750D81602}"
 #endif
-#define MyAppPublisher "The " + MyAppName + " Team"
-#define MyAppURL "https://www.dreamsdk.org/"
 
 ; Copyright
 #define CurrentYear GetDateTimeString('yyyy', '', '')
 #define MyAppCopyright "© Copyleft 2018-" + CurrentYear
 
 ; Version
+#define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 #define VersionNumberRevision GetDateTimeString('yymm', '', '')
 
 #define AppVersion "R" + VersionNumberMajor
@@ -59,25 +59,6 @@
 #else
 #define MyAppEnvironmentVariable "DREAMSDK_HOME"
 #endif
-
-; Application names
-#define MyAppNameHelp MyAppName + " Help"
-#define AppMainName "Shell"
-#define AppManagerName "Manager" 
-
-#define FullAppMainName MyAppName + " " + AppMainName
-#define FullAppManagerName MyAppName + " " + AppManagerName
-
-#define OutputBaseFileName "setup"
-
-#define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
-
-#define IdeCodeBlocksName "Code::Blocks"
-#define IdeCodeBlocksSupportedVersions "17.12 or 20.03"
-
-#define IdeComponentsListName "ide"
-
-#define WindowsTerminalName "Windows Terminal"
 
 // ============================================================================
 // INCLUDES

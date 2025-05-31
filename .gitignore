@@ -1,8 +1,7 @@
-bin/
-rsrc/helpers/temp/*.exe
 *.log
-.sources
-.sources-dev
-.helpers
+.context/
+.sources/
+.sources-dev/
+.helpers/
+bin/
 config.iss
-*.out
