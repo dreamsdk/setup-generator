@@ -15,6 +15,7 @@
 #define SourceDirectoryMinGW64 SourceDirectoryBase + "\mingw64-base"
 #define SourceDirectoryMSYS2 SourceDirectoryBase + "\msys2-base"
 #define SourceDirectoryAppSystemObjectsMSYS2 SourceDirectoryBase + "\msys2-system-objects"
+#define SourceDirectoryAppSystemObjectsConfiguration64 SourceDirectoryBase + "\msys2-system-objects-configuration"
 
 // Addons
 #define SourceDirectoryAddons SourceDirectoryBase + "\addons-cmd"

@@ -24,6 +24,7 @@ Source: "{#SourceDirectoryAppSystemObjectsConfiguration}\*"; DestDir: "{code:Get
 Source: "{#SourceDirectoryMinGW64}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64; Excludes: "dev\mqueue,dev\shm,etc\pacman.d\gnupg,etc\hosts,etc\mtab,etc\networks,etc\protocols,etc\services,home\*"
 Source: "{#SourceDirectoryMSYS2}\*"; DestDir: "{code:GetMsysUserBasePath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
 Source: "{#SourceDirectoryAppSystemObjectsMSYS2}\*"; DestDir: "{code:GetApplicationRootPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
+Source: "{#SourceDirectoryAppSystemObjectsConfiguration64}\*"; DestDir: "{code:GetMsysInstallationPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: main\base\mingw64
 
 ; Addons: Command-line
 Source: "{#SourceDirectoryAddons}\elevate\*"; DestDir: "{code:GetApplicationAddonsPath}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: addons\elevate
