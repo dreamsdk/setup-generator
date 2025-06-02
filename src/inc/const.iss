@@ -27,7 +27,8 @@
 
 #define WindowsTerminalName "Windows Terminal"
 
-#define GENERATED_COMPONENTS_LIST_FILE "components.out"
+#define GENERATED_COMPONENTS_LIST_PATH "../.context"
+#define GENERATED_COMPONENTS_LIST_FILE "components.context.iss"
 
 #define MyAppPublisher "The " + MyAppName + " Team"
 #define MyAppURL "https://www.dreamsdk.org/"
