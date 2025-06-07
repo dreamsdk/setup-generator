@@ -3,6 +3,7 @@
 .context/
 .sources/
 .sources-dev/
+.sources-fake/
 .helpers/
 bin/
 config.iss

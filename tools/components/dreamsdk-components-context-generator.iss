@@ -13,7 +13,7 @@ OutputBaseFilename=dreamsdk-components-context-generator
 
 #define MyAppID ""
 #define MyAppEnvironmentVariable ""
-#define SourceDirectoryBase "../../.sources-dev"
+#define SourceDirectoryBase ".sources-fake"
 
 #include "../../src/inc/options.iss"
 #include "../../src/inc/const.iss"
