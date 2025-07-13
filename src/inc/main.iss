@@ -77,6 +77,9 @@ begin
           if not Result then
             Exit;
         end;
+
+        // Confirm the choice of the selected Foundation
+        ValidateFoundation();
       end;
 
     // GDB Page

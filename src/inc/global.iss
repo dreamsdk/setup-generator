@@ -92,7 +92,8 @@ end;
 
 function IsFoundationChanged: Boolean;
 begin
-  Result := (PreviousFoundation <> Foundation); 
+  Result := (PreviousFoundation <> efkUndefined)
+    and (PreviousFoundation <> Foundation); 
 end;
 
 procedure SetFoundation(SelectedFoundation: TEnvironmentFoundationKind);
@@ -103,6 +104,16 @@ begin
   Log(Format('Initialized Foundation: IsFoundationMinGW64=%d, IsFoundationMinGW=%d', [
     IsFoundationMinGW64,
     IsFoundationMinGW
+  ]));
+end;
+
+procedure ValidateFoundation();
+begin
+  // Don't consider that we changed foundation anymore
+  PreviousFoundation := Foundation;
+  
+  Log(Format('ValidateFoundation: %d', [
+    Foundation
   ]));
 end;
 

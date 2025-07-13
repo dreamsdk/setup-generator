@@ -323,8 +323,14 @@ begin
     ToolchainsComboBoxSelection.ItemIndex := 0;
 
     // Handle re-selection but only if we are in the same flavour (32 or 64-bit)
-    if (ToolchainComboBoxSelectionStoredItemIndex <> -1) then
-//      and (ToolchainSavedStateIsFoundationMinGW64 = IsFoundationMinGW64)then
+#if InstallerMode == DEBUG
+    Log(Format('+ Toolchain ItemIndex Restore Check: ToolchainComboBoxSelectionStoredItemIndex: %d, IsFoundationChanged: %s', [
+      ToolchainComboBoxSelectionStoredItemIndex,
+      BoolToStr(IsFoundationChanged)
+    ]));
+#endif
+    if (ToolchainComboBoxSelectionStoredItemIndex <> -1)
+      and (not IsFoundationChanged) then
     begin
       ToolchainsComboBoxSelection.ItemIndex := ToolchainComboBoxSelectionStoredItemIndex;
 #if InstallerMode == DEBUG
