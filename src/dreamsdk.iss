@@ -11,6 +11,7 @@
 #include "inc/options.iss"
 #include "inc/const.iss"
 
+; Version file
 #include "../.context/version.context.iss"
 
 ; Handle the configuration
@@ -74,8 +75,10 @@
 
 #include "inc/global.iss"
 
-#if FileExists(GENERATED_COMPONENTS_LIST_FILE)
-#include GENERATED_COMPONENTS_LIST_FILE
+// Components List
+#define GENERATED_COMPONENTS_LIST_FILEPATH GENERATED_COMPONENTS_LIST_PATH + "/" + GENERATED_COMPONENTS_LIST_FILE
+#if FileExists(GENERATED_COMPONENTS_LIST_FILEPATH)
+#include GENERATED_COMPONENTS_LIST_FILEPATH
 #define ComponentsListNameGenerated
 #endif
 
