@@ -9,7 +9,9 @@ type
 
 var
   GdbComboBoxSelection: TNewComboBox;
-  GdbLabelSelectionHint: TLabel;
+  GdbLabelSelectionHint,
+  GdbLabelntroduction,
+  GdbLabelPageExplanation: TLabel;
   ComponentGdb32ComponentsListItemIndex,
   ComponentGdb64ComponentsListItemIndex,
   GdbComboBoxSelectionStoredItemIndex: Integer;
@@ -376,13 +378,19 @@ begin
     
     UpdateGdbSelection();  
   end;
+
+  // Set GDB version in the label
+  GdbLabelntroduction.Caption := Format(CustomMessage('LabelGdbIntroduction'), [
+    GetGdbSelectedVersion
+  ]);
+  GdbLabelPageExplanation.Caption := Format(CustomMessage('LabelGdbDescription'), [
+    GetGdbSelectedVersion
+  ]);
 end;
 
 function CreateGdbPage(): Integer;
 var
-  GdbPage: TWizardPage;  
-  Labelntroduction,
-  LabelPageExplanation, 
+  GdbPage: TWizardPage;
   LabelComboBoxSelection: TLabel;
   BtnImage: TBitmapImage;
 
@@ -396,27 +404,31 @@ begin
   BtnImage := SetPageIcon('gdb', GdbPage);
   
   // Introduction label
-  Labelntroduction := TLabel.Create(GdbPage);
-  Labelntroduction.Parent := GdbPage.Surface;  
-  Labelntroduction.Caption := CustomMessage('LabelGdbIntroduction');  
-  Labelntroduction.AutoSize := True;
-  Labelntroduction.WordWrap := True;
-  Labelntroduction.Top := (BtnImage.Height div 2) - (Labelntroduction.Height div 2);
-  Labelntroduction.Left := BtnImage.Height + ScaleX(12);
+  GdbLabelntroduction := TLabel.Create(GdbPage);
+  GdbLabelntroduction.Parent := GdbPage.Surface;  
+  GdbLabelntroduction.Caption := Format(CustomMessage('LabelGdbIntroduction'), [
+    'XX.YY.ZZ'
+  ]);  
+  GdbLabelntroduction.AutoSize := True;
+  GdbLabelntroduction.WordWrap := True;
+  GdbLabelntroduction.Top := (BtnImage.Height div 2) - (GdbLabelntroduction.Height div 2);
+  GdbLabelntroduction.Left := BtnImage.Height + ScaleX(12);
 
   // Explanation of this page
-  LabelPageExplanation := TLabel.Create(GdbPage);
-  LabelPageExplanation.Parent := GdbPage.Surface;
-  LabelPageExplanation.Caption := CustomMessage('LabelGdbDescription');  
-  LabelPageExplanation.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
-  LabelPageExplanation.Width := GdbPage.SurfaceWidth;
-  SetMultiLinesLabel(LabelPageExplanation, 3);
+  GdbLabelPageExplanation := TLabel.Create(GdbPage);
+  GdbLabelPageExplanation.Parent := GdbPage.Surface;
+  GdbLabelPageExplanation.Caption := Format(CustomMessage('LabelGdbDescription'), [
+    'XX.YY.ZZ'
+  ]);  
+  GdbLabelPageExplanation.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
+  GdbLabelPageExplanation.Width := GdbPage.SurfaceWidth;
+  SetMultiLinesLabel(GdbLabelPageExplanation, 3);
   
   // Drop down list label
   LabelComboBoxSelection := TLabel.Create(GdbPage);  
   LabelComboBoxSelection.Parent := GdbPage.Surface;
   LabelComboBoxSelection.Caption := CustomMessage('LabelGdbSelection'); 
-  LabelComboBoxSelection.Top := LabelPageExplanation.Top + LabelPageExplanation.Height + ScaleY(12);
+  LabelComboBoxSelection.Top := GdbLabelPageExplanation.Top + GdbLabelPageExplanation.Height + ScaleY(12);
   LabelComboBoxSelection.Width := GdbPage.SurfaceWidth;
   LabelComboBoxSelection.Font.Style := [fsBold];  
 

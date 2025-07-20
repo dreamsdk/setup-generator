@@ -263,6 +263,14 @@ begin
     GdbPackages := Gdb64Packages;
 end;
 
+function GetGdbSelectedVersion: String;
+begin
+  Result := Gdb32Version;
+  if IsFoundationMinGW64 then 
+    Result := Gdb64Version;
+  Result := Trim(Result); 
+end;
+
 function IsSelectedGdb(): Boolean;
 var
   GdbPackages: TGdbPackageArray;

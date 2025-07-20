@@ -142,7 +142,7 @@ ToolchainsUnsupportedModernConfirmation=This toolchain is unsupported on your OS
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger (GDB) Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
-LabelGdbIntroduction=Customize your GNU Debugger (GDB) %s for SuperH installation.
+LabelGdbIntroduction=Customize your installation of GNU Debugger (GDB) %s.
 LabelGdbDescription=You may enable now Python extensions for GDB %s, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
 LabelGdbSelection=GNU Debugger (GDB) Profile:
 GdbPythonRuntimeNotFound=This GDB is binded with Python %s 32-bits, which was not found on your system.
