@@ -64,20 +64,6 @@ begin
     // Toolchains Page
     ToolchainsPageID:
       begin
-        if IsModernWindowsForToolchain and (not IsSelectedToolchainForModernWindowsOnly) then
-        begin
-          Result := ConfirmLegacyToolchainsUsage;
-          if not Result then
-            Exit;
-        end;
-
-        if (not IsModernWindowsForToolchain) and IsSelectedToolchainForModernWindowsOnly then
-        begin
-          Result := ConfirmModernToolchainsUsage;
-          if not Result then
-            Exit;
-        end;
-
         // Confirm the choice of the selected Foundation
         ValidateFoundation();
       end;

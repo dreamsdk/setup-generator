@@ -135,9 +135,6 @@ ToolchainsSubtitlePage=Which toolchain profile do you want to use?
 LabelToolchainsIntroduction=Customize your toolchain installation.
 LabelToolchainsDescription=Toolchains are used to build Sega Dreamcast programs. Please choose your preferred toolchain profile now. You may change this later in {#FullAppManagerName}.
 LabelToolchainsSelection=Toolchain Profile:
-ToolchainsNotSupportedForOldWindows=(unsupported on your OS)
-ToolchainsLegacyConfirmation=This toolchain is deprecated, are you sure to continue? You can change that later in {#FullAppManagerName}.
-ToolchainsUnsupportedModernConfirmation=This toolchain is unsupported on your OS. Continue anyway? You can change that later in {#FullAppManagerName}.
 
 ; GNU Debugger for Super H
 GdbTitlePage=GNU Debugger (GDB) Configuration

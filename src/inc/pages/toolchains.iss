@@ -24,39 +24,6 @@ var
   ToolchainComboBoxSelectionStoredItemIndex: Integer;
   ToolchainsLabelSelectionHint: TLabel;
 
-function IsModernWindowsForToolchain(): Boolean;
-begin
-  Result := IsWindows10OrGreater;
-end;
-
-function IsSelectedToolchainForModernWindowsOnly(): Boolean;
-(*var
-  ToolchainPackages: TToolchainPackageArray; 
-  SelectedToolchain: Integer;*)
-
-begin
-  Result := IsFoundationMinGW64;
-  (*Result := False;
-  if GetToolchainPackagesList(ToolchainPackages) then
-  begin
-    SelectedToolchain := GetSelectedToolchain;
-    if SelectedToolchain <> -1 then
-      Result := ToolchainPackages[SelectedToolchain].IsModernWindowsOnly;
-  end;*)
-end;
-
-function ConfirmModernToolchainsUsage(): Boolean;
-begin
-  Result := (MsgBox(CustomMessage('ToolchainsUnsupportedModernConfirmation'),
-    mbError, MB_YESNO) = IDYES);
-end;
-
-function ConfirmLegacyToolchainsUsage(): Boolean;
-begin
-  Result := (MsgBox(CustomMessage('ToolchainsLegacyConfirmation'),
-    mbConfirmation, MB_YESNO) = IDYES);
-end;
-
 procedure SetToolchainComponentsControlState(
   const Operation: TToolchainComponentsListStateOperation);
 var
