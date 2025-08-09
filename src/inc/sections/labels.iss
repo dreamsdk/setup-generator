@@ -127,7 +127,7 @@ FoundationMinGW=MinGW/MSYS
 LabelFoundationDescriptionMinGW=The legacy option. This environment is compatible with Windows XP and later, but unfortunately, it's quite outdated (e.g., GCC for Windows is still 9.x). Included packages are no longer updated.
 FoundationMinGW64=MinGW-w64/MSYS2 (highly recommanded)
 LabelFoundationDescriptionMinGW64=The modern option, compatible with Windows 10 and later. It's recommended to use this option whenever possible.
-FoundationUseMinGWConfirmation=MinGW/MSYS is deprecated. This can't be changed later. Are you sure to continue?
+FoundationUseMinGWConfirmation=WARNING: MinGW/MSYS is obsolete. This cannot be changed later. Are you sure you want to continue?
 
 ; Toolchains
 ToolchainsTitlePage=Toolchain Configuration
@@ -143,10 +143,11 @@ ToolchainsUnsupportedModernConfirmation=This toolchain is unsupported on your OS
 GdbTitlePage=GNU Debugger (GDB) Configuration
 GdbSubtitlePage=Do you want to enable Python extensions of GDB for SuperH?
 LabelGdbIntroduction=Customize your installation of GNU Debugger (GDB) %s.
-LabelGdbDescription=You may enable now Python extensions for GDB %s, but only Python 32-bits is supported. If the options below are disabled then install a 32-bits Python runtime on your computer and run Setup again. You can change this later in {#FullAppManagerName}. 
+LabelGdbDescription=You may enable now Python extensions for GDB %s%s. Please choose your preferred profile now. You may change this later in {#FullAppManagerName}.
+LabelGdbDescription32BitOnly=, but only Python 32-bit is supported
 LabelGdbSelection=GNU Debugger (GDB) Profile:
-GdbPythonRuntimeNotFound=This GDB is binded with Python %s 32-bits, which was not found on your system.
-GdbConfirmUnsupportedPythonUsage=Python %s 32-bits was not found on your system, which is required for the selected build. Continue anyway? You can change that later in {#FullAppManagerName}.
+GdbPythonRuntimeNotFound=This GDB is binded with 32-bit Python %s, which was not found on your system.
+GdbConfirmUnsupportedPythonUsage=The 32-bit Python %s binary was not found on your system, which is required for the selected build. Continue anyway? You may change that later in {#FullAppManagerName}.
 
 ; Ruby
 RubyTitlePage=Ruby Configuration

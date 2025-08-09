@@ -341,6 +341,9 @@ begin
 end;
 
 procedure GdbPageInitialize(const FirstInitialization: Boolean);
+var
+  GdbDescription32BitOnly: String;
+
 begin
   Log(Format('GdbPageInitialize called, first call: %s', [BoolToStr(FirstInitialization)]));
 
@@ -383,8 +386,12 @@ begin
   GdbLabelntroduction.Caption := Format(CustomMessage('LabelGdbIntroduction'), [
     GetGdbSelectedVersion
   ]);
+  GdbDescription32BitOnly := sEmptyStr;
+  if not IsFoundationMinGW64 then
+    GdbDescription32BitOnly := CustomMessage('LabelGdbDescription32BitOnly');
   GdbLabelPageExplanation.Caption := Format(CustomMessage('LabelGdbDescription'), [
-    GetGdbSelectedVersion
+    GetGdbSelectedVersion,
+    GdbDescription32BitOnly
   ]);
 end;
 
@@ -418,7 +425,8 @@ begin
   GdbLabelPageExplanation := TLabel.Create(GdbPage);
   GdbLabelPageExplanation.Parent := GdbPage.Surface;
   GdbLabelPageExplanation.Caption := Format(CustomMessage('LabelGdbDescription'), [
-    'XX.YY.ZZ'
+    'XX.YY.ZZ',
+    sEmptyStr
   ]);  
   GdbLabelPageExplanation.Top := BtnImage.Top + BtnImage.Height + ScaleY(12);
   GdbLabelPageExplanation.Width := GdbPage.SurfaceWidth;
