@@ -199,3 +199,11 @@ begin
   SetDoBeforeUninstall(@VersionBeforeUninstall);
 end;
 
+procedure SetupPreferredTerminal();
+var
+  ConfigurationFilePath: String;
+
+begin
+  ConfigurationFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk.conf');  
+  SetIniBool('Settings', 'UseMinTTY', IsShellMinTTY, ConfigurationFilePath);  
+end;

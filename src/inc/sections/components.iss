@@ -30,13 +30,21 @@ Name: "tools\vmutool"; Description: "{cm:ComponentUtilities_vmutool}"; Types: fu
 
 ; Main
 Name: "main"; Description: "{cm:ComponentMain}"; Flags: fixed
+; Main: Foundation
 Name: "main\base"; Description: "{cm:ComponentBase}"; Flags: fixed
 Name: "main\base\mingw"; Description: "{cm:ComponentBase32}"; Flags: exclusive fixed
 Name: "main\base\mingw64"; Description: "{cm:ComponentBase64}"; Flags: exclusive fixed
+; Main: Shell/Terminal
+Name: "main\shell"; Description: "{cm:ComponentShell}"; Flags: fixed
+Name: "main\shell\windows"; Description: "{cm:ComponentShellWindows}"; Flags: exclusive fixed
+Name: "main\shell\mintty"; Description: "{cm:ComponentShellMinTTY}"; Flags: exclusive fixed
+; Main: Toolchains
 Name: "main\toolchains"; Description: "{cm:ComponentToolchain}"; Flags: fixed
 #include "../../../.context/toolchains.context.iss"
+; Main: GNU Debugger (GDB)
 Name: "main\gdb"; Description: "{cm:ComponentGdb}"; Flags: fixed
 #include "../../../.context/gdb.context.iss"
+; Main: KallistiOS
 Name: "main\kos"; Description: "{cm:ComponentKallisti}"; Flags: fixed
 Name: "main\kos\online"; Description: "{cm:ComponentKallistiOnline}"; Flags: exclusive fixed
 Name: "main\kos\offline"; Description: "{cm:ComponentKallistiOffline}"; Flags: exclusive fixed

@@ -4,9 +4,14 @@ type
     efkUndefined,
     efkMinGWMSYS,
     efkMinGW64MSYS2
-  );  
+  );
+  
+  TShellKind = (
+    skUndefined,
+    skWindows,
+    skMinTTY
+  );
 
-type
   TToolchainPackage = record
     ComponentsListItemIndex: Integer;
     Name: String;
@@ -42,6 +47,9 @@ var
   Gdb64Packages: TGdbPackageArray;
   Gdb64Version: String;
   SelectedGdbPackage: Integer;
+
+  // Shell
+  Shell: TShellKind;
 
 //=============================================================================
 // UNINSTALL MODE
@@ -332,3 +340,22 @@ begin
     ]));
   end;
 end;
+
+//=============================================================================
+// Shell/Terminal
+//=============================================================================
+
+function IsShellMinTTY: Boolean;
+begin
+  Result := (Shell = skMinTTY);
+end;
+
+procedure SetShell(SelectedShell: TShellKind);
+begin
+  Shell := SelectedShell;
+
+  Log(Format('SelectedShell: %s', [
+    BoolToStrCustom(IsShellMinTTY, 'MinTTY', 'Windows Command Prompt/Windows Terminal')
+  ]));
+end;
+

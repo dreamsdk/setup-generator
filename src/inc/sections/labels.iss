@@ -117,6 +117,9 @@ ComponentUtilities_ipwriter_iplogos=Additional ready-to-use Initial Program logo
 ComponentUtilities_mrwriter=MR Writer – Initial Program picture format management tool
 ComponentUtilities_sbinducr=Selfboot Inducer – DreamInducer disc generator
 ComponentUtilities_vmutool=VMU Tool PC – Visual Memory data manager (GUI)
+ComponentShell=Terminal/Shell
+ComponentShellWindows=Windows Prompt/Windows Terminal
+ComponentShellMinTTY=Mintty
 
 ; Foundation
 FoundationTitlePage=Foundation Configuration
@@ -146,16 +149,18 @@ LabelGdbSelection=GNU Debugger (GDB) Profile:
 GdbPythonRuntimeNotFound=This GDB is binded with 32-bit Python %s, which was not found on your system.
 GdbConfirmUnsupportedPythonUsage=The 32-bit Python %s binary was not found on your system, which is required for the selected build. Continue anyway? You may change that later in {#FullAppManagerName}.
 
-; Ruby
-RubyTitlePage=Ruby Configuration
-RubySubtitlePage=Do you want to enable Ruby support for the Sega Dreamcast?
-LabelRubyIntroduction=You may use RubyInstaller for Windows to set up Ruby on your computer.
-LabelRubyDescription=Ruby may be used for Sega Dreamcast programming, but this is experimental. This feature uses mruby, the lightweight Ruby implementation which may be embedded in C/C++ programs. Sample projects are provided, you may use them as templates.
-RubyEnabled=Enable Ruby (experimental)
-LabelRubyDescriptionEnabled=Enable Ruby support for the Sega Dreamcast. This is experimental. Ruby projects are not supported in {#IdeCodeBlocksName}.
-RubyDisabled=Don't enable Ruby
-LabelRubyDescriptionDisabled=Don't enable Ruby support for the Sega Dreamcast. You may activate it later in {#FullAppManagerName} if you change your mind.
-RubyEnableConfirmation=Ruby support for the Sega Dreamcast is experimental. Are you sure to continue?
+; Shell / Terminal
+ShellTitlePage=Terminal Configuration
+ShellSubtitlePage=Which shell terminal do you want to use?
+LabelShellIntroduction=Customize your preferred terminal application.
+LabelShellDescription={#MyAppName} is primarily used via a terminal. Please choose your preferred terminal app now; this does not affect functionality. You can change this setting later in {#FullAppManagerName} at any time.
+ShellWindows=Windows %s
+ShellWindows_Prompt=Prompt
+ShellWindows_Terminal=Terminal
+LabelShellDescriptionWindows=Use the native, integrated Windows %s application.%s
+LabelShellDescriptionWindows_Terminal= With Windows Terminal, you can configure more comprehensive integration using the {#MyAppName} Tasks step, including opening a new {#MyAppName} tab directly from Windows Terminal.
+ShellMinTTY=Mintty
+LabelShellDescriptionMinTTY=Use Mintty, the default MSYS terminal. Mintty offers a more flexible user interface and closer adherence to Unix standards compared to the standard Windows terminal application.
 
 ; KallistiOS
 KallistiEmbeddedTitlePage=Sega Dreamcast Libraries Configuration

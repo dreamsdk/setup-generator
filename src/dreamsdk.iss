@@ -94,11 +94,12 @@
 #include "inc/helpers/preq.iss"
 #include "inc/helpers/wt.iss"
 
-#include "inc/pages/foundation.iss"
-#include "inc/pages/kos.iss"
 #include "inc/pages/ide.iss"
+#include "inc/pages/shell.iss"
+#include "inc/pages/kos.iss"
 #include "inc/pages/gdb.iss"
 #include "inc/pages/toolchains.iss"
+#include "inc/pages/foundation.iss"
 
 #include "inc/helpers.iss"
 

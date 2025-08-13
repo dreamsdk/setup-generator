@@ -6,7 +6,8 @@ var
   GdbPageID,
   KallistiEmbeddedPageID,
   ToolchainsPageID,
-  FoundationPageID: Integer;
+  FoundationPageID,
+  ShellPageID: Integer;
 
 function InitializeSetup(): Boolean;
 begin
@@ -41,6 +42,7 @@ begin
   SetupApplication();  
   CreateJunctions(); 
   AddGitSafeDirectories();
+  SetupPreferredTerminal();
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -261,6 +263,7 @@ begin
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage();
   GdbPageID := CreateGdbPage();
   ToolchainsPageID := CreateToolchainsPage();
+  ShellPageID := CreateShellPage();
   FoundationPageID := CreateFoundationPage();
 
   // Create page after Select Components
