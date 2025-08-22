@@ -69,6 +69,7 @@ external 'GetPortableExecutableBitnessW@{#CommonHelperLibraryUninstallFullPath} 
 
 function IsWindowsTerminalInstalled(): Boolean;
 begin
+  Log('IsWindowsTerminalInstalled called');
   if IsUninstallMode() then
     Result := IsWindowsTerminalInstalledUninstall()
   else

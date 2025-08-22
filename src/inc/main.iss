@@ -248,18 +248,23 @@ end;
 
 procedure InitializeWizard();
 begin
+  Log('InitializeWizard started');
+
   // Parse generated configuration
+  Log('Initializing generated configuration: Toolchain');
   InitializeArrayToolchain();
+
+  Log('Initializing generated configuration: GNU Debugger (GDB)');
   InitializeArrayGdb();
 
   // Components List custom code handling
   ComponentsListInitialize(True);
 
   // Create BrowseForFolderEx component
-  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;  
+  BrowseForFolderExFakePageID := CreateBrowseForFolderExFakePage;
 
   // Creates pages before Select Components
-  // Creates pages in the specified order  
+  // Creates pages in the specified order
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage();
   GdbPageID := CreateGdbPage();
   ToolchainsPageID := CreateToolchainsPage();
@@ -273,6 +278,8 @@ begin
   ToolchainsPageInitialize(True);
   GdbPageInitialize(True);
   KallistiPageInitialize(True);
+
+  Log('InitializeWizard exited');
 end;
 
 //=============================================================================
