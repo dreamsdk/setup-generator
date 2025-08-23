@@ -154,14 +154,9 @@ DiskSliceSize=134217728
 
 #if CompressionMode == COMPRESSION_ENABLED
 ; Release mode
-SolidCompression=True
 Compression=lzma2/ultra64
-LZMAUseSeparateProcess=True
-LZMADictionarySize=1048576
-LZMANumFastBytes=273
 #else
 ; Debug mode
-SolidCompression=False
 Compression=none
 #endif
 
