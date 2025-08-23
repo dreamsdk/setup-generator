@@ -96,7 +96,7 @@ end;
 
 function GetApplicationComponentHelpFilePath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{code:GetApplicationMainPath}\dreamsdk.chm');
+  Result := ExpandConstant('{code:GetApplicationMainPath}\docs\dreamsdk.chm');
 end;
 
 function GetApplicationComponentGettingStartedFilePath(Dummy: String): String;
