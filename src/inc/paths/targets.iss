@@ -101,7 +101,7 @@ end;
 
 function GetApplicationComponentGettingStartedFilePath(Dummy: String): String;
 begin
-  Result := ExpandConstant('{code:GetApplicationMainPath}\docs\getstart.html');
+  Result := ExpandConstant('{code:GetApplicationMainPath}\docs\getstart\index.html');
 end;
 
 function GetFoundationFilePath(Dummy: String): String;
