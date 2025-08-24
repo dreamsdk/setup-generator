@@ -204,6 +204,6 @@ var
   ConfigurationFilePath: String;
 
 begin
-  ConfigurationFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk.conf');  
+  ConfigurationFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk\dreamsdk.conf');  
   SetIniBool('Settings', 'UseMinTTY', IsShellMinTTY, ConfigurationFilePath);  
 end;
