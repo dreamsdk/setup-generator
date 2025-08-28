@@ -131,6 +131,7 @@ LabelFoundationDescriptionMinGW=The legacy option. This environment is compatibl
 FoundationMinGW64=MinGW-w64/MSYS2 (highly recommanded)
 LabelFoundationDescriptionMinGW64=The modern option, compatible with Windows 10 and later. It's recommended to use this option whenever possible.
 FoundationUseMinGWConfirmation=WARNING: MinGW/MSYS is obsolete. This cannot be changed later. Are you sure you want to continue?
+FoundationMigrationUserFilesNeeded=A previous MinGW/MSYS-based installation has been detected. Please note that old files in "msys" (the previous root directory) are not migrated automatically.
 
 ; Toolchains
 ToolchainsTitlePage=Toolchain Configuration

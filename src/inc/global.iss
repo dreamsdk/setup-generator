@@ -104,6 +104,26 @@ begin
     and (PreviousFoundation <> Foundation); 
 end;
 
+function IsFoundationPreviouslyMinGW: Boolean;
+var
+  PreviousRootPath: String;
+  FoundationFilePath: String;
+
+begin
+  Log('IsFoundationPreviouslyMinGW called');
+  
+  PreviousRootPath := AddBackslash(ExpandConstant('{app}')) + 'msys\1.0';
+  FoundationFilePath := ExpandConstant('{code:GetFoundationFilePath}');
+
+  Result := (not FileExists(FoundationFilePath)) and DirExists(PreviousRootPath);
+
+  Log(Format('IsFoundationPreviouslyMinGW; PreviousRootPath: "%s", FoundationFilePath: "%s", Result: "%s"', [
+    PreviousRootPath,
+    FoundationFilePath,
+    BoolToStr(Result)
+  ]));   
+end;
+
 procedure SetFoundation(SelectedFoundation: TEnvironmentFoundationKind);
 begin  
   PreviousFoundation := Foundation;

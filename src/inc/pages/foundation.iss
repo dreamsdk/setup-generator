@@ -11,6 +11,11 @@ begin
     mbError, MB_YESNO) = IDYES);
 end;
 
+procedure InformForUserFilesMigration();
+begin
+  MsgBox(CustomMessage('FoundationMigrationUserFilesNeeded'), mbInformation, MB_OK);
+end;
+
 procedure UpdateFoundation;
 begin  
   with WizardForm.ComponentsList do

@@ -131,7 +131,11 @@ begin
           Result := ConfirmFoundationMinGW;
           if not Result then
             Exit;      
-        end;       
+        end;
+
+        // Check if the user had old files in "msys" directory
+        if IsFoundationMinGW64 and IsFoundationPreviouslyMinGW then
+          InformForUserFilesMigration();               
       end;
 
     // Code::Blocks Page
