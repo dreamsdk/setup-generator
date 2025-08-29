@@ -95,12 +95,14 @@ begin
   Log('CreateJunctions');
 
   if IsFoundationMinGW() then
+    // MinGW/MSYS
     CreateJunction('{code:GetMsysInstallationPath}', '{app}\usr')
-  else
+  else if not DirExists(ExpandConstant('{app}\msys')) then
   begin
+    // MinGW-w64/MSYS2  
     ForceDirectories(ExpandConstant('{app}\msys'));
     if CreateJunction('{code:GetMsysInstallationPath}', '{app}\msys\1.0') then
-        HideFileOrDirectory(ExpandConstant('{app}\msys'));
+      HideFileOrDirectory(ExpandConstant('{app}\msys'));
   end;
 end;
 
@@ -109,11 +111,13 @@ begin
   Log('RemoveJunctions');
 
   if IsFoundationMinGW() then
+    // MinGW/MSYS  
     RemoveJunction(ExpandConstant('{app}\usr'))
   else
   begin
-    RemoveJunction(ExpandConstant('{app}\msys\1.0'));
-    DelTree(ExpandConstant('{app}\msys'), True, False, False);
+    // MinGW-w64/MSYS2    
+    if RemoveJunction(ExpandConstant('{app}\msys\1.0')) then
+      DelTree(ExpandConstant('{app}\msys'), True, False, False);
   end;
 end;
 
