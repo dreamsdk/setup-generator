@@ -32,7 +32,8 @@ begin
       Log(Format('  Executable: "%s", CommandLine: [%s]', [Executable, CommandLine]));
       
       Result := Exec(Executable, CommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-      Log(Format('  Result: %d', [Result]));
+      Log(Format('  Result: %d, ResultCode: %d', [Result, ResultCode]));	 
+	  Result := Result and (ResultCode = 0);
     end
     else
       Result := True;
@@ -51,7 +52,7 @@ begin
   
   TargetDirectoryPath := ExpandConstant(TargetDirectoryPath);
     
-  Log(Format('CreateJunction [TargetDirectoryPath: "%s"]', [
+  Log(Format('RemoveJunction [TargetDirectoryPath: "%s"]', [
     TargetDirectoryPath
   ]));
   
@@ -64,7 +65,8 @@ begin
       Log(Format('  Executable: "%s", CommandLine: [%s]', [Executable, CommandLine]));
       
       Result := Exec(Executable, CommandLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-      Log(Format('  Result: %d', [Result]));
+      Log(Format('  Result: %d, ResultCode: %d', [Result, ResultCode]));
+	  Result := Result and (ResultCode = 0);	  
     end
     else
       Result := True;

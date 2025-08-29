@@ -99,8 +99,8 @@ begin
   else
   begin
     ForceDirectories(ExpandConstant('{app}\msys'));
-    CreateJunction('{code:GetMsysInstallationPath}', '{app}\msys\1.0');
-    HideFileOrDirectory(ExpandConstant('{app}\msys'));
+    if CreateJunction('{code:GetMsysInstallationPath}', '{app}\msys\1.0') then
+        HideFileOrDirectory(ExpandConstant('{app}\msys'));
   end;
 end;
 
@@ -108,7 +108,7 @@ procedure RemoveJunctions();
 begin
   Log('RemoveJunctions');
 
-  if IsFoundationMinGW then
+  if IsFoundationMinGW() then
     RemoveJunction(ExpandConstant('{app}\usr'))
   else
   begin
@@ -135,7 +135,7 @@ begin
   LoadStringFromFile(ExpandConstant('{code:GetFoundationFilePath}'), Buffer);
   FoundationIndex := StrToIntDef(Buffer, -1);  
   Log(Format('  FoundationIndex: %d', [FoundationIndex]));
-  if (FoundationIndex = 2) then   // TODO: Improve this
+  if (FoundationIndex >= 2) then
     SetFoundation(efkMinGW64MSYS2)
   else
     SetFoundation(efkMinGWMSYS);  
@@ -166,11 +166,11 @@ procedure RenamePreviousDirectoriesBeforeInstallation();
 begin
   Log('RenamePreviousDirectoriesBeforeInstallation');
 
-  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
-  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetMsysOptBasePath}\mruby'));
-
   if IsFoundationMinGW64() then
     RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationRootPath}\msys'));
+
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetApplicationToolchainBasePath}'));
+  RenameFileOrDirectoryAsBackup(ExpandConstant('{code:GetMsysOptBasePath}\mruby'));
 end;
 
 function VersionSanitizer(const VersionNumber: String): String;
