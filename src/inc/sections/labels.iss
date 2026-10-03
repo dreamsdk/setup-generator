@@ -147,8 +147,8 @@ LabelGdbIntroduction=Customize your installation of GNU Debugger (GDB) %s.
 LabelGdbDescription=You may enable now Python extensions for GDB %s%s. Please choose your preferred profile now. You may change this later in {#FullAppManagerName}.
 LabelGdbDescription32BitOnly=, but only Python 32-bit is supported
 LabelGdbSelection=GNU Debugger (GDB) Profile:
-GdbPythonRuntimeNotFound=This GDB is binded with 32-bit Python %s, which was not found on your system.
-GdbConfirmUnsupportedPythonUsage=The 32-bit Python %s binary was not found on your system, which is required for the selected build. Continue anyway? You may change that later in {#FullAppManagerName}.
+GdbPythonRuntimeNotFound=This GDB is linked against %s-bit Python %s, which was not found on your system.
+GdbConfirmUnsupportedPythonUsage=The %s-bit Python %s binary was not found on your system, which is required for the selected build. Continue anyway? You may change that later in {#FullAppManagerName}.
 
 ; Shell / Terminal
 ShellTitlePage=Terminal Configuration
@@ -174,6 +174,19 @@ KallistiEmbeddedOffline=Use offline repositories
 KallistiEmbeddedOfflineConfirmation=Are you really sure to use offline repositories included in that {#MyAppName} Setup?
 LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-date by using the online repositories. This requires an Internet connection and Git. For better experience, Python and Subversion Client (SVN) are recommended, but not mandatory.
 LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions of the required Sega Dreamcast component libraries. Use this option only if you don't have an active Internet connection or you don't want to use the up-to-date online repositories.
+
+; Repositories
+RepositoriesTitlePage=Sega Dreamcast Libraries Repositories
+RepositoriesSubtitlePage=Which repositories and branches/tags do you want to use?
+LabelRepositoriesIntroduction=Select the Git repository URL and the branch/tag to use for each component. Leave the branch/tag empty to use the default branch of the repository.
+LabelRepository=%1 repository URL and branch/tag:
+RepositoryNameKallisti=KallistiOS (kos)
+RepositoryNameKallistiPorts=KallistiOS Ports (kos-ports)
+RepositoryNameDreamcastToolSerial=Dreamcast Tool Serial (dcload-serial)
+RepositoryNameDreamcastToolInternetProtocol=Dreamcast Tool IP (dcload-ip)
+RepositoryUrlEmpty=Please specify the repository URL for %1.
+RepositoryUnreachable=Unable to access the repository for %1:%n%2%n%nPlease check the URL and your Internet connection.
+RepositoryRefNotFound=The branch/tag "%2" doesn't exist in the repository for %1:%n%3
 
 ; Code::Blocks IDE
 CodeBlocksTitlePage={#IdeCodeBlocksName} Plug-in Integration

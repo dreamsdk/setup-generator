@@ -97,6 +97,7 @@
 #include "inc/pages/ide.iss"
 #include "inc/pages/shell.iss"
 #include "inc/pages/kos.iss"
+#include "inc/pages/repos.iss"
 #include "inc/pages/gdb.iss"
 #include "inc/pages/toolchains.iss"
 #include "inc/pages/foundation.iss"

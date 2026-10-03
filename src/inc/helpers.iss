@@ -211,3 +211,12 @@ begin
   ConfigurationFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk\dreamsdk.conf');  
   SetIniBool('Settings', 'UseMinTTY', IsShellMinTTY, ConfigurationFilePath);  
 end;
+
+procedure SetupRepositories();
+var
+  ConfigurationFilePath: String;
+
+begin
+  ConfigurationFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk\dreamsdk.conf');
+  SaveRepositoriesConfiguration(ConfigurationFilePath);
+end;

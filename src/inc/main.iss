@@ -5,6 +5,7 @@ var
   IntegratedDevelopmentEnvironmentSettingsPageID, 
   GdbPageID,
   KallistiEmbeddedPageID,
+  RepositoriesPageID,
   ToolchainsPageID,
   FoundationPageID,
   ShellPageID: Integer;
@@ -38,6 +39,7 @@ procedure FinalizeSetup();
 begin
   SaveFoundationToFile();
   SetPackageVersion();  
+  SetupRepositories();
   ApplyPostInstallPatches();
   SetupApplication();  
   CreateJunctions(); 
@@ -122,6 +124,15 @@ begin
         end;
       end;
 
+    // Repositories Page
+    RepositoriesPageID:
+      begin
+        // Check the selected repositories URL and branches/tags
+        Result := ValidateRepositories;
+        if not Result then
+          Exit;
+      end;
+
     // Foundation Page
     FoundationPageID:
       begin
@@ -184,6 +195,14 @@ begin
     Result := not IsCodeBlocksIntegrationEnabled;
     if Result then
       Log('Should Skip IDE Page');
+  end;
+
+  // Display Repositories Page only if using online repositories
+  if (PageID = RepositoriesPageID) then
+  begin
+    Result := IsKallistiEmbedded;
+    if Result then
+      Log('Skipping Repositories Page as we are using offline repositories');
   end;
 end;
 
@@ -270,6 +289,7 @@ begin
   // Creates pages before Select Components
   // Creates pages in the specified order
   KallistiEmbeddedPageID := CreateKallistiEmbeddedPage();
+  RepositoriesPageID := CreateRepositoriesPage(KallistiEmbeddedPageID);
   GdbPageID := CreateGdbPage();
   ToolchainsPageID := CreateToolchainsPage();
   ShellPageID := CreateShellPage();

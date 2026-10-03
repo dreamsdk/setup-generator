@@ -49,14 +49,24 @@ begin
         Result := ((not IsWin64Binary) and (PythonBitness = peb32)) or 
           (IsWin64Binary and (PythonBitness = peb64));
         Log(Format('Python %s: bitness="%s"; expected Win64=%s', [
-          Version, 
+          Version,
           PortableExecutableBitnessToString(PythonBitness),
           BoolToStr(IsWin64Binary)
         ]));
+        // Stop at the first matching runtime; later PATH entries must not override it
+        if Result then
+          Break;
       end
       else
         Log(Format('Python %s: not installed', [Version]));
     end;
+end;
+
+function GetGdbPackageBitness(const GdbPackage: TGdbPackage): String;
+begin
+  Result := '32';
+  if GdbPackage.IsWindows64 then
+    Result := '64';
 end;
 
 function GdbCheckUnsupportedPythonUsage(): Boolean;
@@ -65,11 +75,12 @@ var
 
 begin
   Result := True;
-  if IsUnsupportedGdbSelected 
+  if IsUnsupportedGdbSelected
     and GetSelectedGdbPackage(SelectedGdbPackage) then
-  begin    
+  begin
     Result := (MsgBox(
       Format(CustomMessage('GdbConfirmUnsupportedPythonUsage'), [
+        GetGdbPackageBitness(SelectedGdbPackage),
         SelectedGdbPackage.Version
       ]),
       mbError, MB_YESNO) = IDYES);
@@ -191,6 +202,7 @@ begin
         IsUnsupportedGdbSelected := True;
         GdbLabelSelectionHint.Caption := Format(
           CustomMessage('GdbPythonRuntimeNotFound'), [
+            GetGdbPackageBitness(SelectedGdb),
             SelectedGdb.Version
           ]);
       end;

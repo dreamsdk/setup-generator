@@ -9,6 +9,8 @@ Name: "{code:GetApplicationShortcutsPath}\{cm:ToolsGroupDirectory}"; MinVersion:
 [Files]
 ; Temporary files used for the installation
 Source: "..\rsrc\pages\*.bmp"; Flags: dontcopy noencryption nocompression
+Source: "{#SourceDirectoryAppCommonObjects}\etc\dreamsdk\repositories\*.conf"; Flags: dontcopy noencryption
+Source: "{#SourceDirectoryAppCommonObjects}\etc\dreamsdk\repositories-default.conf"; Flags: dontcopy noencryption
 
 ; Additional Resources
 Source: "..\rsrc\text\license.rtf"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion

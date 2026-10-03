@@ -70,6 +70,12 @@ begin
   Result := AMatchStr = Copy( ATestStr, 1, Length( AMatchStr ));
 end;
 
+function EndsWith(const AMatchStr, ATestStr: String): Boolean;
+begin
+  Result := (Length(ATestStr) >= Length(AMatchStr))
+    and (AMatchStr = Copy(ATestStr, Length(ATestStr) - Length(AMatchStr) + 1, Length(AMatchStr)));
+end;
+
 // Replace a string in a existing file
 function PatchFile(const FileName, OldValue, NewValue: String): Boolean;
 var
