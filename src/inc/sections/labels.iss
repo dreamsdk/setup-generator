@@ -186,6 +186,7 @@ RepositoryNameDreamcastToolSerial=Dreamcast Tool Serial (dcload-serial)
 RepositoryNameDreamcastToolInternetProtocol=Dreamcast Tool IP (dcload-ip)
 RepositoryUrlEmpty=Please specify the repository URL for %1.
 RepositoryUnreachable=Unable to access the repository for %1:%n%2%n%nPlease check the URL and your Internet connection.
+RepositoryPending=The repository for %1 is still being contacted:%n%2%n%nPlease wait a moment and try again, or check the URL.
 ButtonRepositoryRefresh=Refresh
 RepositoryRefNotFound=The branch/tag "%2" doesn't exist in the repository for %1:%n%3
 

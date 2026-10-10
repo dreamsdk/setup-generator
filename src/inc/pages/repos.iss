@@ -2,18 +2,29 @@
 const
   REPOSITORIES_COUNT = 4;
   REPOSITORIES_DEFAULT_FILE_NAME = 'repositories-default.conf';
-  GIT_LS_REMOTE_OUTPUT_FILE_NAME = 'git-ls-remote.txt';
+  GIT_LS_REMOTE_OUTPUT_FILE_NAME = 'git-ls-remote-%d-%d.txt';
+  GIT_LS_REMOTE_DONE_FILE_NAME = 'git-ls-remote-%d-%d.done';
+  GIT_LS_REMOTE_SUCCEEDED = 'ok';
+  GIT_LS_REMOTE_FAILED = 'fail';
   GIT_HEADS_PREFIX = 'refs/heads/';
   GIT_TAGS_PREFIX = 'refs/tags/';
   GIT_PEELED_TAG_SUFFIX = '^{}';
+  REPOSITORY_REFS_FETCH_TIMEOUT = 15000; // ms
+  REPOSITORY_REFS_FETCH_POLL_INTERVAL = 100; // ms
+
+type
+  TRepositoryRefsStatus = (rrsSucceeded, rrsFailed, rrsPending);
 
 var
   RepositoryUrlComboBoxes,
   RepositoryRefComboBoxes: array[0..3] of TNewComboBox;
   RepositoryDefaultUrls,
-  RepositoryRefsLoadedUrls: array[0..3] of String;
+  RepositoryRefsLoadedUrls,
+  RepositoryRefsFetchUrls: array[0..3] of String;
   RepositoryRefsLoaded,
-  RepositoryRefsLoadSucceeded: array[0..3] of Boolean;
+  RepositoryRefsFetchStarted: array[0..3] of Boolean;
+  RepositoryRefsLoadStatus: array[0..3] of TRepositoryRefsStatus;
+  RepositoryRefsFetchCounts: array[0..3] of Integer;
 
 // Repository configuration file name, as used by the Manager
 // (i.e., "etc/dreamsdk/repositories/*.conf")
@@ -106,44 +117,113 @@ begin
   Result := Trim(RepositoryRefComboBoxes[Index].Text);
 end;
 
-// Retrieve branches then tags available on the remote repository, sorted like
-// in the Manager (i.e., master/main first, then tags in "newest first" order)
-function FetchRepositoryRefs(Url: String; Refs: TStringList): Boolean;
+function GetRepositoryRefsFetchFileName(const Index: Integer;
+  const FileNameFormat: String): String;
+begin
+  Result := ExpandConstant('{tmp}\' + Format(FileNameFormat, [Index,
+    RepositoryRefsFetchCounts[Index]]));
+end;
+
+// The "done" file is written by the background fetch once Git has exited.
+// It may exist but still be empty while it's being written.
+function IsRepositoryRefsFetchFinished(const Index: Integer;
+  var Succeeded: Boolean): Boolean;
 var
-  OutputFileName,
-  CommandLine,
+  Done: AnsiString;
+
+begin
+  Result := LoadStringFromFile(GetRepositoryRefsFetchFileName(Index,
+    GIT_LS_REMOTE_DONE_FILE_NAME), Done) and (Trim(Done) <> '');
+  Succeeded := Result and (Trim(Done) = GIT_LS_REMOTE_SUCCEEDED);
+end;
+
+// Run "git ls-remote" in the background for the current URL, so the
+// branch/tag list is ready when the user needs it. Does nothing if the list
+// is already loaded or being fetched for this URL.
+function StartRepositoryRefsFetch(const Index: Integer): Boolean;
+var
+  Url,
+  CommandLine: String;
+  ResultCode: Integer;
+
+begin
+  Url := GetRepositoryUrl(Index);
+
+  Result := (RepositoryRefsLoaded[Index] and (RepositoryRefsLoadedUrls[Index] = Url))
+    or (RepositoryRefsFetchStarted[Index] and (RepositoryRefsFetchUrls[Index] = Url));
+  if Result or (Url = '') then
+    Exit;
+
+  // Each fetch has its own files, so a slow previous fetch (e.g., for another
+  // URL) can't be mistaken for this one
+  Inc(RepositoryRefsFetchCounts[Index]);
+  RepositoryRefsFetchUrls[Index] := Url;
+
+  // Avoid breaking the command line
+  StringChangeEx(Url, '"', '', True);
+
+  // Never prompt for credentials (e.g., with a wrong GitHub URL)
+  CommandLine := Format('/C set GIT_TERMINAL_PROMPT=0&& set GCM_INTERACTIVE=never&& '
+    + '(git ls-remote --heads --tags "%s" > "%s" 2> nul && echo %s> "%s" || echo %s> "%s")', [
+      Url,
+      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_OUTPUT_FILE_NAME),
+      GIT_LS_REMOTE_SUCCEEDED,
+      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_DONE_FILE_NAME),
+      GIT_LS_REMOTE_FAILED,
+      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_DONE_FILE_NAME)
+    ]);
+  Log(Format('StartRepositoryRefsFetch: %s', [CommandLine]));
+
+  Result := Exec(ExpandConstant('{cmd}'), CommandLine, '', SW_HIDE, ewNoWait,
+    ResultCode);
+  if not Result then
+    Log(Format('StartRepositoryRefsFetch: Unable to execute Git: %s', [
+      SysErrorMessage(ResultCode)]));
+  RepositoryRefsFetchStarted[Index] := Result;
+end;
+
+// Wait for the background fetch to finish (up to the timeout)
+function WaitRepositoryRefsFetch(const Index: Integer): TRepositoryRefsStatus;
+var
+  Elapsed: Integer;
+  Succeeded: Boolean;
+
+begin
+  Elapsed := 0;
+  while not IsRepositoryRefsFetchFinished(Index, Succeeded) do
+  begin
+    if Elapsed >= REPOSITORY_REFS_FETCH_TIMEOUT then
+    begin
+      Log(Format('WaitRepositoryRefsFetch: %s still pending', [GetRepositoryKey(Index)]));
+      Result := rrsPending;
+      Exit;
+    end;
+    Sleep(REPOSITORY_REFS_FETCH_POLL_INTERVAL);
+    Elapsed := Elapsed + REPOSITORY_REFS_FETCH_POLL_INTERVAL;
+  end;
+
+  if Succeeded then
+    Result := rrsSucceeded
+  else
+    Result := rrsFailed;
+end;
+
+// Read branches then tags from the "git ls-remote" output, sorted like in the
+// Manager (i.e., master/main first, then tags in "newest first" order)
+function ParseRepositoryRefs(const OutputFileName: String; Refs: TStringList): Boolean;
+var
   RefName: String;
   Lines: TArrayOfString;
   Branches,
   Tags: TStringList;
   i,
-  TabPosition,
-  ResultCode: Integer;
+  TabPosition: Integer;
 
 begin
   Result := False;
   Refs.Clear;
 
-  // Avoid breaking the command line
-  StringChangeEx(Url, '"', '', True);
-
-  OutputFileName := ExpandConstant('{tmp}\' + GIT_LS_REMOTE_OUTPUT_FILE_NAME);
-  DeleteFile(OutputFileName);
-
-  // Never prompt for credentials (e.g., with a wrong GitHub URL)
-  CommandLine := Format('/C set GIT_TERMINAL_PROMPT=0&& set GCM_INTERACTIVE=never&& '
-    + 'git ls-remote --heads --tags "%s" > "%s" 2> nul', [Url, OutputFileName]);
-  Log(Format('FetchRepositoryRefs: %s', [CommandLine]));
-
-  if not Exec(ExpandConstant('{cmd}'), CommandLine, '', SW_HIDE,
-    ewWaitUntilTerminated, ResultCode) then
-  begin
-    Log(Format('FetchRepositoryRefs: Unable to execute Git: %s', [SysErrorMessage(ResultCode)]));
-    Exit;
-  end;
-
-  Log(Format('FetchRepositoryRefs: ResultCode=%d', [ResultCode]));
-  if (ResultCode <> 0) or (not LoadStringsFromFile(OutputFileName, Lines)) then
+  if not LoadStringsFromFile(OutputFileName, Lines) then
     Exit;
 
   Branches := TStringList.Create;
@@ -192,12 +272,12 @@ begin
     Branches.Free;
   end;
 
-  Log(Format('FetchRepositoryRefs: %d refs found', [Refs.Count]));
+  Log(Format('ParseRepositoryRefs: %d refs found', [Refs.Count]));
 end;
 
-// Fill the branch/tag list for the current URL; the list is cached until the
-// URL is changed
-function EnsureRepositoryRefsLoaded(const Index: Integer): Boolean;
+// Fill the branch/tag list for the current URL from the background fetch
+// (started now if needed); the list is cached until the URL is changed
+function EnsureRepositoryRefsLoaded(const Index: Integer): TRepositoryRefsStatus;
 var
   Url,
   SavedRef: String;
@@ -209,7 +289,7 @@ begin
 
   if RepositoryRefsLoaded[Index] and (RepositoryRefsLoadedUrls[Index] = Url) then
   begin
-    Result := RepositoryRefsLoadSucceeded[Index];
+    Result := RepositoryRefsLoadStatus[Index];
     Exit;
   end;
 
@@ -217,10 +297,21 @@ begin
   try
     WizardForm.Cursor := crHourGlass;
     try
-      Result := (Url <> '') and FetchRepositoryRefs(Url, Refs);
+      Result := rrsFailed;
+      if (Url <> '') and StartRepositoryRefsFetch(Index) then
+      begin
+        Result := WaitRepositoryRefsFetch(Index);
+        if (Result = rrsSucceeded) and (not ParseRepositoryRefs(
+          GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_OUTPUT_FILE_NAME), Refs)) then
+            Result := rrsFailed;
+      end;
     finally
       WizardForm.Cursor := crDefault;
     end;
+
+    // Still running: keep waiting for the same fetch on the next attempt
+    if Result = rrsPending then
+      Exit;
 
     with RepositoryRefComboBoxes[Index] do
     begin
@@ -237,7 +328,38 @@ begin
 
   RepositoryRefsLoaded[Index] := True;
   RepositoryRefsLoadedUrls[Index] := Url;
-  RepositoryRefsLoadSucceeded[Index] := Result;
+  RepositoryRefsLoadStatus[Index] := Result;
+  RepositoryRefsFetchStarted[Index] := False;
+end;
+
+procedure ShowRepositoryRefsError(const Index: Integer; const Status: TRepositoryRefsStatus);
+var
+  MessageName: String;
+
+begin
+  if Status = rrsPending then
+    MessageName := 'RepositoryPending'
+  else
+    MessageName := 'RepositoryUnreachable';
+  MsgBox(FmtMessage(CustomMessage(MessageName), [GetRepositoryName(Index),
+    GetRepositoryUrl(Index)]), mbError, MB_OK);
+end;
+
+// Start fetching the branch/tag list as soon as a URL is picked from the list
+// (typed URLs are handled when leaving the field)
+procedure RepositoryUrlComboBoxChange(Sender: TObject);
+var
+  UrlComboBox: TNewComboBox;
+
+begin
+  UrlComboBox := Sender as TNewComboBox;
+  if UrlComboBox.Items.IndexOf(Trim(UrlComboBox.Text)) <> -1 then
+    StartRepositoryRefsFetch(UrlComboBox.Tag);
+end;
+
+procedure RepositoryUrlComboBoxExit(Sender: TObject);
+begin
+  StartRepositoryRefsFetch((Sender as TNewComboBox).Tag);
 end;
 
 procedure RepositoryRefComboBoxDropDown(Sender: TObject);
@@ -249,19 +371,36 @@ end;
 procedure RepositoryRefreshButtonClick(Sender: TObject);
 var
   Index: Integer;
+  Status: TRepositoryRefsStatus;
+  Succeeded: Boolean;
 
 begin
   Index := (Sender as TNewButton).Tag;
   RepositoryRefsLoaded[Index] := False;
 
-  if EnsureRepositoryRefsLoaded(Index) then
+  // Reuse a fetch still running, but never the result of a finished one
+  if RepositoryRefsFetchStarted[Index]
+    and IsRepositoryRefsFetchFinished(Index, Succeeded) then
+      RepositoryRefsFetchStarted[Index] := False;
+
+  Status := EnsureRepositoryRefsLoaded(Index);
+  if Status = rrsSucceeded then
   begin
     WizardForm.ActiveControl := RepositoryRefComboBoxes[Index];
     RepositoryRefComboBoxes[Index].DroppedDown := True;
   end
   else
-    MsgBox(FmtMessage(CustomMessage('RepositoryUnreachable'), [GetRepositoryName(Index),
-      GetRepositoryUrl(Index)]), mbError, MB_OK);
+    ShowRepositoryRefsError(Index, Status);
+end;
+
+// Called when the page is displayed: fetch all the lists at once
+procedure RepositoriesPageInitialize;
+var
+  i: Integer;
+
+begin
+  for i := 0 to REPOSITORIES_COUNT - 1 do
+    StartRepositoryRefsFetch(i);
 end;
 
 function IsRepositoryRefAvailable(const Index: Integer; const Ref: String): Boolean;
@@ -284,6 +423,7 @@ var
   i: Integer;
   Url,
   Ref: String;
+  Status: TRepositoryRefsStatus;
 
 begin
   Result := True;
@@ -305,10 +445,10 @@ begin
     if (Url = RepositoryDefaultUrls[i]) and (Ref = '') then
       Continue;
 
-    if not EnsureRepositoryRefsLoaded(i) then
+    Status := EnsureRepositoryRefsLoaded(i);
+    if Status <> rrsSucceeded then
     begin
-      MsgBox(FmtMessage(CustomMessage('RepositoryUnreachable'), [GetRepositoryName(i), Url]),
-        mbError, MB_OK);
+      ShowRepositoryRefsError(i, Status);
       Result := False;
       Exit;
     end;
@@ -401,6 +541,8 @@ begin
       Parent := RepositoriesPage.Surface;
       Style := csDropDown;
       Tag := i;
+      OnChange := @RepositoryUrlComboBoxChange;
+      OnExit := @RepositoryUrlComboBoxExit;
       Top := LabelRepository.Top + LabelRepository.Height + ScaleY(3);
       Width := (RepositoriesPage.SurfaceWidth * 55) div 100;
 

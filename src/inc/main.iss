@@ -225,6 +225,11 @@ begin
         KallistiPageInitialize(False);
       end;
 
+    RepositoriesPageID:
+      begin
+        RepositoriesPageInitialize;
+      end;
+
     wpSelectComponents:
       begin       
         // Update radio buttons in Components List
