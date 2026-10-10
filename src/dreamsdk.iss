@@ -42,7 +42,12 @@
 #define BuildDateTime GetDateTimeString('yyyy/mm/dd @ hh:nn:ss', '-', ':');
 #define VersionNumberRevision GetDateTimeString('yymm', '', '')
 
+; e.g., "R4" for 4.0.x, "R4.1" for 4.1.x
+#if Int(VersionNumberMinor) == 0
 #define AppVersion "R" + VersionNumberMajor
+#else
+#define AppVersion "R" + VersionNumberMajor + "." + VersionNumberMinor
+#endif
 #define FullVersionNumber VersionNumberMajor + "." + VersionNumberMinor + "." + VersionNumberBuild + "." + VersionNumberRevision
 
 #define PackageVersion FullVersionNumber
