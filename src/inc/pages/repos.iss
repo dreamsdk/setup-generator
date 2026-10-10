@@ -245,6 +245,25 @@ begin
   EnsureRepositoryRefsLoaded((Sender as TNewComboBox).Tag);
 end;
 
+// Force reloading the branch/tag list, then show it to the user
+procedure RepositoryRefreshButtonClick(Sender: TObject);
+var
+  Index: Integer;
+
+begin
+  Index := (Sender as TNewButton).Tag;
+  RepositoryRefsLoaded[Index] := False;
+
+  if EnsureRepositoryRefsLoaded(Index) then
+  begin
+    WizardForm.ActiveControl := RepositoryRefComboBoxes[Index];
+    RepositoryRefComboBoxes[Index].DroppedDown := True;
+  end
+  else
+    MsgBox(FmtMessage(CustomMessage('RepositoryUnreachable'), [GetRepositoryName(Index),
+      GetRepositoryUrl(Index)]), mbError, MB_OK);
+end;
+
 function IsRepositoryRefAvailable(const Index: Integer; const Ref: String): Boolean;
 var
   i: Integer;
@@ -339,6 +358,7 @@ var
   RepositoriesPage: TWizardPage;
   LabelRepositoriesIntroduction,
   LabelRepository: TLabel;
+  ButtonRefresh: TNewButton;
   BtnImage: TBitmapImage;
   DefaultsFileName: String;
   i,
@@ -354,12 +374,13 @@ begin
   // Introduction label
   LabelRepositoriesIntroduction := TLabel.Create(RepositoriesPage);
   LabelRepositoriesIntroduction.Parent := RepositoriesPage.Surface;
+  LabelRepositoriesIntroduction.AutoSize := False;
+  LabelRepositoriesIntroduction.WordWrap := True;
   LabelRepositoriesIntroduction.Left := BtnImage.Width + ScaleX(12);
   LabelRepositoriesIntroduction.Width := RepositoriesPage.SurfaceWidth
     - LabelRepositoriesIntroduction.Left;
-  LabelRepositoriesIntroduction.WordWrap := True;
-  LabelRepositoriesIntroduction.AutoSize := True;
   LabelRepositoriesIntroduction.Caption := CustomMessage('LabelRepositoriesIntroduction');
+  LabelRepositoriesIntroduction.AutoSize := True;
   LabelRepositoriesIntroduction.Top := (BtnImage.Height div 2)
     - (LabelRepositoriesIntroduction.Height div 2);
 
@@ -381,7 +402,33 @@ begin
       Style := csDropDown;
       Tag := i;
       Top := LabelRepository.Top + LabelRepository.Height + ScaleY(3);
-      Width := (RepositoriesPage.SurfaceWidth * 65) div 100;
+      Width := (RepositoriesPage.SurfaceWidth * 55) div 100;
+
+      // The real height (computed from the font) is only known once the
+      // window is created, so force it before using the height elsewhere
+      if Handle = 0 then
+        Log('CreateRepositoriesPage: Unable to create the ComboBox handle');
+    end;
+
+    // Refresh the branch/tag list for the selected URL
+    ButtonRefresh := TNewButton.Create(RepositoriesPage);
+    with ButtonRefresh do
+    begin
+      Parent := RepositoriesPage.Surface;
+      Caption := CustomMessage('ButtonRepositoryRefresh');
+      Tag := i;
+      OnClick := @RepositoryRefreshButtonClick;
+      Top := RepositoryUrlComboBoxes[i].Top;
+      Height := RepositoryUrlComboBoxes[i].Height;
+      Width := ScaleX(70);
+      Left := RepositoriesPage.SurfaceWidth - Width;
+
+      // Themed buttons are drawn with a 1px margin inside their bounds
+      if IsVisualStylesEnabled then
+      begin
+        Top := Top - ScaleY(1);
+        Height := Height + ScaleY(2);
+      end;
     end;
 
     // Branch/Tag, empty means the default branch of the repository
@@ -395,7 +442,7 @@ begin
       OnDropDown := @RepositoryRefComboBoxDropDown;
       Top := RepositoryUrlComboBoxes[i].Top;
       Left := RepositoryUrlComboBoxes[i].Left + RepositoryUrlComboBoxes[i].Width + ScaleX(8);
-      Width := RepositoriesPage.SurfaceWidth - Left;
+      Width := ButtonRefresh.Left - ScaleX(4) - Left;
     end;
 
     LoadRepositoryUrls(i, DefaultsFileName);

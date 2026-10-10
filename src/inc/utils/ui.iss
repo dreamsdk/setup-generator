@@ -1,4 +1,14 @@
 [Code]
+function IsAppThemed: Boolean;
+external 'IsAppThemed@uxtheme.dll stdcall delayload';
+
+// Visual styles are enabled (i.e., not the "Windows Classic" theme).
+// Visual styles don't exist before Windows XP (no "uxtheme.dll" available).
+function IsVisualStylesEnabled: Boolean;
+begin
+  Result := IsWindowsXPOrGreater and IsAppThemed;
+end;
+
 var
   BrowseForFolderExFakePage: TInputDirWizardPage;
 
