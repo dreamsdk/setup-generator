@@ -4,7 +4,8 @@
 
 ; Installer mode [DEBUG|RELEASE]
 ; If set to DEBUG, this will append the "-dev" suffix to the package release,
-; e.g., "DreamSDK R3-dev".
+; e.g., "DreamSDK R3-dev". If "VERSION_DEBUG_SUFFIX" is set in the "prepare"
+; script configuration, it's appended too, e.g., "DreamSDK R4.1-dev-alpha1".
 #define InstallerMode RELEASE
 
 ; Source mode [DEBUG|RELEASE]

@@ -53,8 +53,17 @@
 #define PackageVersion FullVersionNumber
 #define ProductVersion FullVersionNumber
 
+; e.g., "R4.1-dev-alpha1" if VersionDebugSuffix is "alpha1", "R4.1-dev" if empty
+#ifndef VersionDebugSuffix
+#define VersionDebugSuffix ""
+#endif
+
 #if InstallerMode == DEBUG
+#if VersionDebugSuffix != ""
+#define MyAppVersion AppVersion + "-dev-" + VersionDebugSuffix
+#else
 #define MyAppVersion AppVersion + "-dev"
+#endif
 #else
 #define MyAppVersion AppVersion
 #endif

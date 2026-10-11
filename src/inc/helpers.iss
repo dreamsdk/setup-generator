@@ -178,10 +178,16 @@ begin
 end;
 
 function VersionSanitizer(const VersionNumber: String): String;
+var
+  DevSuffixPosition: Integer;
+
 begin
-  Result := VersionNumber;  
+  Result := VersionNumber;
   StringChangeEx(Result, 'R', '', True);
-  StringChangeEx(Result, '-dev', '', True);
+  // Remove "-dev" and the optional debug suffix after it (e.g., "-dev-alpha1")
+  DevSuffixPosition := Pos('-dev', Result);
+  if DevSuffixPosition > 0 then
+    Result := Copy(Result, 1, DevSuffixPosition - 1);
   Log(Format('VersionSanitizer: Old=%s, New=%s', [VersionNumber, Result]));
 end;
 
