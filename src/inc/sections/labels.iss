@@ -215,6 +215,17 @@ WindowsTerminalIntegrationUninstallationFailed=Error when uninstalling {#Windows
 AddToPathEnvironmentVariable=Add {#MyAppName} to the PATH system environment variable
 IntegrateWithWindowsTerminal=Add {#MyAppName} to {#WindowsTerminalName}
 
+; Post-install
+PostInstallTitle=Finalizing the installation
+PostInstallDescription=Please wait while Setup installs KallistiOS, KallistiOS Ports and Dreamcast Tool. This may take a while.
+PostInstallAbortButton=&Abort
+PostInstallAbortConfirmation=Do you really want to abort?%nKallistiOS, KallistiOS Ports and Dreamcast Tool won't be fully installed, but you will be able to install them later from {#FullAppManagerName}.
+PostInstallCloseButton=&Close
+PostInstallFailedStatus=Operation terminated with errors.
+PostInstallAbortedStatus=Operation aborted.
+PostInstallFailed=Errors occurred while installing KallistiOS, KallistiOS Ports and Dreamcast Tool.%n%nThe full log was saved in:%n%1%n%nYou may use {#FullAppManagerName} to finish the installation.
+PostInstallAborted=The installation of KallistiOS, KallistiOS Ports and Dreamcast Tool was aborted.%nYou may use {#FullAppManagerName} to finish the installation.
+
 ; End messages
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 LaunchGettingStarted=Open the Getting Started guide

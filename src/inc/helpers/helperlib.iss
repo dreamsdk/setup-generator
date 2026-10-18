@@ -4,9 +4,14 @@
 #define CodeBlocksHelperLibraryFileName "cbhelper.dll"
 #define CodeBlocksHelperLibraryUninstallFullPath "{app}\" + AppSupportDirectoryName + "\" + CodeBlocksHelperLibraryFileName
 
+#define PostInstallHelperLibraryFileName "postinst.dll"
+#define PostInstallHelperLibrarySetupFullPath "{tmp}\" + PostInstallHelperLibraryFileName
+
 [Files]
 Source: "..\.helpers\{#CommonHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 Source: "..\.helpers\{#CodeBlocksHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+; Post-install helper is used only while installing, so it's never copied
+Source: "..\.helpers\{#PostInstallHelperLibraryFileName}"; Flags: dontcopy noencryption nocompression
 
 [Code]
 
@@ -247,4 +252,78 @@ begin
     CodeBlocksInitializeProfilesUninstall()
   else
     CodeBlocksInitializeProfilesSetup();
+end;
+
+// ============================================================================
+// IMPORTS FROM LIBRARY // POST-INSTALL
+// ============================================================================
+
+const
+  POST_INSTALL_STATUS_IDLE = 0;
+  POST_INSTALL_STATUS_RUNNING = 1;
+  POST_INSTALL_STATUS_SUCCEEDED = 2;
+  POST_INSTALL_STATUS_FAILED = 3;
+  POST_INSTALL_STATUS_ABORTED = 4;
+
+function PostInstallInitialize(const lpHomeDirectory: String): Boolean;
+external 'PostInstallInitializeW@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+function PostInstallStart: Boolean;
+external 'PostInstallStart@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+function PostInstallPoll: Cardinal;
+external 'PostInstallPoll@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+function PostInstallGetProgressTextSetup(lpProgressText: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'PostInstallGetProgressTextW@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+function PostInstallGetNewLinesSetup(lpNewLines: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'PostInstallGetNewLinesW@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+function PostInstallGetProgressPosition: Integer;
+external 'PostInstallGetProgressPosition@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+procedure PostInstallAbort;
+external 'PostInstallAbort@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+procedure PostInstallFinalize;
+external 'PostInstallFinalize@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
+// ============================================================================
+// EXPOSED FUNCTIONS // POST-INSTALL
+// ============================================================================
+
+// Unload the post-install helper (PostInstallFinalize must be called before)
+procedure PostInstallUnload;
+begin
+  UnloadDLL(ExpandConstant('{#PostInstallHelperLibrarySetupFullPath}'));
+end;
+
+function PostInstallGetProgressText(): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  BufferSize := PostInstallGetProgressTextSetup(Buffer,
+    HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
+end;
+
+// Get the output lines received since the last call (separated by CR/LF)
+function PostInstallGetNewLines(): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  BufferSize := PostInstallGetNewLinesSetup(Buffer,
+    HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
 end;

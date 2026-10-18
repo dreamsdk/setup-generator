@@ -59,7 +59,8 @@ begin
     PatchSystemSettings();
 end;
 
-procedure SetupApplication();
+// Fallback: execute the post-install steps through DreamSDK Manager
+procedure SetupApplicationWithManager();
 var
   ResultCode: Integer;
   ManagerFileName,
@@ -77,6 +78,34 @@ begin
   if not ExecAsOriginalUser(ManagerFileName, Parameters, '', SW_SHOWNORMAL,
     ewWaitUntilTerminated, ResultCode) then
       MsgBox(CustomMessage('UnableToFinalizeSetup'), mbCriticalError, MB_OK);
+end;
+
+// Execute the post-install steps (i.e., unpacking toolchains, installing
+// KallistiOS, KallistiOS Ports and Dreamcast Tool)
+procedure SetupApplication();
+var
+  HomeDirectory: String;
+
+begin
+  HomeDirectory := ExpandConstant('{code:GetApplicationRootPath}');
+  case RunPostInstallHelper(HomeDirectory) of
+    POST_INSTALL_STATUS_SUCCEEDED:
+      Log('SetupApplication: post-install done');
+
+    POST_INSTALL_STATUS_FAILED:
+      MsgBox(FmtMessage(CustomMessage('PostInstallFailed'),
+        [GetPostInstallLogFileName(HomeDirectory)]), mbError, MB_OK);
+
+    POST_INSTALL_STATUS_ABORTED:
+      MsgBox(CustomMessage('PostInstallAborted'), mbInformation, MB_OK);
+
+  else
+    begin
+      // The post-install helper couldn't be used at all
+      Log('SetupApplication: post-install helper unavailable, using DreamSDK Manager');
+      SetupApplicationWithManager();
+    end;
+  end;
 end;
 
 procedure SetPackageVersion();

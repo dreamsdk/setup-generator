@@ -101,6 +101,7 @@
 
 #include "inc/helpers/psvince.iss"
 #include "inc/helpers/helperlib.iss"
+#include "inc/helpers/postinst.iss"
 #include "inc/helpers/components.iss"
 #include "inc/helpers/git.iss"
 #include "inc/helpers/junction.iss"
