@@ -93,8 +93,8 @@ begin
       Log('SetupApplication: post-install done');
 
     POST_INSTALL_STATUS_FAILED:
-      MsgBox(FmtMessage(CustomMessage('PostInstallFailed'),
-        [GetPostInstallLogFileName(HomeDirectory)]), mbError, MB_OK);
+      MsgBox(FmtMessage(CustomMessage('PostInstallFailed'), [
+        GetPostInstallLogFileName(HomeDirectory)]), mbError, MB_OK);
 
     POST_INSTALL_STATUS_ABORTED:
       MsgBox(CustomMessage('PostInstallAborted'), mbInformation, MB_OK);
