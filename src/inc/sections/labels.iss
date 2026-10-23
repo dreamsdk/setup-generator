@@ -227,5 +227,6 @@ PostInstallFailed=Errors occurred while installing KallistiOS, KallistiOS Ports 
 PostInstallAborted=The installation of KallistiOS, KallistiOS Ports and Dreamcast Tool was aborted.%nYou may use {#FullAppManagerName} to finish the installation.
 
 ; End messages
+FinalizeSetupFailed=An error occurred while finalizing the {#MyAppName} Setup:%n%1%n%nPlease check that there is enough free disk space, then use {#FullAppManagerName} to finish the installation.
 UnableToFinalizeSetup=Unable to finalize the {#MyAppName} Setup!%nThe {#FullAppManagerName} application cannot be started.%nPlease notify {#MyAppPublisher} to fix this issue, visit {#MyAppURL} for more information.
 LaunchGettingStarted=Open the Getting Started guide

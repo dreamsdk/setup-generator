@@ -160,15 +160,25 @@ begin
     wpInfoAfter:
       begin
         WizardForm.NextButton.Enabled := False;
+        try
+          try
+            // Install Code::Blocks Integration if requested.
+            if IsCodeBlocksIntegrationEnabled then
+              InstallCodeBlocksIntegration;
 
-        // Install Code::Blocks Integration if requested.
-        if IsCodeBlocksIntegrationEnabled then
-          InstallCodeBlocksIntegration;
-
-        // Patch fstab and setup KallistiOS.
-        FinalizeSetup();
-
-        WizardForm.NextButton.Enabled := True;
+            // Patch fstab and setup KallistiOS.
+            FinalizeSetup();
+          except
+            // Unhandled error (e.g., raised by a helper library when the disk
+            // is full): report it and go to the last page instead of leaving
+            // the wizard stuck with the Next button disabled
+            Log('Finalizing the installation failed: ' + GetExceptionMessage);
+            MsgBox(FmtMessage(CustomMessage('FinalizeSetupFailed'), [
+              GetExceptionMessage]), mbCriticalError, MB_OK);
+          end;
+        finally
+          WizardForm.NextButton.Enabled := True;
+        end;
       end;
   end;
 end;
