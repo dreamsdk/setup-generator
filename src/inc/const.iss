@@ -23,6 +23,9 @@
 #define IdeCodeBlocksName "Code::Blocks"
 #define IdeCodeBlocksSupportedVersions "17.12 or 20.03"
 
+#define IdeVisualStudioCodeName "Visual Studio Code"
+#define IdeVSCodiumName "VSCodium"
+
 #define IdeComponentsListName "ide"
 
 #define WindowsTerminalName "Windows Terminal"

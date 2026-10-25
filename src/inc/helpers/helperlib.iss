@@ -4,12 +4,16 @@
 #define CodeBlocksHelperLibraryFileName "cbhelper.dll"
 #define CodeBlocksHelperLibraryUninstallFullPath "{app}\" + AppSupportDirectoryName + "\" + CodeBlocksHelperLibraryFileName
 
+#define VisualStudioCodeHelperLibraryFileName "vshelper.dll"
+#define VisualStudioCodeHelperLibraryUninstallFullPath "{app}\" + AppSupportDirectoryName + "\" + VisualStudioCodeHelperLibraryFileName
+
 #define PostInstallHelperLibraryFileName "postinst.dll"
 #define PostInstallHelperLibrarySetupFullPath "{tmp}\" + PostInstallHelperLibraryFileName
 
 [Files]
 Source: "..\.helpers\{#CommonHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 Source: "..\.helpers\{#CodeBlocksHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
+Source: "..\.helpers\{#VisualStudioCodeHelperLibraryFileName}"; DestDir: "{code:GetApplicationSupportPath}"; Flags: ignoreversion noencryption nocompression
 ; Post-install helper is used only while installing, so it's never copied
 Source: "..\.helpers\{#PostInstallHelperLibraryFileName}"; Flags: dontcopy noencryption nocompression
 
@@ -32,6 +36,7 @@ procedure HelperLibraryUnload;
 begin
   UnloadDLL(ExpandConstant('{#CommonHelperLibraryUninstallFullPath}'));
   UnloadDLL(ExpandConstant('{#CodeBlocksHelperLibraryUninstallFullPath}'));
+  UnloadDLL(ExpandConstant('{#VisualStudioCodeHelperLibraryUninstallFullPath}'));
 end;
 
 // ============================================================================
@@ -252,6 +257,142 @@ begin
     CodeBlocksInitializeProfilesUninstall()
   else
     CodeBlocksInitializeProfilesSetup();
+end;
+
+// ============================================================================
+// IMPORTS FROM LIBRARY // VISUAL STUDIO CODE (AND FORKS)
+// ============================================================================
+
+// The editor identifiers are defined in the VSCTools unit (e.g. "vscode",
+// "vscodium"): see VSCODE_EDITORS.
+
+function VSCodeDetectCliSetup(const lpEditorId: String;
+  lpCommandLineInterface: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeDetectCliW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeDetectCliUninstall(const lpEditorId: String;
+  lpCommandLineInterface: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeDetectCliW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
+function VSCodeDetectVersionSetup(const lpEditorId: String;
+  lpVersion: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeDetectVersionW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeDetectVersionUninstall(const lpEditorId: String;
+  lpVersion: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeDetectVersionW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
+function VSCodeGetAvailableUsersSetup(const lpDelimiter: AnsiChar;
+  lpAvailableUsers: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeGetAvailableUsersW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeGetAvailableUsersUninstall(const lpDelimiter: AnsiChar;
+  lpAvailableUsers: String; const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeGetAvailableUsersW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
+function VSCodeInstallExtensionSetup(const lpEditorId: String;
+  const lpVsixFileName: String): Boolean;
+external 'VSCodeInstallExtensionW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeRemoveExtensionSetup(const lpEditorId: String): Boolean;
+external 'VSCodeRemoveExtensionW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeRemoveExtensionUninstall(const lpEditorId: String): Boolean;
+external 'VSCodeRemoveExtensionW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
+function VSCodeGetLastErrorSetup(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeGetLastErrorW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
+function VSCodeGetLastErrorUninstall(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'VSCodeGetLastErrorW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
+// ============================================================================
+// EXPOSED FUNCTIONS // VISUAL STUDIO CODE (AND FORKS)
+// ============================================================================
+
+function VSCodeDetectCli(const EditorId: String): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  if IsUninstallMode() then
+    BufferSize := VSCodeDetectCliUninstall(EditorId, Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL)
+  else
+    BufferSize := VSCodeDetectCliSetup(EditorId, Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
+  Log(Format('VSCodeDetectCli: %s="%s"', [EditorId, Result]));
+end;
+
+function VSCodeDetectVersion(const EditorId: String): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  if IsUninstallMode() then
+    BufferSize := VSCodeDetectVersionUninstall(EditorId, Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL)
+  else
+    BufferSize := VSCodeDetectVersionSetup(EditorId, Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
+end;
+
+function VSCodeGetAvailableUsers(var AvailableUsers: TArrayOfString): Boolean;
+var
+  Buffer,
+  OutputBuffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  if IsUninstallMode() then
+    BufferSize := VSCodeGetAvailableUsersUninstall(
+      HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE)
+  else
+    BufferSize := VSCodeGetAvailableUsersSetup(
+      HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  SetLength(Buffer, BufferSize);
+  OutputBuffer := Copy(Buffer, 1, Length(Buffer));
+  Result := Length(OutputBuffer) > 0;
+  if Result then
+    Explode(AvailableUsers, OutputBuffer, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
+end;
+
+// Only available while installing: the .vsix is installed with DreamSDK
+function VSCodeInstallExtension(const EditorId, VsixFileName: String): Boolean;
+begin
+  Result := VSCodeInstallExtensionSetup(EditorId, VsixFileName);
+  Log(Format('VSCodeInstallExtension: %s, "%s", result=%s', [EditorId, VsixFileName, BoolToStr(Result)]));
+end;
+
+function VSCodeRemoveExtension(const EditorId: String): Boolean;
+begin
+  if IsUninstallMode() then
+    Result := VSCodeRemoveExtensionUninstall(EditorId)
+  else
+    Result := VSCodeRemoveExtensionSetup(EditorId);
+  Log(Format('VSCodeRemoveExtension: %s, result=%s', [EditorId, BoolToStr(Result)]));
+end;
+
+function VSCodeGetLastError(): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  if IsUninstallMode() then
+    BufferSize := VSCodeGetLastErrorUninstall(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE)
+  else
+    BufferSize := VSCodeGetLastErrorSetup(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
 end;
 
 // ============================================================================

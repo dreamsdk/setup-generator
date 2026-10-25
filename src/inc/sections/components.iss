@@ -8,6 +8,8 @@ Name: "custom"; Description: "{cm:TypeCustomInstallation}"; Flags: iscustom
 ; IDE
 Name: "{#IdeComponentsListName}"; Description: "{cm:ComponentIDE}"; Types: full
 Name: "{#IdeComponentsListName}\codeblocks"; Description: "{cm:ComponentIDE_CodeBlocks}"; Types: full
+Name: "{#IdeComponentsListName}\vscode"; Description: "{cm:ComponentIDE_VisualStudioCode}"; Types: full
+Name: "{#IdeComponentsListName}\vscodium"; Description: "{cm:ComponentIDE_VSCodium}"; Types: full
 
 ; Addons
 Name: "addons"; Description: "{cm:ComponentAdditionalTools}"; Types: full fullwithoutide

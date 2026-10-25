@@ -102,6 +102,8 @@ ComponentKallistiOnline=Online (use Git repositories)
 ComponentKallistiOffline=Offline (use embedded packages)
 ComponentIDE=Support for Integrated Development Environment (IDE)
 ComponentIDE_CodeBlocks={#IdeCodeBlocksName}
+ComponentIDE_VisualStudioCode={#IdeVisualStudioCodeName}
+ComponentIDE_VSCodium={#IdeVSCodiumName}
 ComponentAdditionalTools=Additional command line tools
 ComponentAdditionalTools_elevate=Elevate – Command-line UAC elevation utility (elevate)
 ComponentAdditionalTools_pvr2png=PVR to PNG – PowerVR image to PNG converter (pvr2png)
@@ -206,6 +208,10 @@ CodeBlocksIntegrationSetupFailed=Error when patching {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksIntegrationRemoveFailed=Error when restoring {#IdeCodeBlocksName}!%n%n%s
 CodeBlocksRunning={#IdeCodeBlocksName} is running, please close it to continue.
 CodeBlocksInitializeConfirmation=This will create the required files to enable {#IdeCodeBlocksName} integration for all the users on this computer. Continue?
+
+; Visual Studio Code (and forks)
+VisualStudioCodeIntegrationSetupFailed=Error when installing the {#MyAppName} extension for %1!%n%n%2
+VisualStudioCodeIntegrationRemoveFailed=Error when removing the {#MyAppName} extension for %1!%n%n%2
 
 ; Windows Terminal
 WindowsTerminalIntegrationInstallationFailed=Error when installing {#WindowsTerminalName}!%n%n%s

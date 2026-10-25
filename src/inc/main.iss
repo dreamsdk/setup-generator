@@ -166,6 +166,10 @@ begin
             if IsCodeBlocksIntegrationEnabled then
               InstallCodeBlocksIntegration;
 
+            // Install the extension in Visual Studio Code and/or its
+            // forks if requested.
+            InstallVisualStudioCodeIntegration;
+
             // Patch fstab and setup KallistiOS.
             FinalizeSetup();
           except
@@ -254,6 +258,9 @@ begin
           happening... sounds like a bug somewhere but nevermind. }
         SetToolchainComponentsControlState(gclsoLock);
         SetGdbComponentsControlState(gclsoLock);
+
+        // Disable the Visual Studio Code (and forks) components if not available
+        SetVisualStudioCodeComponentState();
 
         { Initialize the component list items count. This needs to have all
           the GDB items disabled (see SetGdbComponentsControlState() above). }
@@ -354,6 +361,7 @@ begin
 #endif        
         RemoveFoundationFile();        
         UninstallCodeBlocksIntegration();
+        UninstallVisualStudioCodeIntegration();
         UninstallWindowsTerminalIntegration();
         RemoveJunctions();
         UnloadHelperLibraries();

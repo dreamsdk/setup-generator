@@ -108,6 +108,7 @@
 #include "inc/helpers/inet.iss"
 #include "inc/helpers/preq.iss"
 #include "inc/helpers/wt.iss"
+#include "inc/helpers/vscode.iss"
 
 #include "inc/pages/ide.iss"
 #include "inc/pages/shell.iss"
