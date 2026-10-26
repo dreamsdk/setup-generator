@@ -176,7 +176,8 @@ var
   ProgressText,
   PreviousProgressText,
   NewLines,
-  StatusText: String;
+  StatusText,
+  HelperErrorMessage: String;
   HelperLoaded,
   HelperInitialized,
   AbortSent: Boolean;
@@ -294,6 +295,14 @@ begin
         PostInstallFinalize();
       except
         Log('Post-install: finalize exception: ' + GetExceptionMessage);
+      end;
+      // The exceptions caught in the helper are only reported this way
+      try
+        HelperErrorMessage := PostInstallGetLastError();
+        if HelperErrorMessage <> '' then
+          Log('Post-install: helper exception: ' + HelperErrorMessage);
+      except
+        Log('Post-install: unable to get the helper error: ' + GetExceptionMessage);
       end;
       PostInstallUnload();
     end;

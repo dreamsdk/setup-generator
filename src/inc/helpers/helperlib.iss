@@ -73,9 +73,35 @@ external 'GetPortableExecutableBitnessW@files:{#CommonHelperLibraryFileName} std
 function GetPortableExecutableBitnessUninstall(const FileName: String): Byte; 
 external 'GetPortableExecutableBitnessW@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
+function CommonGetLastErrorSetup(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'CommonGetLastErrorW@files:{#CommonHelperLibraryFileName} stdcall setuponly';
+
+function CommonGetLastErrorUninstall(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'CommonGetLastErrorW@{#CommonHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
 // ============================================================================
 // EXPOSED FUNCTIONS // COMMON
 // ============================================================================
+
+// Log the message of the last exception caught in the helper library, if any
+// (the message is cleared once read)
+procedure CommonLogLastError(const FunctionName: String);
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  if IsUninstallMode() then
+    BufferSize := CommonGetLastErrorUninstall(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL)
+  else
+    BufferSize := CommonGetLastErrorSetup(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  SetLength(Buffer, BufferSize);
+  if BufferSize > 0 then
+    Log(Format('%s: helper exception: %s', [FunctionName, Copy(Buffer, 1, Length(Buffer))]));
+end;
 
 function IsWindowsTerminalInstalled(): Boolean;
 begin
@@ -84,6 +110,7 @@ begin
     Result := IsWindowsTerminalInstalledUninstall()
   else
     Result := IsWindowsTerminalInstalledSetup();
+  CommonLogLastError('IsWindowsTerminalInstalled');
   Log(Format('IsWindowsTerminalInstalled: %s', [BoolToStr(Result)]));
 end;
 
@@ -102,6 +129,7 @@ begin
   else
     BufferSize := GetFileLocationsInSystemPathSetup(FileName,
       HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  CommonLogLastError('GetFileLocationsInSystemPath');
   SetLength(Buffer, BufferSize);
   OutputBuffer := Copy(Buffer, 1, Length(Buffer));
   Result := Length(OutputBuffer) > 0;
@@ -115,6 +143,7 @@ begin
     Result := RenameFileOrDirectoryAsBackupUninstall(TargetFileOrDirectory)
   else
     Result := RenameFileOrDirectoryAsBackupSetup(TargetFileOrDirectory);
+  CommonLogLastError('RenameFileOrDirectoryAsBackup');
   Log(Format('RenameFileOrDirectoryAsBackup: "%s", result=%s', [
     TargetFileOrDirectory, BoolToStr(Result)]));  
 end;
@@ -128,6 +157,7 @@ begin
     Buffer := GetPortableExecutableBitnessUninstall(FileName)
   else
     Buffer := GetPortableExecutableBitnessSetup(FileName);
+  CommonLogLastError('GetPortableExecutableBitness');
   Result := TPortableExecutableBitness(Buffer);
 end;
 
@@ -180,9 +210,35 @@ external 'CodeBlocksInitializeProfiles@files:{#CodeBlocksHelperLibraryFileName} 
 procedure CodeBlocksInitializeProfilesUninstall;
 external 'CodeBlocksInitializeProfiles@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
+function CodeBlocksGetLastErrorSetup(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'CodeBlocksGetLastErrorW@files:{#CodeBlocksHelperLibraryFileName} stdcall setuponly';
+
+function CodeBlocksGetLastErrorUninstall(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'CodeBlocksGetLastErrorW@{#CodeBlocksHelperLibraryUninstallFullPath} stdcall uninstallonly';
+
 // ============================================================================
 // EXPOSED FUNCTIONS // CODE::BLOCKS
 // ============================================================================
+
+// Log the message of the last exception caught in the helper library, if any
+// (the message is cleared once read)
+procedure CodeBlocksLogLastError(const FunctionName: String);
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  if IsUninstallMode() then
+    BufferSize := CodeBlocksGetLastErrorUninstall(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL)
+  else
+    BufferSize := CodeBlocksGetLastErrorSetup(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  SetLength(Buffer, BufferSize);
+  if BufferSize > 0 then
+    Log(Format('%s: helper exception: %s', [FunctionName, Copy(Buffer, 1, Length(Buffer))]));
+end;
 
 function CodeBlocksGetAvailableUsers(var AvailableUsers: TArrayOfString): Boolean;
 var
@@ -198,6 +254,7 @@ begin
   else
     BufferSize := CodeBlocksGetAvailableUsersSetup(
       HELPER_LIBRARY_BUFFER_SPLIT_CHAR, Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  CodeBlocksLogLastError('CodeBlocksGetAvailableUsers');
   SetLength(Buffer, BufferSize);  
   OutputBuffer := Copy(Buffer, 1, Length(Buffer)); 
   Result := Length(OutputBuffer) > 0; 
@@ -211,6 +268,7 @@ begin
     Result := CodeBlocksRemoveProfilesUninstall()
   else
     Result := CodeBlocksRemoveProfilesSetup();
+  CodeBlocksLogLastError('CodeBlocksRemoveProfiles');
 end;
 
 function CodeBlocksDetectInstallationPath(): String;
@@ -227,6 +285,7 @@ begin
   else
     BufferSize := CodeBlocksDetectInstallationPathSetup(Buffer,
       HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  CodeBlocksLogLastError('CodeBlocksDetectInstallationPath');
   SetLength(Buffer, BufferSize);
   OutputBuffer := Copy(Buffer, 1, Length(Buffer));   
   Result := OutputBuffer;
@@ -246,6 +305,7 @@ begin
   else
     BufferSize := CodeBlocksDetectVersionSetup(CodeBlocksInstallationPath, 
       Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  CodeBlocksLogLastError('CodeBlocksDetectVersion');
   SetLength(Buffer, BufferSize);
   OutputBuffer := Copy(Buffer, 1, Length(Buffer));
   Result := OutputBuffer;
@@ -257,6 +317,7 @@ begin
     CodeBlocksInitializeProfilesUninstall()
   else
     CodeBlocksInitializeProfilesSetup();
+  CodeBlocksLogLastError('CodeBlocksInitializeProfiles');
 end;
 
 // ============================================================================
@@ -368,30 +429,8 @@ begin
     Explode(AvailableUsers, OutputBuffer, HELPER_LIBRARY_BUFFER_SPLIT_CHAR);
 end;
 
-// Only available while installing: the .vsix is installed with DreamSDK
-function VSCodeInstallExtension(const EditorId, VsixFileName: String): Boolean;
-begin
-  Result := VSCodeInstallExtensionSetup(EditorId, VsixFileName);
-  Log(Format('VSCodeInstallExtension: %s, "%s", result=%s', [EditorId, VsixFileName, BoolToStr(Result)]));
-end;
-
-function VSCodeRemoveExtension(const EditorId: String): Boolean;
-begin
-  if IsUninstallMode() then
-    Result := VSCodeRemoveExtensionUninstall(EditorId)
-  else
-    Result := VSCodeRemoveExtensionSetup(EditorId);
-  Log(Format('VSCodeRemoveExtension: %s, result=%s', [EditorId, BoolToStr(Result)]));
-end;
-
-// Save the users having the extension in ide.conf (read by DreamSDK Manager)
-function VSCodeRefreshInstalledUsers(const EditorId, ConfigurationFileName: String): Boolean;
-begin
-  Result := VSCodeRefreshInstalledUsersSetup(EditorId, ConfigurationFileName);
-  Log(Format('VSCodeRefreshInstalledUsers: %s, "%s", result=%s', [EditorId,
-    ConfigurationFileName, BoolToStr(Result)]));
-end;
-
+// Error message of the last install/remove operation, or of the last exception
+// caught in the helper library
 function VSCodeGetLastError(): String;
 var
   Buffer: String;
@@ -405,6 +444,34 @@ begin
     BufferSize := VSCodeGetLastErrorSetup(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
   SetLength(Buffer, BufferSize);
   Result := Copy(Buffer, 1, Length(Buffer));
+end;
+
+// Only available while installing: the .vsix is installed with DreamSDK
+function VSCodeInstallExtension(const EditorId, VsixFileName: String): Boolean;
+begin
+  Result := VSCodeInstallExtensionSetup(EditorId, VsixFileName);
+  Log(Format('VSCodeInstallExtension: %s, "%s", result=%s', [EditorId, VsixFileName, BoolToStr(Result)]));
+  if not Result then
+    Log(Format('VSCodeInstallExtension: error: %s', [VSCodeGetLastError()]));
+end;
+
+function VSCodeRemoveExtension(const EditorId: String): Boolean;
+begin
+  if IsUninstallMode() then
+    Result := VSCodeRemoveExtensionUninstall(EditorId)
+  else
+    Result := VSCodeRemoveExtensionSetup(EditorId);
+  Log(Format('VSCodeRemoveExtension: %s, result=%s', [EditorId, BoolToStr(Result)]));
+  if not Result then
+    Log(Format('VSCodeRemoveExtension: error: %s', [VSCodeGetLastError()]));
+end;
+
+// Save the users having the extension in ide.conf (read by DreamSDK Manager)
+function VSCodeRefreshInstalledUsers(const EditorId, ConfigurationFileName: String): Boolean;
+begin
+  Result := VSCodeRefreshInstalledUsersSetup(EditorId, ConfigurationFileName);
+  Log(Format('VSCodeRefreshInstalledUsers: %s, "%s", result=%s', [EditorId,
+    ConfigurationFileName, BoolToStr(Result)]));
 end;
 
 // ============================================================================
@@ -444,6 +511,10 @@ external 'PostInstallAbort@files:{#PostInstallHelperLibraryFileName} stdcall set
 procedure PostInstallFinalize;
 external 'PostInstallFinalize@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
 
+function PostInstallGetLastErrorSetup(lpErrorMessage: String;
+  const uBufferMaxSize: Cardinal): Cardinal;
+external 'PostInstallGetLastErrorW@files:{#PostInstallHelperLibraryFileName} stdcall setuponly delayload';
+
 // ============================================================================
 // EXPOSED FUNCTIONS // POST-INSTALL
 // ============================================================================
@@ -477,6 +548,21 @@ begin
   SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_LARGE);
   BufferSize := PostInstallGetNewLinesSetup(Buffer,
     HELPER_LIBRARY_BUFFER_SIZE_LARGE);
+  SetLength(Buffer, BufferSize);
+  Result := Copy(Buffer, 1, Length(Buffer));
+end;
+
+// Get the message of the last exception caught in the helper library, or an
+// empty string (the message is cleared once read)
+function PostInstallGetLastError(): String;
+var
+  Buffer: String;
+  BufferSize: Cardinal;
+
+begin
+  SetLength(Buffer, HELPER_LIBRARY_BUFFER_SIZE_SMALL);
+  BufferSize := PostInstallGetLastErrorSetup(Buffer,
+    HELPER_LIBRARY_BUFFER_SIZE_SMALL);
   SetLength(Buffer, BufferSize);
   Result := Copy(Buffer, 1, Length(Buffer));
 end;
