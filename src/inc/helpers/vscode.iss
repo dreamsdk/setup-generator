@@ -6,6 +6,7 @@
 
 const
   VSCODE_EXTENSION_FILE = '{code:GetApplicationPackagesPath}\ide\vscode\dreamsdk.vsix';
+  VSCODE_CONFIGURATION_FILE = '{code:GetMsysInstallationPath}\etc\dreamsdk\ide.conf';
 
 var
   VisualStudioCodeEditorIds,
@@ -99,6 +100,13 @@ begin
         MsgBox(FmtMessage(CustomMessage('VisualStudioCodeIntegrationSetupFailed'), [
           VisualStudioCodeEditorNames[i], VSCodeGetLastError()]), mbCriticalError, MB_OK);
     end;
+
+  // Save the users having the extension (for all the editors, even if not
+  // selected), as DreamSDK Manager can't read the other profiles when not
+  // elevated
+  for i := 0 to GetArrayLength(VisualStudioCodeEditorIds) - 1 do
+    VSCodeRefreshInstalledUsers(VisualStudioCodeEditorIds[i],
+      ExpandConstant(VSCODE_CONFIGURATION_FILE));
 end;
 
 // Remove the extension from all the editors and all the profiles. This is

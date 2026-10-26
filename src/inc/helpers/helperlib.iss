@@ -300,6 +300,10 @@ external 'VSCodeRemoveExtensionW@files:{#VisualStudioCodeHelperLibraryFileName} 
 function VSCodeRemoveExtensionUninstall(const lpEditorId: String): Boolean;
 external 'VSCodeRemoveExtensionW@{#VisualStudioCodeHelperLibraryUninstallFullPath} stdcall uninstallonly';
 
+function VSCodeRefreshInstalledUsersSetup(const lpEditorId: String;
+  const lpConfigurationFileName: String): Boolean;
+external 'VSCodeRefreshInstalledUsersW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
+
 function VSCodeGetLastErrorSetup(lpErrorMessage: String;
   const uBufferMaxSize: Cardinal): Cardinal;
 external 'VSCodeGetLastErrorW@files:{#VisualStudioCodeHelperLibraryFileName} stdcall setuponly';
@@ -378,6 +382,14 @@ begin
   else
     Result := VSCodeRemoveExtensionSetup(EditorId);
   Log(Format('VSCodeRemoveExtension: %s, result=%s', [EditorId, BoolToStr(Result)]));
+end;
+
+// Save the users having the extension in ide.conf (read by DreamSDK Manager)
+function VSCodeRefreshInstalledUsers(const EditorId, ConfigurationFileName: String): Boolean;
+begin
+  Result := VSCodeRefreshInstalledUsersSetup(EditorId, ConfigurationFileName);
+  Log(Format('VSCodeRefreshInstalledUsers: %s, "%s", result=%s', [EditorId,
+    ConfigurationFileName, BoolToStr(Result)]));
 end;
 
 function VSCodeGetLastError(): String;
