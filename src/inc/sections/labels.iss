@@ -66,7 +66,6 @@ PrerequisiteMissingHintLink2Single=its
 PrerequisiteMissingHintLink2Multiple=their
 PrerequisiteMissingPython=Python
 PrerequisiteMissingGit=Git
-PrerequisiteMissingSubversion=Subversion Client (SVN)
 PrerequisiteMissingRuby=Ruby
 
 ; Startup messages
@@ -174,7 +173,7 @@ KallistiEmbeddedOnline=Use online repositories (highly recommended)
 InactiveInternetConnection=To use the online repositories, the {#MyAppName} Setup need to be connected to Internet. Please check your connection and try again.
 KallistiEmbeddedOffline=Use offline repositories
 KallistiEmbeddedOfflineConfirmation=Are you really sure to use offline repositories included in that {#MyAppName} Setup?
-LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-date by using the online repositories. This requires an Internet connection and Git. For better experience, Python and Subversion Client (SVN) are recommended, but not mandatory.
+LabelKallistiEmbeddedDescriptionOnline=This option will allow you to stay up-to-date by using the online repositories. This requires an Internet connection and Git. For better experience, Python is recommended, but not mandatory.
 LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions of the required Sega Dreamcast component libraries. Use this option only if you don't have an active Internet connection or you don't want to use the up-to-date online repositories.
 
 ; Repositories

@@ -1,7 +1,7 @@
 [Code]
 
 type
-  TPrerequisiteApplication = (paGit, paPython, paSubversion, paRuby); // Please add new items to CheckPrerequisites...
+  TPrerequisiteApplication = (paGit, paPython, paRuby); // Please add new items to CheckPrerequisites...
   TPrerequisiteApplicationSet = set of TPrerequisiteApplication;
   
 function PrerequisiteToCommand(const Prerequisite: TPrerequisiteApplication): String;
@@ -12,8 +12,6 @@ begin
       Result := 'git'; 
     paPython:
       Result := 'python';
-    paSubversion:
-      Result := 'svn';
     paRuby:
       Result := 'rake';
   end;
@@ -27,8 +25,6 @@ begin
       Result := 'PrerequisiteMissingGit'; 
     paPython:
       Result := 'PrerequisiteMissingPython';
-    paSubversion:
-      Result := 'PrerequisiteMissingSubversion';
     paRuby:
       Result := 'PrerequisiteMissingRuby';
   end;
@@ -43,8 +39,6 @@ begin
       Result := 'version';                  
     paPython:
       Result := 'Python';
-    paSubversion:
-      Result := 'version';
     paRuby:
       Result := 'version';
   end;
@@ -114,12 +108,6 @@ begin
     if not CheckPrerequisite(Prerequisites, paPython) then
       PrerequisitesList.Add(PrerequisiteToString(paPython));
 
-    // Check SVN
-    // Update: SVN was needed for libtremor kos-ports, but it has been moved
-    // on Git. So no need to install this prerequisite now.
-    (*if not CheckPrerequisite(Prerequisites, paSubversion) then
-      PrerequisitesList.Add(PrerequisiteToString(paSubversion));*)
-
     // Check Ruby
     if not CheckPrerequisite(Prerequisites, paRuby) then
       PrerequisitesList.Add(PrerequisiteToString(paRuby));
@@ -188,7 +176,7 @@ end;
 // Online optional prerequisites
 function CheckOnlinePrerequisitesOptional: Boolean;
 begin
-  Result := CheckPrerequisites([paPython, paSubversion], False);
+  Result := CheckPrerequisites([paPython], False);
 end;
 { Offline prerequisites }
 
