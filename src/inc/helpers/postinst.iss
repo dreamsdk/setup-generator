@@ -38,14 +38,23 @@ end;
 // up to read the output
 function PostInstallIsMemoScrolledToBottom(OutputMemo: TNewMemo): Boolean;
 var
-  LastVisibleLine: Integer;
+  LastVisibleLine,
+  LastLine: Integer;
 
 begin
   // The line index is in the high-order word
   LastVisibleLine := (SendMessage(OutputMemo.Handle, EM_CHARFROMPOS, 0,
     (OutputMemo.ClientHeight - 1) shl 16) shr 16) and $FFFF;
-  Result := LastVisibleLine >=
-    SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0) - 1;
+
+  // Lines.Add ends the text with a line break, so the last line is empty (and
+  // holds the caret when following the output). EM_CHARFROMPOS never returns
+  // this line as there is no character on it, so the line before is used.
+  LastLine := SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0) - 1;
+  if (LastLine > 0) and (SendMessage(OutputMemo.Handle, EM_LINELENGTH,
+    SendMessage(OutputMemo.Handle, EM_LINEINDEX, LastLine, 0), 0) = 0) then
+    LastLine := LastLine - 1;
+
+  Result := LastVisibleLine >= LastLine;
 end;
 
 // The memo follows the output only when it is scrolled to the bottom, so the
