@@ -89,7 +89,8 @@ var
 
 begin
   UninstallExecutable := '';
-  UninstallParameters := '';  
+  UninstallParameters := '';
+  
   Result := RegQueryStringValue(RootKey, RegistryKey, 'UninstallString', UninstallString);
   Result := Result and RegQueryStringValue(RootKey, RegistryKey, 'QuietUninstallString', QuietUninstallString);
   if Result then

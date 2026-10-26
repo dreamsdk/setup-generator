@@ -177,7 +177,8 @@ end;
 function CheckOnlinePrerequisitesOptional: Boolean;
 begin
   Result := CheckPrerequisites([paPython], False);
-end;
+end;
+
 { Offline prerequisites }
 
 function CheckOfflinePrerequisitesMandatory: Boolean;

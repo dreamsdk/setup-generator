@@ -1,0 +1,2 @@
+# Inno Setup scripts must keep CRLF line endings
+*.iss text eol=crlf
