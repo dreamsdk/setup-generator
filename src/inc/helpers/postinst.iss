@@ -38,23 +38,14 @@ end;
 // up to read the output
 function PostInstallIsMemoScrolledToBottom(OutputMemo: TNewMemo): Boolean;
 var
-  LastVisibleLine,
-  LastLine: Integer;
+  LastVisibleLine: Integer;
 
 begin
   // The line index is in the high-order word
   LastVisibleLine := (SendMessage(OutputMemo.Handle, EM_CHARFROMPOS, 0,
     (OutputMemo.ClientHeight - 1) shl 16) shr 16) and $FFFF;
-
-  // Lines.Add ends the text with a line break, so the last line is empty (and
-  // holds the caret when following the output). EM_CHARFROMPOS never returns
-  // this line as there is no character on it, so the line before is used.
-  LastLine := SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0) - 1;
-  if (LastLine > 0) and (SendMessage(OutputMemo.Handle, EM_LINELENGTH,
-    SendMessage(OutputMemo.Handle, EM_LINEINDEX, LastLine, 0), 0) = 0) then
-    LastLine := LastLine - 1;
-
-  Result := LastVisibleLine >= LastLine;
+  Result := LastVisibleLine >=
+    SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0) - 1;
 end;
 
 // The memo follows the output only when it is scrolled to the bottom, so the
@@ -102,7 +93,10 @@ begin
     begin
       TextLength := SendMessage(OutputMemo.Handle, WM_GETTEXTLENGTH, 0, 0);
       SendMessage(OutputMemo.Handle, EM_SETSEL, TextLength, TextLength);
-      SendMessage(OutputMemo.Handle, EM_SCROLLCARET, 0, 0);
+      // EM_SCROLLCARET does nothing while the redraw is disabled, so scroll by
+      // the line count instead (the memo stops at its last line)
+      SendMessage(OutputMemo.Handle, EM_LINESCROLL, 0,
+        SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0));
     end
     else
     begin
