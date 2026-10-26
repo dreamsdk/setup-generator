@@ -1,6 +1,29 @@
 [Code]
+const
+  WM_SETREDRAW = $000B;
+  WM_GETTEXTLENGTH = $000E;
+  WM_HSCROLL = $0114;
+  EM_SETSEL = $00B1;
+  EM_LINESCROLL = $00B6;
+  EM_SCROLLCARET = $00B7;
+  EM_GETLINECOUNT = $00BA;
+  EM_GETFIRSTVISIBLELINE = $00CE;
+  EM_CHARFROMPOS = $00D7;
+  SB_HORZ = 0;
+  SB_THUMBPOSITION = 4;
+  RDW_INVALIDATE = $0001;
+  RDW_ERASE = $0004;
+  RDW_FRAME = $0400;
+
 function IsAppThemed: Boolean;
 external 'IsAppThemed@uxtheme.dll stdcall delayload';
+
+function GetScrollPos(hWnd: HWND; nBar: Integer): Integer;
+external 'GetScrollPos@user32.dll stdcall';
+
+function RedrawWindow(hWnd: HWND; lprcUpdate, hrgnUpdate: Longint;
+  flags: Cardinal): Boolean;
+external 'RedrawWindow@user32.dll stdcall';
 
 // Visual styles are enabled (i.e., not the "Windows Classic" theme).
 // Visual styles don't exist before Windows XP (no "uxtheme.dll" available).

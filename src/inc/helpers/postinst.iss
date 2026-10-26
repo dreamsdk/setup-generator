@@ -34,16 +34,96 @@ begin
   PostInstallCloseRequested := True;
 end;
 
+// True when the last line of the memo is visible, i.e. the user didn't scroll
+// up to read the output
+function PostInstallIsMemoScrolledToBottom(OutputMemo: TNewMemo): Boolean;
+var
+  LastVisibleLine: Integer;
+
+begin
+  // The line index is in the high-order word
+  LastVisibleLine := (SendMessage(OutputMemo.Handle, EM_CHARFROMPOS, 0,
+    (OutputMemo.ClientHeight - 1) shl 16) shr 16) and $FFFF;
+  Result := LastVisibleLine >=
+    SendMessage(OutputMemo.Handle, EM_GETLINECOUNT, 0, 0) - 1;
+end;
+
+// The memo follows the output only when it is scrolled to the bottom, so the
+// user can scroll up (or right) to read the output without being disturbed
 procedure PostInstallAddLines(const NewLines: String; OutputMemo: TNewMemo;
   OutputLog: TStringList);
+var
+  FollowOutput: Boolean;
+  FirstVisibleLine,
+  HorizontalPosition,
+  SelectionStart,
+  SelectionLength,
+  DeletedLines,
+  DeletedChars,
+  TextLength: Integer;
+
 begin
   if NewLines = '' then
     Exit;
   OutputLog.Add(NewLines);
-  OutputMemo.Lines.Add(NewLines);
-  // Keep the memo small, the full output is in the log file
-  while OutputMemo.Lines.Count > POST_INSTALL_MEMO_MAX_LINES do
-    OutputMemo.Lines.Delete(0);
+
+  FollowOutput := PostInstallIsMemoScrolledToBottom(OutputMemo);
+  FirstVisibleLine := SendMessage(OutputMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+  HorizontalPosition := GetScrollPos(OutputMemo.Handle, SB_HORZ);
+  SelectionStart := OutputMemo.SelStart;
+  SelectionLength := OutputMemo.SelLength;
+
+  // Adding or deleting lines moves the caret and scrolls the memo, so the
+  // redraw is disabled until the scroll position is restored
+  SendMessage(OutputMemo.Handle, WM_SETREDRAW, 0, 0);
+  try
+    OutputMemo.Lines.Add(NewLines);
+
+    // Keep the memo small, the full output is in the log file
+    DeletedLines := 0;
+    DeletedChars := 0;
+    while OutputMemo.Lines.Count > POST_INSTALL_MEMO_MAX_LINES do
+    begin
+      DeletedChars := DeletedChars + Length(OutputMemo.Lines[0]) + 2;
+      OutputMemo.Lines.Delete(0);
+      DeletedLines := DeletedLines + 1;
+    end;
+
+    if FollowOutput then
+    begin
+      TextLength := SendMessage(OutputMemo.Handle, WM_GETTEXTLENGTH, 0, 0);
+      SendMessage(OutputMemo.Handle, EM_SETSEL, TextLength, TextLength);
+      SendMessage(OutputMemo.Handle, EM_SCROLLCARET, 0, 0);
+    end
+    else
+    begin
+      // Keep the selection and the visible lines where the user left them
+      SelectionStart := SelectionStart - DeletedChars;
+      if SelectionStart < 0 then
+      begin
+        SelectionLength := SelectionLength + SelectionStart;
+        if SelectionLength < 0 then
+          SelectionLength := 0;
+        SelectionStart := 0;
+      end;
+      OutputMemo.SelStart := SelectionStart;
+      OutputMemo.SelLength := SelectionLength;
+
+      FirstVisibleLine := FirstVisibleLine - DeletedLines;
+      if FirstVisibleLine < 0 then
+        FirstVisibleLine := 0;
+      SendMessage(OutputMemo.Handle, EM_LINESCROLL, 0, FirstVisibleLine
+        - SendMessage(OutputMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0));
+    end;
+
+    // The horizontal position is always kept
+    SendMessage(OutputMemo.Handle, WM_HSCROLL,
+      SB_THUMBPOSITION or (HorizontalPosition shl 16), 0);
+  finally
+    SendMessage(OutputMemo.Handle, WM_SETREDRAW, 1, 0);
+    RedrawWindow(OutputMemo.Handle, 0, 0,
+      RDW_INVALIDATE or RDW_ERASE or RDW_FRAME);
+  end;
 end;
 
 // Position is 0 to 100 when a percentage is detected in the output, or -1 when
@@ -122,13 +202,18 @@ begin
   AbortButton.OnClick := @PostInstallAbortButtonClick;
   AbortButton.Parent := ProgressPage.Surface;
 
+  // The second message is never used, so the progress bar takes its place to
+  // give more room to the output
+  ProgressPage.Msg2Label.Visible := False;
+  ProgressPage.ProgressBar.Top := ProgressPage.Msg2Label.Top;
+
   // OutputMemo
   OutputMemo := TNewMemo.Create(ProgressPage);
   OutputMemo.Top := ProgressPage.ProgressBar.Top
     + ProgressPage.ProgressBar.Height + ScaleY(8);
   OutputMemo.Width := ProgressPage.SurfaceWidth;
   OutputMemo.Height := AbortButton.Top - OutputMemo.Top - ScaleY(8);
-  OutputMemo.ScrollBars := ssVertical;
+  OutputMemo.ScrollBars := ssBoth;
   OutputMemo.ReadOnly := True;
   OutputMemo.WordWrap := False;
   OutputMemo.Color := clWindow;
