@@ -1,7 +1,7 @@
 [Code]
 
 type
-  TPrerequisiteApplication = (paGit, paPython, paRuby); // Please add new items to CheckPrerequisites...
+  TPrerequisiteApplication = (paGit, paPython); // Please add new items to CheckPrerequisites...
   TPrerequisiteApplicationSet = set of TPrerequisiteApplication;
   
 function PrerequisiteToCommand(const Prerequisite: TPrerequisiteApplication): String;
@@ -12,8 +12,6 @@ begin
       Result := 'git'; 
     paPython:
       Result := 'python';
-    paRuby:
-      Result := 'rake';
   end;
 end;
 
@@ -25,8 +23,6 @@ begin
       Result := 'PrerequisiteMissingGit'; 
     paPython:
       Result := 'PrerequisiteMissingPython';
-    paRuby:
-      Result := 'PrerequisiteMissingRuby';
   end;
   Result := CustomMessage(Result);
 end;
@@ -39,8 +35,6 @@ begin
       Result := 'version';                  
     paPython:
       Result := 'Python';
-    paRuby:
-      Result := 'version';
   end;
 end;
 
@@ -107,10 +101,6 @@ begin
     // Check Python
     if not CheckPrerequisite(Prerequisites, paPython) then
       PrerequisitesList.Add(PrerequisiteToString(paPython));
-
-    // Check Ruby
-    if not CheckPrerequisite(Prerequisites, paRuby) then
-      PrerequisitesList.Add(PrerequisiteToString(paRuby));
       
     // Computing the text
     if PrerequisitesList.Count > 0 then
@@ -192,9 +182,3 @@ begin
   Result := CheckPrerequisites([paPython], False);
 end;
 
-{ Ruby prerequisites }
-
-function CheckRubyPrerequisites: Boolean;
-begin
-  Result := CheckPrerequisites([paRuby], True);
-end;

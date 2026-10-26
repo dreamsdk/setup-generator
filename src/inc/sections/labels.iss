@@ -66,7 +66,6 @@ PrerequisiteMissingHintLink2Single=its
 PrerequisiteMissingHintLink2Multiple=their
 PrerequisiteMissingPython=Python
 PrerequisiteMissingGit=Git
-PrerequisiteMissingRuby=Ruby
 
 ; Startup messages
 PreviousVersionUninstall={#MyAppName} %s is already installed. This version will be uninstalled. Continue?
