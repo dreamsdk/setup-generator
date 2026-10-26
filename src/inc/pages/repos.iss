@@ -4,10 +4,14 @@ const
   REPOSITORIES_DEFAULT_FILE_NAME = 'repositories-default.conf';
   GIT_LS_REMOTE_OUTPUT_FILE_NAME = 'git-ls-remote-%d-%d.txt';
   GIT_LS_REMOTE_DONE_FILE_NAME = 'git-ls-remote-%d-%d.done';
+  GIT_LS_REMOTE_SCRIPT_FILE_NAME = 'git-ls-remote-%d-%d.cmd';
+  GIT_LS_REMOTE_START_FILE_NAME = 'git-ls-remote-start-%d.cmd';
   GIT_LS_REMOTE_SUCCEEDED = 'ok';
   GIT_LS_REMOTE_FAILED = 'fail';
   GIT_HEADS_PREFIX = 'refs/heads/';
   GIT_TAGS_PREFIX = 'refs/tags/';
+  GIT_SYMREF_PREFIX = 'ref: ';
+  GIT_HEAD_REF = 'HEAD';
   GIT_PEELED_TAG_SUFFIX = '^{}';
   REPOSITORY_REFS_FETCH_TIMEOUT = 15000; // ms
   REPOSITORY_REFS_FETCH_POLL_INTERVAL = 100; // ms
@@ -19,12 +23,14 @@ var
   RepositoryUrlComboBoxes,
   RepositoryRefComboBoxes: array[0..3] of TNewComboBox;
   RepositoryDefaultUrls,
+  RepositoryDefaultBranches,
   RepositoryRefsLoadedUrls,
   RepositoryRefsFetchUrls: array[0..3] of String;
   RepositoryRefsLoaded,
   RepositoryRefsFetchStarted: array[0..3] of Boolean;
   RepositoryRefsLoadStatus: array[0..3] of TRepositoryRefsStatus;
   RepositoryRefsFetchCounts: array[0..3] of Integer;
+  RepositoryRefsFetchStartCount: Integer;
 
 // Repository configuration file name, as used by the Manager
 // (i.e., "etc/dreamsdk/repositories/*.conf")
@@ -137,49 +143,118 @@ begin
   Succeeded := Result and (Trim(Done) = GIT_LS_REMOTE_SUCCEEDED);
 end;
 
-// Run "git ls-remote" in the background for the current URL, so the
-// branch/tag list is ready when the user needs it. Does nothing if the list
-// is already loaded or being fetched for this URL.
-function StartRepositoryRefsFetch(const Index: Integer): Boolean;
+// Run "git ls-remote" in the background for the current URL of each
+// repository in the range, so the branch/tag list is ready when the user needs
+// it. Repositories whose list is already loaded or being fetched for their URL
+// are skipped. All the fetches are started from a single process: starting
+// processes is slow (e.g., with an antivirus) and it's done on the UI thread.
+// Scripts only use file names relative to {tmp} (the working directory), as
+// they are saved in the ANSI code page while cmd reads them in the OEM one.
+function StartRepositoryRefsFetches(const FirstIndex, LastIndex: Integer): Boolean;
 var
   Url,
-  CommandLine: String;
+  FetchCommand,
+  StartScript,
+  StartScriptFileName: String;
+  Pending: array[0..3] of Boolean;
+  i,
+  PendingCount,
   ResultCode: Integer;
 
 begin
-  Url := GetRepositoryUrl(Index);
+  Result := True;
+  PendingCount := 0;
+  StartScript := '@echo off' + #13#10
+    // Never prompt for credentials (e.g., with a wrong GitHub URL)
+    + 'set GIT_TERMINAL_PROMPT=0' + #13#10
+    + 'set GCM_INTERACTIVE=never' + #13#10;
 
-  Result := (RepositoryRefsLoaded[Index] and (RepositoryRefsLoadedUrls[Index] = Url))
-    or (RepositoryRefsFetchStarted[Index] and (RepositoryRefsFetchUrls[Index] = Url));
-  if Result or (Url = '') then
+  for i := FirstIndex to LastIndex do
+  begin
+    Pending[i] := False;
+    Url := GetRepositoryUrl(i);
+
+    if (RepositoryRefsLoaded[i] and (RepositoryRefsLoadedUrls[i] = Url))
+      or (RepositoryRefsFetchStarted[i] and (RepositoryRefsFetchUrls[i] = Url)) then
+        Continue;
+
+    if Url = '' then
+    begin
+      Result := False;
+      Continue;
+    end;
+
+    // Each fetch has its own files, so a slow previous fetch (e.g., for another
+    // URL) can't be mistaken for this one
+    Inc(RepositoryRefsFetchCounts[i]);
+    RepositoryRefsFetchUrls[i] := Url;
+
+    // Avoid breaking the command line
+    StringChangeEx(Url, '"', '', True);
+
+    // "--symref" with "HEAD" gives the default branch of the repository too
+    FetchCommand := Format('git ls-remote --symref "%s" HEAD "refs/heads/*" "refs/tags/*" > %s 2> nul && echo %s> %s || echo %s> %s', [
+      Url,
+      ExtractFileName(GetRepositoryRefsFetchFileName(i, GIT_LS_REMOTE_OUTPUT_FILE_NAME)),
+      GIT_LS_REMOTE_SUCCEEDED,
+      ExtractFileName(GetRepositoryRefsFetchFileName(i, GIT_LS_REMOTE_DONE_FILE_NAME)),
+      GIT_LS_REMOTE_FAILED,
+      ExtractFileName(GetRepositoryRefsFetchFileName(i, GIT_LS_REMOTE_DONE_FILE_NAME))
+    ]);
+    Log(Format('StartRepositoryRefsFetches: %s', [FetchCommand]));
+
+    // "%" has a special meaning in scripts (e.g., in "%20" from an URL)
+    StringChangeEx(FetchCommand, '%', '%%', True);
+
+    if not SaveStringToFile(GetRepositoryRefsFetchFileName(i, GIT_LS_REMOTE_SCRIPT_FILE_NAME),
+      '@echo off' + #13#10 + FetchCommand + #13#10, False) then
+    begin
+      Log(Format('StartRepositoryRefsFetches: Unable to write the script for %s', [
+        GetRepositoryKey(i)]));
+      Result := False;
+      Continue;
+    end;
+
+    // ".\" is needed when the current directory isn't searched for commands
+    // (i.e., when "NoDefaultCurrentDirectoryInExePath" is set)
+    StartScript := StartScript + 'start "" /b cmd /C .\' + ExtractFileName(
+      GetRepositoryRefsFetchFileName(i, GIT_LS_REMOTE_SCRIPT_FILE_NAME)) + #13#10;
+    Pending[i] := True;
+    Inc(PendingCount);
+  end;
+
+  if PendingCount = 0 then
     Exit;
 
-  // Each fetch has its own files, so a slow previous fetch (e.g., for another
-  // URL) can't be mistaken for this one
-  Inc(RepositoryRefsFetchCounts[Index]);
-  RepositoryRefsFetchUrls[Index] := Url;
+  // Each start has its own script, so it can't be changed while still running
+  Inc(RepositoryRefsFetchStartCount);
+  StartScriptFileName := Format(GIT_LS_REMOTE_START_FILE_NAME, [RepositoryRefsFetchStartCount]);
+  if SaveStringToFile(ExpandConstant('{tmp}\' + StartScriptFileName), StartScript, False) then
+  begin
+    Log(Format('StartRepositoryRefsFetches: Starting %d fetch(es)', [PendingCount]));
+    if not Exec(ExpandConstant('{cmd}'), '/C .\' + StartScriptFileName,
+      ExpandConstant('{tmp}'), SW_HIDE, ewNoWait, ResultCode) then
+    begin
+      Log(Format('StartRepositoryRefsFetches: Unable to execute Git: %s', [
+        SysErrorMessage(ResultCode)]));
+      PendingCount := 0;
+    end;
+  end
+  else
+  begin
+    Log('StartRepositoryRefsFetches: Unable to write the start script');
+    PendingCount := 0;
+  end;
 
-  // Avoid breaking the command line
-  StringChangeEx(Url, '"', '', True);
+  for i := FirstIndex to LastIndex do
+    if Pending[i] then
+      RepositoryRefsFetchStarted[i] := PendingCount > 0;
+  Result := Result and (PendingCount > 0);
+end;
 
-  // Never prompt for credentials (e.g., with a wrong GitHub URL)
-  CommandLine := Format('/C set GIT_TERMINAL_PROMPT=0&& set GCM_INTERACTIVE=never&& '
-    + '(git ls-remote --heads --tags "%s" > "%s" 2> nul && echo %s> "%s" || echo %s> "%s")', [
-      Url,
-      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_OUTPUT_FILE_NAME),
-      GIT_LS_REMOTE_SUCCEEDED,
-      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_DONE_FILE_NAME),
-      GIT_LS_REMOTE_FAILED,
-      GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_DONE_FILE_NAME)
-    ]);
-  Log(Format('StartRepositoryRefsFetch: %s', [CommandLine]));
-
-  Result := Exec(ExpandConstant('{cmd}'), CommandLine, '', SW_HIDE, ewNoWait,
-    ResultCode);
-  if not Result then
-    Log(Format('StartRepositoryRefsFetch: Unable to execute Git: %s', [
-      SysErrorMessage(ResultCode)]));
-  RepositoryRefsFetchStarted[Index] := Result;
+function StartRepositoryRefsFetch(const Index: Integer): Boolean;
+begin
+  Result := StartRepositoryRefsFetches(Index, Index);
 end;
 
 // Wait for the background fetch to finish (up to the timeout)
@@ -209,9 +284,11 @@ begin
 end;
 
 // Read branches then tags from the "git ls-remote" output, sorted like in the
-// Manager (i.e., master/main first, then tags in "newest first" order)
-function ParseRepositoryRefs(const OutputFileName: String; Refs: TStringList): Boolean;
+// Manager (i.e., default branch first, then tags in "newest first" order)
+function ParseRepositoryRefs(const OutputFileName: String; Refs: TStringList;
+  var DefaultBranch: String): Boolean;
 var
+  Target,
   RefName: String;
   Lines: TArrayOfString;
   Branches,
@@ -222,6 +299,7 @@ var
 begin
   Result := False;
   Refs.Clear;
+  DefaultBranch := '';
 
   if not LoadStringsFromFile(OutputFileName, Lines) then
     Exit;
@@ -231,14 +309,25 @@ begin
   try
     Tags.Sorted := True;
 
-    // Lines are like "<hash><TAB>refs/heads/master"
+    // Lines are like "<hash><TAB>refs/heads/master", plus
+    // "ref: refs/heads/master<TAB>HEAD" for the default branch
     for i := 0 to GetArrayLength(Lines) - 1 do
     begin
       TabPosition := Pos(#9, Lines[i]);
       if TabPosition = 0 then
         Continue;
 
+      Target := Trim(Copy(Lines[i], 1, TabPosition - 1));
       RefName := Trim(Copy(Lines[i], TabPosition + 1, Length(Lines[i])));
+
+      if RefName = GIT_HEAD_REF then
+      begin
+        if StartsWith(GIT_SYMREF_PREFIX + GIT_HEADS_PREFIX, Target) then
+          DefaultBranch := Copy(Target, Length(GIT_SYMREF_PREFIX + GIT_HEADS_PREFIX) + 1,
+            Length(Target));
+        Continue;
+      end;
+
       if EndsWith(GIT_PEELED_TAG_SUFFIX, RefName) then
         Continue;
 
@@ -248,10 +337,12 @@ begin
         Tags.Add(Copy(RefName, Length(GIT_TAGS_PREFIX) + 1, Length(RefName)));
     end;
 
-    // Pin master/main at the top of the branch list, if present
+    // Pin the default branch at the top of the branch list (or master/main
+    // if the remote didn't tell it)
     for i := Branches.Count - 1 downto 0 do
-      if (CompareText(Branches[i], 'master') = 0)
-        or (CompareText(Branches[i], 'main') = 0) then
+      if (Branches[i] = DefaultBranch) or ((DefaultBranch = '')
+        and ((CompareText(Branches[i], 'master') = 0)
+        or (CompareText(Branches[i], 'main') = 0))) then
       begin
         RefName := Branches[i];
         Branches.Delete(i);
@@ -272,7 +363,8 @@ begin
     Branches.Free;
   end;
 
-  Log(Format('ParseRepositoryRefs: %d refs found', [Refs.Count]));
+  Log(Format('ParseRepositoryRefs: %d refs found, default branch "%s"', [
+    Refs.Count, DefaultBranch]));
 end;
 
 // Fill the branch/tag list for the current URL from the background fetch
@@ -280,12 +372,14 @@ end;
 function EnsureRepositoryRefsLoaded(const Index: Integer): TRepositoryRefsStatus;
 var
   Url,
-  SavedRef: String;
+  SavedRef,
+  DefaultBranch: String;
   Refs: TStringList;
   i: Integer;
 
 begin
   Url := GetRepositoryUrl(Index);
+  DefaultBranch := '';
 
   if RepositoryRefsLoaded[Index] and (RepositoryRefsLoadedUrls[Index] = Url) then
   begin
@@ -302,7 +396,8 @@ begin
       begin
         Result := WaitRepositoryRefsFetch(Index);
         if (Result = rrsSucceeded) and (not ParseRepositoryRefs(
-          GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_OUTPUT_FILE_NAME), Refs)) then
+          GetRepositoryRefsFetchFileName(Index, GIT_LS_REMOTE_OUTPUT_FILE_NAME), Refs,
+          DefaultBranch)) then
             Result := rrsFailed;
       end;
     finally
@@ -317,6 +412,12 @@ begin
     begin
       // Clearing the list clears the typed text as well
       SavedRef := Text;
+
+      // Empty means "use the default branch": show which one it is (also
+      // when it was shown for the previous URL)
+      if (SavedRef = '') or (SavedRef = RepositoryDefaultBranches[Index]) then
+        SavedRef := DefaultBranch;
+
       Items.Clear;
       for i := 0 to Refs.Count - 1 do
         Items.Add(Refs[i]);
@@ -325,6 +426,8 @@ begin
   finally
     Refs.Free;
   end;
+
+  RepositoryDefaultBranches[Index] := DefaultBranch;
 
   RepositoryRefsLoaded[Index] := True;
   RepositoryRefsLoadedUrls[Index] := Url;
@@ -395,12 +498,8 @@ end;
 
 // Called when the page is displayed: fetch all the lists at once
 procedure RepositoriesPageInitialize;
-var
-  i: Integer;
-
 begin
-  for i := 0 to REPOSITORIES_COUNT - 1 do
-    StartRepositoryRefsFetch(i);
+  StartRepositoryRefsFetches(0, REPOSITORIES_COUNT - 1);
 end;
 
 function IsRepositoryRefAvailable(const Index: Integer; const Ref: String): Boolean;
@@ -485,6 +584,12 @@ begin
       if Url = RepositoryDefaultUrls[i] then
         Url := '';
       Ref := GetRepositoryRef(i);
+
+      // The default branch is only shown for information: keep following
+      // the default branch of the repository (i.e., empty)
+      if (Ref = RepositoryDefaultBranches[i])
+        and (RepositoryRefsLoadedUrls[i] = GetRepositoryUrl(i)) then
+          Ref := '';
     end;
 
     Log(Format('  %s: URL="%s", Ref="%s"', [GetRepositoryKey(i), Url, Ref]));
