@@ -48,6 +48,9 @@ begin
   PatchFile(MSystemFilePath, '{MSYSTEM:-MSYS}', '{MSYSTEM:-MINGW64}');
   ProfileFilePath := ExpandConstant('{code:GetMsysInstallationPath}\etc\profile');
   PatchFile(ProfileFilePath, '{MSYS2_PATH_TYPE:-minimal}', '{MSYS2_PATH_TYPE:-inherit}');
+  // Force hiding the useless MSYS2 directories/files on the first login, as
+  // reinstalling the same version restores pacman.log with the same mtime
+  DeleteFile(ExpandConstant('{code:GetMsysInstallationPath}\etc\dreamsdk\pacman.stamp'));
 end;
 
 procedure ApplyPostInstallPatches();
