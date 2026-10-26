@@ -178,8 +178,8 @@ LabelKallistiEmbeddedDescriptionOffline={#MyAppName} includes offline versions o
 ; Repositories
 RepositoriesTitlePage=Sega Dreamcast Libraries Repositories
 RepositoriesSubtitlePage=Which repositories and branches/tags do you want to use?
-LabelRepositoriesIntroduction=Select the Git repository URL and the branch/tag to use for each component. Leave the branch/tag empty to use the default branch of the repository.
-LabelRepository=%1 repository URL and branch/tag:
+LabelRepositoriesIntroduction=Select the Git repository URL and the branch, tag or commit to use for each component. Leave it empty to use the default branch of the repository.
+LabelRepository=%1 repository URL and branch/tag/commit:
 RepositoryNameKallisti=KallistiOS (kos)
 RepositoryNameKallistiPorts=KallistiOS Ports (kos-ports)
 RepositoryNameDreamcastToolSerial=Dreamcast Tool Serial (dcload-serial)

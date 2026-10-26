@@ -502,6 +502,24 @@ begin
   StartRepositoryRefsFetches(0, REPOSITORIES_COUNT - 1);
 end;
 
+// A (possibly abbreviated) commit hash, as opposed to a branch or a tag name.
+// It can't be checked here, as "git ls-remote" only lists branches and tags.
+function IsCommitHash(const Ref: String): Boolean;
+var
+  i: Integer;
+
+begin
+  // Up to 64 characters for SHA-256 repositories
+  Result := (Length(Ref) >= 7) and (Length(Ref) <= 64);
+  if Result then
+    for i := 1 to Length(Ref) do
+      if Pos(Lowercase(Ref[i]), '0123456789abcdef') = 0 then
+      begin
+        Result := False;
+        Exit;
+      end;
+end;
+
 function IsRepositoryRefAvailable(const Index: Integer; const Ref: String): Boolean;
 var
   i: Integer;
@@ -552,7 +570,8 @@ begin
       Exit;
     end;
 
-    if (Ref <> '') and (not IsRepositoryRefAvailable(i, Ref)) then
+    if (Ref <> '') and (not IsRepositoryRefAvailable(i, Ref))
+      and (not IsCommitHash(Ref)) then
     begin
       MsgBox(FmtMessage(CustomMessage('RepositoryRefNotFound'), [GetRepositoryName(i), Ref, Url]),
         mbError, MB_OK);
@@ -678,7 +697,7 @@ begin
       end;
     end;
 
-    // Branch/Tag, empty means the default branch of the repository
+    // Branch/Tag/Commit, empty means the default branch of the repository
     RepositoryRefComboBoxes[i] := TNewComboBox.Create(RepositoriesPage);
     with RepositoryRefComboBoxes[i] do
     begin
